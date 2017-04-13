@@ -38,6 +38,10 @@ Currently, pymongo-schema does not handle inconsistent types in a field. It only
 - Log database and collection being processed
 - Log "percent complete"  / number of document 
 
+## Diff between schemas
+
+A way to compare the schema dictionaries and highlights the differences.
+
 
 ## Tackle bigger databases
 This code has been only used on a relatively small sized Mongo database, on which it was faster than Variety. 
