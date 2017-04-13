@@ -60,24 +60,28 @@ TYPE_TO_STR = {
 }
 
 
-def extract_mongo_client_schema(pymongo_client, database_names=None):
+def extract_mongo_client_schema(pymongo_client, database_names=None, collection_names=None):
     """Extract the schema for every database in database_names
     
     :param pymongo_client: pymongo.mongo_client.MongoClient
-    :param database_names: list of str, default None
+    :param database_names: str, list of str, default None
+    :param collection_names: str, list of str, default None
+        Will be used for every database in database_names list
     :return mongo_schema: dict
     """
+
+    if isinstance(database_names, str):
+        database_names = list(database_names)
 
     if database_names is None:
         database_names = pymongo_client.database_names()
         database_names.remove('admin')
         database_names.remove('local')
 
-
     mongo_schema = dict()
     for database in database_names:
         pymongo_database = pymongo_client[database]
-        mongo_schema[database] = extract_database_schema(pymongo_database)
+        mongo_schema[database] = extract_database_schema(pymongo_database, collection_names)
 
     return mongo_schema
 
@@ -86,9 +90,12 @@ def extract_database_schema(pymongo_database, collection_names=None):
     """Extract the database schema, for every collection in collection_names
 
     :param pymongo_database: pymongo.database.Database
-    :param collection_names: list of str, default None
+    :param collection_names: str, list of str, default None
     :return database_schema: dict
     """
+    if isinstance(collection_names, str):
+        collection_names = list(collection_names)
+
     if collection_names is None:
         collection_names = pymongo_database.collection_names()
 
