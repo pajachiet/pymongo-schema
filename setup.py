@@ -9,7 +9,7 @@ setup(name='pymongo-schema',
       packages=['pymongo_schema'],
       install_requires=[
           'pymongo',
-          'bson'
+          'pyyaml'
       ],
       entry_points={
           'console_scripts': [
