@@ -70,8 +70,8 @@ def extract_mongo_client_schema(pymongo_client, database_names=None, collection_
     :return mongo_schema: dict
     """
 
-    if isinstance(database_names, str):
-        database_names = list(database_names)
+    if isinstance(database_names, basestring):
+        database_names = [database_names]
 
     if database_names is None:
         database_names = pymongo_client.database_names()
@@ -94,7 +94,7 @@ def extract_database_schema(pymongo_database, collection_names=None):
     :return database_schema: dict
     """
     if isinstance(collection_names, str):
-        collection_names = list(collection_names)
+        collection_names = [collection_names]
 
     if collection_names is None:
         collection_names = pymongo_database.collection_names()
