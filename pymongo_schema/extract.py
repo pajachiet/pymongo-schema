@@ -60,7 +60,7 @@ TYPE_TO_STR = {
 }
 
 
-def extract_mongo_client_schema(pymongo_client, database_names=None, collection_names=None):
+def extract_mongo_client_schema(pymongo_client, database_names=[], collection_names=[]):
     """Extract the schema for every database in database_names
     
     :param pymongo_client: pymongo.mongo_client.MongoClient
@@ -73,7 +73,7 @@ def extract_mongo_client_schema(pymongo_client, database_names=None, collection_
     if isinstance(database_names, basestring):
         database_names = [database_names]
 
-    if database_names is None:
+    if database_names is []:
         database_names = pymongo_client.database_names()
         database_names.remove('admin')
         database_names.remove('local')
@@ -96,7 +96,7 @@ def extract_database_schema(pymongo_database, collection_names=None):
     if isinstance(collection_names, str):
         collection_names = [collection_names]
 
-    if collection_names is None:
+    if collection_names is []:
         collection_names = pymongo_database.collection_names()
 
     database_schema = dict()
