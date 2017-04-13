@@ -3,20 +3,29 @@ A schema analyser for MongoDB, written in Python.
 
 This tools is inspired by [variety](https://github.com/variety/variety), with the following enhancements :
 
-- **extract the hierarchical structure of the schema** 
+- extract the **hierarchical structure** of the schema 
 - Several output options : python dictionnary, json, yaml or text
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
-- **a way to filter the schema** by collection, field and nested fields
+- ways to **filter** and **manipulate** the output schema
 
 # Install
 
-TODO
-
+Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
+```shell
+pip install -e git+https://github.com/pajachiet/pymongo-schema.git#egg=Package
+```
 # Usage
 
-TODO
-- simple case, with different outputs
-- filtering of the schema 
+```shell
+pymongo-schema  [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST]
+```
+
+To display full usage, run
+```shell 
+pymongo-schema -h
+```
+
+TODO : add examples
 
 # Contributing - Limitations - TODO 
 The code base should be easy to read and improve upon. Contributions are welcomed.
@@ -53,8 +62,7 @@ To tackle bigger databases, it certainly would be usefull to implement the follo
 ## Tests
 The codebase is not tested. It should not be trusted blindly.
 
-## Packaging
-Add a setup.py file to allow install from github (`pip install git+https://github.com/pajachiet/pymongo-schema.git`)
+## Distribution
 
 Distribute in PyPi
 
