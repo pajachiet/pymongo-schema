@@ -1,0 +1,3 @@
+pymongo
+#bson # conflict with version installed by pymongo
+pyyaml
