@@ -26,7 +26,7 @@ def output_schema(schema, output_format, filename=None):
 
     if output_format == 'txt':
         output_str = schema_as_str(schema)
-        output_file.write(output_str)
+        output_file.write(output_str + '\n')
 
     elif output_format == 'json':
         json.dump(schema, output_file, indent=4)

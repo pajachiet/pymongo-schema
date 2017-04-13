@@ -93,7 +93,7 @@ def extract_database_schema(pymongo_database, collection_names=None):
     :param collection_names: str, list of str, default None
     :return database_schema: dict
     """
-    if isinstance(collection_names, str):
+    if isinstance(collection_names, basestring):
         collection_names = [collection_names]
 
     if collection_names is None:
