@@ -1,8 +1,38 @@
 # coding: utf8
-"""
-We define 'schema' as a dictionnary describing the structure of MongoDB component. 
-We have schemas for MongoDB instances, databases, collections, objects and fields. 
+""" 
 Functions in this library which take a 'schema' as argument, modify this schema as a side-effect and have no value.
+
+Schema are hierarchically nested : (see also README.md)
+
+- A database contains collections
+    {
+        "collection_name_1": collection_schema_1,
+        "collection_name_2": collection_schema_2
+    }
+
+- A collection maintains a 'count' and contains 1 object
+    { 
+        "count" : int, 
+        "object": object_schema 
+    }
+
+- An object contains fields.
+Objects are initialized as defaultdict(empty_field_schema) to simplify the code 
+    { 
+        "field_name_1" : field_schema_1, 
+        "field_name_2": field_schema_2 
+    }
+
+- A field maintains 'type', 'count' and 'null_count' information 
+An optional 'ARRAY' field maintains an 'array_type' if the field is an ARRAY
+An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
+    {
+        'type': type_name,
+        'count': int,
+        'null_count': int, # DELETED while postprocessing if 0 
+        'list_type': 'NULL' # OPTIONAL : if the field is an ARRAY
+        'object': object_schema # OPTIONAL : if the field is a nested document
+    }
 
 Schema are hierarchically nested :  
 - A MongoDB instance contains databases
@@ -63,7 +93,7 @@ TYPE_TO_STR = {
 }
 
 
-def extract_mongo_client_schema(pymongo_client, database_names=None, collection_names=None):
+def extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None):
     """Extract the schema for every database in database_names
     
     :param pymongo_client: pymongo.mongo_client.MongoClient

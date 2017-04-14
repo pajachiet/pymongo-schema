@@ -27,6 +27,42 @@ pymongo-schema -h
 
 TODO : add examples
 
+# Schema
+
+We define 'schema' as a dictionnary describing the structure of MongoDB component, being either a MongoDB instances, a database, a collection, an objects or a field. 
+ 
+Schema are hierarchically nested, with the following structure :  
+
+
+
+```python 
+# mongo_schema : A MongoDB instance contains databases
+{
+    "database_name_1": {}, #database_schema,
+    "database_name_2": # A database contains collections
+    { 
+        "collection_name_1": {}, # collection_schema,
+        "collection_name_2": # A collection maintains a 'count' and contains 1 object
+        { 
+            "count" : int, 
+            "object":  # object_schema : An object contains fields.            
+             {
+                "field_name_1" : {}, # field_schema, 
+                "field_name_2": # A field maintains 'type', 'count' and 'null_count' information
+                                # An optional 'ARRAY' field maintains an 'array_type' if the field is an ARRAY 
+                                # An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
+                {
+                    'type': "", #type_name,
+                    'count': int,
+                    'null_count': int, 
+                    'list_type': 'NULL',
+                    'object': {}, #object_schema
+                } 
+            } 
+        }
+    }           
+}
+```
 # Contributing - Limitations - TODO 
 The code base should be easy to read and improve upon. Contributions are welcomed.
 

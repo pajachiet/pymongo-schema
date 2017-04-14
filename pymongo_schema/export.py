@@ -6,6 +6,7 @@ import yaml
 import logging
 logger = logging.getLogger(__name__)
 
+
 def output_schema(schema, output_format, filename=None):
     if filename is None:
         output_file = sys.stdout

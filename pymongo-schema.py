@@ -33,7 +33,7 @@ Options:
 from docopt import docopt
 import pymongo
 from pymongo_schema.export import output_schema
-from pymongo_schema.extract import extract_mongo_client_schema
+from pymongo_schema.extract import extract_pymongo_client_schema
 import logging
 
 if __name__ == '__main__':
@@ -52,9 +52,9 @@ if __name__ == '__main__':
     # Extract schema
     client = pymongo.MongoClient(host=arg['--host'], port=int(arg['--port']))
 
-    schema = extract_mongo_client_schema(client,
-                                         database_names=arg['--database'],
-                                         collection_names=arg['--collection'])
+    schema = extract_pymongo_client_schema(client,
+                                           database_names=arg['--database'],
+                                           collection_names=arg['--collection'])
     # Output schema
     for output_format in arg['--format']:
         output_schema(schema, output_format=output_format, filename=arg['--output'])
