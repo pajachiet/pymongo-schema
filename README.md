@@ -43,10 +43,6 @@ Currently, pymongo-schema does not handle inconsistent types in a field. It only
    - Allow a field to contains either a type or an array of that type
    - Store a list of types for a field, eventually with its count 
 
-## Logging
-- Log database and collection being processed
-- Log "percent complete"  / number of document 
-
 ## Diff between schemas
 
 A way to compare the schema dictionaries and highlights the differences.
