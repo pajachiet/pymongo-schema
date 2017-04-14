@@ -3,17 +3,6 @@
 import sys
 import json
 import yaml
-import pymongo
-from pymongo_schema import extract
-
-
-def main():
-    client = pymongo.MongoClient()
-    schema = extract.extract_mongo_client_schema(client)
-    output_schema(schema, 'yaml', 'schema')
-    output_schema(schema, 'txt', 'schema')
-    output_schema(schema, 'json', 'schema')
-
 
 
 def output_schema(schema, output_format, filename=None):

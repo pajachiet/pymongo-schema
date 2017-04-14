@@ -43,6 +43,9 @@ An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
 
 import bson
 from collections import defaultdict
+import logging
+logger = logging.getLogger(__name__)
+
 
 TYPE_TO_STR = {
     bson.datetime.datetime: "DATE",
@@ -80,6 +83,7 @@ def extract_mongo_client_schema(pymongo_client, database_names=None, collection_
 
     mongo_schema = dict()
     for database in database_names:
+        logger.info('Extract schema of database ' + database)
         pymongo_database = pymongo_client[database]
         mongo_schema[database] = extract_database_schema(pymongo_database, collection_names)
 
@@ -101,6 +105,7 @@ def extract_database_schema(pymongo_database, collection_names=None):
 
     database_schema = dict()
     for collection in collection_names:
+        logger.info('...collection ' + collection)
         pymongo_collection = pymongo_database[collection]
         database_schema[collection] = extract_collection_schema(pymongo_collection)
 
@@ -122,9 +127,14 @@ def extract_collection_schema(pymongo_collection):
         "object": init_empty_object_schema()
     }
 
+    n = pymongo_collection.count()
+    i = 0
     for document in pymongo_collection.find({}):
         collection_schema['count'] += 1
         add_document_to_object_schema(document, collection_schema['object'])
+        i += 1
+        if i % 10**4 == 0 or i == n:
+            logger.info('   scanned {} documents out of {} ({} %)'.format(i, n, round((100. * i)/n, 2)))
 
     post_process_schema(collection_schema)
     collection_schema = recursive_default_to_regular_dict(collection_schema)
