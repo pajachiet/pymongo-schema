@@ -8,6 +8,9 @@ logger = logging.getLogger(__name__)
 
 
 def output_schema(schema, output_format='txt', filename=None):
+    if output_format not in ['txt', 'json', 'yaml']:
+        raise ValueError("Ouput format should be txt, json or yaml. {} is not supported".format(output_format))
+
     if filename is None:
         output_file = sys.stdout
         filename = 'standard output'
@@ -27,9 +30,6 @@ def output_schema(schema, output_format='txt', filename=None):
 
     elif output_format == 'yaml':
         yaml.safe_dump(schema, output_file, default_flow_style=False)
-
-    else:
-        raise ValueError("Ouput format should be txt, json or yaml. {} is not supported".format(output_format))
 
 
 
@@ -70,6 +70,7 @@ def mongo_schema_as_str(mongo_schema):
 
     return '\n\n'.join(database_schema_list)
 
+
 def database_schema_as_str(database_schema):
     collection_str_list = []
     for collection, collection_schema in database_schema.iteritems():
@@ -100,8 +101,6 @@ def collection_schema_as_str(collection_schema):
     return object_schema_str
 
 
-
-
 def object_schema_to_lines_tuples(object_schema, field_prefix=''):
     """Get the list of tuples describing lines in object_schema
 
@@ -123,7 +122,7 @@ def object_schema_to_lines_tuples(object_schema, field_prefix=''):
         field_name = field_prefix + field
         field_type = field_schema['type']
         if field_type == "ARRAY":
-            field_type = "ARRAY({})".format(field_schema['list_type'])
+            field_type = "ARRAY({})".format(field_schema['array_type'])
 
         field_count = str(field_schema['count'])
         field_null_count = str(field_schema.get('null', ''))
@@ -163,9 +162,3 @@ def format_str_for_tuple_list(tuple_list, margin=3):
         field_size = max(field_lengths) + margin
         format_str += '{' + str(i) + ':' + str(field_size) + '}'
     return format_str
-
-
-
-
-if __name__ == '__main__':
-    main()

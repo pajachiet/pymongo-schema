@@ -12,7 +12,7 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 
 Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
 ```shell
-pip install -e git+https://github.com/pajachiet/pymongo-schema.git#egg=Package
+pip install --upgrade -e git+https://github.com/pajachiet/pymongo-schema.git#egg=Package
 ```
 # Usage
 
@@ -21,10 +21,13 @@ Usage:
     pymongo-schema  -h | --help
     pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST --quiet]
     pymongo-schema  filter --input=FILENAME --namespace=FILENAME [--output=FILENAME --format=FORMAT... --quiet]
+    pymongo-schema  tosql --input=FILENAME [--output=FILENAME --quiet]
+
 
 Commands: 
     extract                     Extract schema from a MongoDB instance
     filter                      Apply a namespace filter to a mongo schema
+    tosql                       Create a mapping from mongo schema to relational schema
 ```
 
 To display full usage, with options description, run:

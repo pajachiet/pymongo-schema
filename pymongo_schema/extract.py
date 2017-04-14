@@ -34,7 +34,7 @@ An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
         'type': type_name,
         'count': int,
         'null_count': int, # DELETED while postprocessing if 0 
-        'list_type': 'NULL' # OPTIONAL : if the field is an ARRAY
+        'array_type': 'NULL' # OPTIONAL : if the field is an ARRAY
         'object': object_schema # OPTIONAL : if the field is a nested document
     }    
 """
@@ -252,11 +252,11 @@ def add_potential_list_to_field_schema(value_list, field_schema):
     :param field_schema: dict
     """
     if isinstance(value_list, list):
-        if 'list_type' not in field_schema:
-            field_schema['list_type'] = 'NULL'
+        if 'array_type' not in field_schema:
+            field_schema['array_type'] = 'NULL'
 
         for value in value_list:
-            define_or_check_value_type(value, field_schema, type_str='list_type')
+            define_or_check_value_type(value, field_schema, type_str='array_type')
             add_potential_document_to_field_schema(value, field_schema)
 
 

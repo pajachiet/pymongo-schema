@@ -1,3 +1,4 @@
+# coding: utf8
 from copy import deepcopy
 import logging
 logger = logging.getLogger(__name__)

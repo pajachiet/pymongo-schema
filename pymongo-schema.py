@@ -8,10 +8,13 @@ Usage:
     pymongo-schema  -h | --help
     pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST --quiet]
     pymongo-schema  filter --input=FILENAME --namespace=FILENAME [--output=FILENAME --format=FORMAT... --quiet]
+    pymongo-schema  tosql --input=FILENAME [--output=FILENAME --quiet]
+
 
 Commands:
     extract                     Extract schema from a MongoDB instance
     filter                      Apply a namespace filter to a mongo schema
+    tosql                       Create a mapping from mongo schema to relational schema
 
 Options:
     -d --database DB            Only analyze this database. 
@@ -27,8 +30,8 @@ Options:
     -o , --output FILENAME      Output file for schema. Default to standard output. 
                                 Extension added automatically if omitted (useful for multi-format outputs)
     
-    -f , --format FORMAT        Output format for schema : 'txt', 'yaml' or 'json' [default: txt]
-                                Multiple format may be specified.
+    -f , --format FORMAT        Output format for schema : 'txt', 'yaml' or 'json'
+                                Multiple format may be specified. Default is txt.
     
     -i , --input FILENAME       SInput file for schema to filter. json format expected. 
 
@@ -48,7 +51,7 @@ import pymongo
 from pymongo_schema.export import output_schema
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.filter import filter_mongo_schema_namespaces
-
+from pymongo_schema.tosql import mongo_schema_to_mapping
 
 def inititialize_logger(arg):
     logger = logging.getLogger()
@@ -85,6 +88,14 @@ def filter_schema(arg):
     return filter_mongo_schema_namespaces(input_schema, config['namespaces'])
 
 
+def schema_to_sql(arg):
+    logger.info('=== Generate mapping from mongo to sql')
+    with open(arg['--input']) as data_file:
+        mongo_schema = json.load(data_file)
+
+    return mongo_schema_to_mapping(mongo_schema)
+
+
 if __name__ == '__main__':
     # Parse command line argument
     arg = docopt(__doc__, help=True)
@@ -95,13 +106,17 @@ if __name__ == '__main__':
 
     # Extract schema
     if arg['extract']:
-        schema = extract_schema(arg)
+        output_dict = extract_schema(arg)
 
     # Filter schema
     if arg['filter']:
-        schema = filter_schema(arg)
+        output_dict = filter_schema(arg)
+
+    if arg['tosql']:
+        arg['--format'] = ['json']
+        output_dict = schema_to_sql(arg)
 
     # Output schema
     logger.info('=== Write MongoDB schema')
     for output_format in arg['--format']:
-        output_schema(schema, output_format=output_format, filename=arg['--output'])
+        output_schema(output_dict, output_format=output_format, filename=arg['--output'])
