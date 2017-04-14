@@ -3,15 +3,19 @@
 import sys
 import json
 import yaml
-
+import logging
+logger = logging.getLogger(__name__)
 
 def output_schema(schema, output_format, filename=None):
     if filename is None:
         output_file = sys.stdout
+        filename = 'standard output'
     else:
         if not filename.endswith('.' + output_format):
             filename += '.' + output_format
         output_file = open(filename, 'w')
+
+    logger.info('Write schema to {} with format {}'.format(filename, output_format))
 
     if output_format == 'txt':
         output_str = schema_as_str(schema)

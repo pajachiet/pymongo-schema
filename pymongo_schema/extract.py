@@ -133,7 +133,7 @@ def extract_collection_schema(pymongo_collection):
         collection_schema['count'] += 1
         add_document_to_object_schema(document, collection_schema['object'])
         i += 1
-        if i % 10**4 == 0 or i == n:
+        if i % 10**5 == 0 or i == n:
             logger.info('   scanned {} documents out of {} ({} %)'.format(i, n, round((100. * i)/n, 2)))
 
     post_process_schema(collection_schema)

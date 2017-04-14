@@ -6,7 +6,7 @@ pymongo-schema extract schemas from MongoDB
 
 Usage:
     pymongo-schema  -h | --help
-    pymongo-schema  [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST]
+    pymongo-schema  [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... options]
 
 Options:
     
@@ -20,10 +20,12 @@ Options:
     
     --host HOST                 Server to connect to [default: localhost]
     
-    -o , --output FILENAME      Specify output file name, default to standard output. Extension can be ommited
+    -o , --output FILENAME      Specify output file name, default to standard output. Extension can be omitted
     
     -f , --format FORMAT        Output format for schema : 'txt', 'yaml' or 'json' [default: txt]
                                 Multiple format may be specified.
+    
+    --quiet                     Desactivate logging to standard output
     
     -h, --help                  show this usage information
 """
@@ -34,26 +36,25 @@ from pymongo_schema.export import output_schema
 from pymongo_schema.extract import extract_mongo_client_schema
 import logging
 
-logger = logging.getLogger('pymongo_schema')
-steam_handler = logging.StreamHandler()
-steam_handler.setLevel(logging.DEBUG)
-logger.addHandler(steam_handler)
-
 if __name__ == '__main__':
+    # Parse command line argument
     arg = docopt(__doc__, help=True)
     if not arg['--collection']:
         arg['--collection'] = None
 
+    # Add stream to logger
+    if not arg['--quiet']:
+        logger = logging.getLogger('pymongo_schema')
+        steam_handler = logging.StreamHandler()
+        steam_handler.setLevel(logging.DEBUG)
+        logger.addHandler(steam_handler)
+
+    # Extract schema
     client = pymongo.MongoClient(host=arg['--host'], port=int(arg['--port']))
 
     schema = extract_mongo_client_schema(client,
                                          database_names=arg['--database'],
                                          collection_names=arg['--collection'])
-
+    # Output schema
     for output_format in arg['--format']:
         output_schema(schema, output_format=output_format, filename=arg['--output'])
-
-    if False:
-        output_schema(schema, 'yaml', 'schema')
-        output_schema(schema, 'txt', 'schema')
-        output_schema(schema, 'json', 'schema')
