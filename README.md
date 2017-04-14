@@ -17,10 +17,17 @@ pip install -e git+https://github.com/pajachiet/pymongo-schema.git#egg=Package
 # Usage
 
 ```shell
-pymongo-schema  [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST]
+Usage:
+    pymongo-schema  -h | --help
+    pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST --quiet]
+    pymongo-schema  filter --input=FILENAME --namespace=FILENAME [--output=FILENAME --format=FORMAT... --quiet]
+
+Commands: 
+    extract                     Extract schema from a MongoDB instance
+    filter                      Apply a namespace filter to a mongo schema
 ```
 
-To display full usage, run
+To display full usage, with options description, run:
 ```shell 
 pymongo-schema -h
 ```

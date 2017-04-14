@@ -3,38 +3,6 @@
 Functions in this library which take a 'schema' as argument, modify this schema as a side-effect and have no value.
 
 Schema are hierarchically nested : (see also README.md)
-
-- A database contains collections
-    {
-        "collection_name_1": collection_schema_1,
-        "collection_name_2": collection_schema_2
-    }
-
-- A collection maintains a 'count' and contains 1 object
-    { 
-        "count" : int, 
-        "object": object_schema 
-    }
-
-- An object contains fields.
-Objects are initialized as defaultdict(empty_field_schema) to simplify the code 
-    { 
-        "field_name_1" : field_schema_1, 
-        "field_name_2": field_schema_2 
-    }
-
-- A field maintains 'type', 'count' and 'null_count' information 
-An optional 'ARRAY' field maintains an 'array_type' if the field is an ARRAY
-An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
-    {
-        'type': type_name,
-        'count': int,
-        'null_count': int, # DELETED while postprocessing if 0 
-        'list_type': 'NULL' # OPTIONAL : if the field is an ARRAY
-        'object': object_schema # OPTIONAL : if the field is a nested document
-    }
-
-Schema are hierarchically nested :  
 - A MongoDB instance contains databases
     {
         "database_name_1": database_schema_1,
@@ -164,7 +132,7 @@ def extract_collection_schema(pymongo_collection):
         add_document_to_object_schema(document, collection_schema['object'])
         i += 1
         if i % 10**5 == 0 or i == n:
-            logger.info('   scanned {} documents out of {} ({} %)'.format(i, n, round((100. * i)/n, 2)))
+            logger.info('   scanned {} documents out of {} ({:.2f} %)'.format(i, n, (100. * i)/n))
 
     post_process_schema(collection_schema)
     collection_schema = recursive_default_to_regular_dict(collection_schema)
