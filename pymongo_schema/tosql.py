@@ -1,23 +1,20 @@
 # coding: utf8
 
+from mongo_sql_types import psql_type
 import logging
 logger = logging.getLogger(__name__)
 
-PYTHON_TO_PSQL_TYPE = {
-    'boolean': 'BOOLEAN',
-    'integer': 'INT',
-    'biginteger': 'BIGINT',
-    'float': 'REAL',
-    'number': 'DOUBLE PRECISION',
-    'date': 'TIMESTAMP',
-    'string': 'TEXT',
-    'oid': 'TEXT',
-}
-
-AUTO_GENERATED_IDS_TYPE = 'TEXT'
+# Type of automatically generated primary keys
+# int in default mongo-connector-postgresql, string in pajachiet branch
+AUTO_GENERATED_PK_TYPE = 'TEXT'
 
 
 def mongo_schema_to_mapping(mongo_schema):
+    """Create a mapping to SQL from a mongo schema
+    
+    :param mongo_schema: dict 
+    :return mapping: dict 
+    """
     mapping = dict()
     for db in mongo_schema:
         database_schema = mongo_schema[db]
@@ -32,57 +29,105 @@ def mongo_schema_to_mapping(mongo_schema):
 
 
 def init_collection_mapping(collection, mapping, database_schema):
+    """Initialize a mapping for a collection"""
     id_mongo_type = database_schema[collection]['object']['_id']['type']
-    id_psql_type = PYTHON_TO_PSQL_TYPE[id_mongo_type]
+    id_psql_type = psql_type(id_mongo_type)
     mapping[collection] = {
         'pk': '_id',
         '_id': {'type': id_psql_type}
     }
 
 
-def add_object_to_mapping(object_schema, mapping, collection, field_prefix=''):
+def add_object_to_mapping(object_schema, mapping, table_name, field_prefix=''):
+    """Add an object to a mapping 
+    
+    :param object_schema: dict
+    :param mapping: dict
+        base mapping dict has to be given, and not only local mapping[collectino], to add 'ARRAY's
+    :param table_name: str
+    :param field_prefix: str
+        used to get full name of imbricated object, from table's parent object (either collection or ARRAY(OBJECT))
+    """
     for field, field_info in object_schema.iteritems():
+        # Assemble mongo_field_name, the full field name from table's parent object, either collection or ARRAY(OBJECT)
+        mongo_field_name = field_prefix + field
 
-        field_name = field_prefix + field
-        field_mongo_type = field_info['type']
+        mongo_type = field_info['type']
+        if mongo_type == 'dbref':
+            print "field of type DBREF is skipped : " + mongo_field_name
 
-        if field_mongo_type == 'DBREF':
-            print "field of type DBREF is skipped : " + field_name
+        elif mongo_type == 'null':
+            print "field of type NULL is skipped : " + mongo_field_name
 
-        elif field_mongo_type == 'NULL':
-            print "field of type NULL is skipped : " + field_name
+        elif mongo_type == 'ARRAY':
+            mongo_array_type = field_info['array_type']
+            if mongo_array_type == 'OBJECT':
+                add_object_array_to_mapping(mongo_field_name, field_info['object'], mapping, table_name)
+            else:
+                add_scalar_array_field_to_mapping(field, mongo_field_name, mongo_array_type, mapping, table_name)
 
-        elif field_mongo_type == 'ARRAY':
-            add_list_field_to_mapping(object_schema, field, field_name, field_info['array_type'], collection, mapping)
-
-        elif field_mongo_type == 'OBJECT':
-            add_object_to_mapping(object_schema[field]['object'], mapping, collection, field_prefix=field_name + '.')
+        elif mongo_type == 'OBJECT':
+            add_object_to_mapping(field_info['object'], mapping, table_name, field_prefix=mongo_field_name + '.')
 
         else:
-            add_field_to_collection_mapping(field, mapping[collection], field_mongo_type)
+            add_field_to_table_mapping(mongo_field_name, mapping[table_name], mongo_type)
 
 
-def add_list_field_to_mapping(object_schema, field, field_name, list_mongo_type, collection, mapping):
-    linked_table_name = initiate_array_mapping(field_name, collection, mapping)
+def add_scalar_array_field_to_mapping(field, mongo_field_name, mongo_array_type, mapping, parent_table_name):
+    """Add a linked table to the mapping, corresponding to an array of scalars
+    
+    :param field: str
+        local field name, used to define column name (valueField) in target mapping
+    :param mongo_field_name: str
+        full field name from table's parent object, either collection or ARRAY(OBJECT)
+    :param mongo_array_type: str
+    :param mapping: dict
+    :param parent_table_name: str 
+    """
+    linked_table_name = initiate_array_mapping(mongo_field_name, mapping, parent_table_name)
+    mapping[parent_table_name][mongo_field_name]['type'] = '_ARRAY_OF_SCALARS'
+    mapping[parent_table_name][mongo_field_name]['valueField'] = field
+    add_field_to_table_mapping(mongo_field_name, mapping[linked_table_name], mongo_array_type)
 
-    if list_mongo_type == 'OBJECT':
-        mapping[collection][field_name]['type'] = '_ARRAY'
-        add_object_to_mapping(object_schema[field]['object'], mapping, linked_table_name)
-    else:
-        mapping[collection][field_name]['type'] = '_ARRAY_OF_SCALARS'
-        mapping[collection][field_name]['valueField'] = field
-        add_field_to_collection_mapping(field, mapping[linked_table_name], list_mongo_type)
+
+def add_object_array_to_mapping(mongo_field_name, object_schema, mapping, parent_table_name):
+    """Add a linked table to the mapping, corresponding to an array of objects
+    
+    :param mongo_field_name: str
+        full field name from table's parent object, either collection or ARRAY(OBJECT)
+    :param object_schema: str
+    :param mapping: dict
+    :param parent_table_name: str 
+    """
+    linked_table_name = initiate_array_mapping(mongo_field_name, mapping, parent_table_name)
+    mapping[parent_table_name][mongo_field_name]['type'] = '_ARRAY'
+    add_object_to_mapping(object_schema, mapping, linked_table_name, field_prefix='')
 
 
-def initiate_array_mapping(field_name, collection, mapping):
-    linked_table_name = to_sql_idenfier(collection + '.' + field_name)
-    fk_name = 'id_' + collection
-    pk_type = get_collection_pk_type(mapping, collection)
-    mapping[collection][field_name] = {
+def initiate_array_mapping(mongo_field_name, mapping, parent_table_name):
+    """Initiate an array mapping. 
+    
+    Common part between either object or scalar arrays.
+    
+    - initialize field in original collection
+    - initialize linked table
+    
+    :param mongo_field_name: str
+        full field name from table's parent object, either collection or ARRAY(OBJECT)
+    :param parent_table_name: str
+    :param mapping: 
+    :return linked_table_name: str
+    """
+    linked_table_name = parent_table_name + '.' + mongo_field_name
+    linked_table_name = to_sql_identifier(linked_table_name).replace('.', '__')
+    fk_name = 'id_' + parent_table_name
+
+    mapping[parent_table_name][mongo_field_name] = {
         'dest': linked_table_name,
         'fk': fk_name,
     }
 
+    pk_type = get_collection_pk_type(mapping, parent_table_name)
     mapping[linked_table_name] = {
         'pk': 'id',
         fk_name: {
@@ -92,22 +137,37 @@ def initiate_array_mapping(field_name, collection, mapping):
     return linked_table_name
 
 
-def to_sql_idenfier(mongo_identifier):
-    return mongo_identifier.replace('.', '__')
+def add_field_to_table_mapping(mongo_field_name, table_mapping, mongo_type):
+    """Add a field to a local 
+    
+    :param mongo_field_name: str
+        full field name from table's parent object, either collection or ARRAY(OBJECT)
+    :param table_mapping: dict
+    :param mongo_type: str
+    :return: 
+    """
+    field_psql_type = psql_type(mongo_type)
+    table_mapping[mongo_field_name] = {
+        'dest': to_sql_identifier(mongo_field_name),
+        'type': field_psql_type,
+    }
 
 
-def add_field_to_collection_mapping(field, collection_mapping, field_mongo_type):
-    field_psql_type = PYTHON_TO_PSQL_TYPE[field_mongo_type]
-    collection_mapping[field] = {'type': field_psql_type}
-
-
-def get_collection_pk_type(mapping, collection):
-    collection_pk = mapping[collection]['pk']
+def get_collection_pk_type(mapping, table_name):
+    """Get the type of a table primary key in the mapping
+    
+    :param mapping: dict
+    :param table_name: str
+    :return collection_pk_type: str
+    """
+    collection_pk = mapping[table_name]['pk']
     if collection_pk == '_id':
-        collection_pk_type = mapping[collection][collection_pk]['type']
+        collection_pk_type = mapping[table_name][collection_pk]['type']
     else:
-        collection_pk_type = AUTO_GENERATED_IDS_TYPE
+        collection_pk_type = AUTO_GENERATED_PK_TYPE
     return collection_pk_type
 
-if __name__ == '__main__':
-    main()
+
+def to_sql_identifier(identifier):
+    """Replace '.' by '__' in identifier, to make it SQL compliant"""
+    return identifier.replace('.', '__')
