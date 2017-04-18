@@ -39,8 +39,8 @@ Objects are initialized as defaultdict(empty_field_schema) to simplify the code
 """
 
 from collections import defaultdict
-import logging
 from mongo_sql_types import type_name, least_common_parent_type
+import logging
 logger = logging.getLogger(__name__)
 
 

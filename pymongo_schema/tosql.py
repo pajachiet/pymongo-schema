@@ -53,13 +53,7 @@ def add_object_to_mapping(object_schema, mapping, table_name, field_prefix=''):
         mongo_field_name = field_prefix + field
 
         mongo_type = field_info['type']
-        if mongo_type == 'dbref':
-            print "field of type DBREF is skipped : " + mongo_field_name
-
-        elif mongo_type == 'null':
-            print "field of type NULL is skipped : " + mongo_field_name
-
-        elif mongo_type == 'ARRAY':
+        if mongo_type == 'ARRAY':
             mongo_array_type = field_info['array_type']
             if mongo_array_type == 'OBJECT':
                 add_object_array_to_mapping(mongo_field_name, field_info['object'], mapping, table_name)
@@ -144,13 +138,19 @@ def add_field_to_table_mapping(mongo_field_name, table_mapping, mongo_type):
         full field name from table's parent object, either collection or ARRAY(OBJECT)
     :param table_mapping: dict
     :param mongo_type: str
-    :return: 
     """
-    field_psql_type = psql_type(mongo_type)
+    try:
+        field_psql_type = psql_type(mongo_type)
+    except KeyError:
+        logger.warning('Mongo type {} is not mapped to an SQL type. Field {} from table {} is skipped from the mapping'
+                       .format(mongo_type, mongo_field_name, table_mapping))
+        return
+
     table_mapping[mongo_field_name] = {
         'dest': to_sql_identifier(mongo_field_name),
         'type': field_psql_type,
     }
+
 
 
 def get_collection_pk_type(mapping, table_name):

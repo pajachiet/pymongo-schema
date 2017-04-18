@@ -37,7 +37,7 @@ def type_name(value):
     try:
         mongo_type = TYPE_TO_STR[value_type]
     except KeyError:
-        logger.warning('Type {} is not mapped to a type_str. We define it as unknown for current schema extraction'.format(value))
+        logger.warning('Type {} is not mapped to a type_str. We define it as unknown for current schema extraction'.format(value_type))
         TYPE_TO_STR[value_type] = 'unknown'
         mongo_type = 'unknown'
 
