@@ -87,7 +87,7 @@ def collection_schema_as_str(collection_schema):
     :param object_schema: dict
     :return object_schema_str: str
     """
-    lines = [('FIELD_NAME', 'TYPES_COUNT', 'COUNT', 'PERCENTAGE')]
+    lines = [('FIELD_NAME', 'TYPE', 'COUNT', 'PERCENTAGE', 'TYPES_COUNT')]
     lines += object_schema_to_lines_tuples(collection_schema['object'])
 
     format_str = format_str_for_tuple_list(lines)
@@ -118,11 +118,13 @@ def object_schema_to_lines_tuples(object_schema, field_prefix=''):
 
     for field, field_schema in sorted_fields:
         field_name = field_prefix + field
-        field_types_count = format_types_count(field_schema['types_count'], field_schema.get('array_types_count', None))
-
+        field_type = field_schema['type']
+        if field_type == 'ARRAY':
+            field_type = 'ARRAY(' + field_schema['array_type'] + ')'
         field_count = str(field_schema['count'])
         field_percent = str(100 * field_schema['prop_in_object'])
-        line = (field_name, field_types_count, field_count, field_percent)
+        field_types_count = format_types_count(field_schema['types_count'], field_schema.get('array_types_count', None))
+        line = (field_name, field_type, field_count, field_percent, field_types_count)
 
         lines_tuples.append(line)
 

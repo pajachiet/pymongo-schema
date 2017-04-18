@@ -1,3 +1,4 @@
 pymongo
 pyyaml
 docopt
+ete3

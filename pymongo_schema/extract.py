@@ -30,32 +30,60 @@ Objects are initialized as defaultdict(empty_field_schema) to simplify the code
 - A field maintains 'count' and 'types_count' information, and has optional 'array_types_count' and 'object'
     {
         'count': int,
+        'type', 'type_str',
         'types_count': defaultdict(int) # count for each encountered type  
-        'array_types_count': defaultdict(int) # (optional) count for each type encountered  in arrays
-        'object': {}, # (optional) object_schema 
+        'array_type', 'type_str', # (optional if array)
+        'array_types_count': defaultdict(int), # (optional if array) count for each type encountered  in arrays
+        'object': {}, # (optional if object) object_schema 
     } 
 """
 
 import bson
 from collections import defaultdict
+from ete3 import Tree
 import logging
 logger = logging.getLogger(__name__)
 
 
+
 TYPE_TO_STR = {
-    bson.datetime.datetime: "Date",
-    bson.timestamp.Timestamp: "Timestamp",
-    int: "Integer",
-    bson.int64.Int64: "BIGINTEGER",
-    float: "Float",
-    unicode: "String",
-    bson.objectid.ObjectId: "OID",
     list: "ARRAY",
     dict: "OBJECT",
-    type(None): "Null",
-    bson.dbref.DBRef: "DBREF",
-    bool: "Boolean"
+    type(None): "null",
+
+    bool: "boolean",
+    int: "integer",
+    bson.int64.Int64: "biginteger",
+    float: "float",
+
+    str: "string",
+    unicode: "string",
+
+    bson.datetime.datetime: "date",
+    bson.timestamp.Timestamp: "timestamp",
+
+    bson.dbref.DBRef: "dbref",
+    bson.objectid.ObjectId: "oid",
 }
+
+TYPES_TREE_STR = """
+(
+    (
+        (
+            float, 
+            ((boolean) integer) biginteger
+        ) number,
+        (
+            oid, 
+            dbref
+        ) str,
+        date,
+        timestamp
+    ) general_scalar,
+    object
+) mixed_scalar_object
+;"""
+TYPES_TREE = Tree(TYPES_TREE_STR, format=8)
 
 
 def extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None):
@@ -154,7 +182,7 @@ def recursive_default_to_regular_dict(value):
 def post_process_schema(object_count_schema):
     """Clean and add information to schema once it has been built
 
-    - delete 'null_count' if 0
+    - compute the main type for each field 
     - compute the proportion of non null values in the parent object
     - recursively postprocess imbricated object schemas
 
@@ -165,10 +193,68 @@ def post_process_schema(object_count_schema):
     object_schema = object_count_schema['object']
     for field_schema in object_schema.values():
 
+        summarize_types(field_schema)
         field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 5)
 
         if 'object' in field_schema:
             post_process_schema(field_schema)
+
+
+def summarize_types(field_schema):
+    """Summarize types information to one 'type' field 
+    
+    Add a 'type' field, compatible with all encountered types in 'types_count'. 
+    This is done by taking the least common parent type between types.
+    
+    If 'ARRAY' type count is not null, the main type is 'ARRAY'. 
+    An 'array_type' is defined, as the least common parent type between 'types' and 'array_types'
+    
+    :param field_schema: 
+    
+    """
+
+    type_list = field_schema['types_count'].keys()
+    type_list += field_schema.get('array_types_count', {}).keys()  # Only exists if 'ARRAY' in 'types_count'
+
+    cleaned_type_list = [type_name for type_name in type_list if type_name != 'ARRAY' and type_name != 'null']
+    common_type = least_common_parent_type(cleaned_type_list)
+
+    if 'ARRAY' in field_schema['types_count']:
+        field_schema['type'] = 'ARRAY'
+        field_schema['array_type'] = common_type
+    else:
+        field_schema['type'] = common_type
+
+
+def least_common_parent_type(type_list):
+    """Get the least common parent type from a list of types.
+    
+    :param type_list: list
+    :return common_type: 
+    """
+    if not type_list:
+        return 'null'
+    elif len(type_list) == 1:
+        return type_list[0]
+    else:
+        return TYPES_TREE.get_common_ancestor(*type_list).name
+
+"""
+from ete3 import Tree, faces, TextFace, TreeStyle
+def get_tree_style():
+    ts = TreeStyle()
+    ts.show_leaf_name = False
+    ts.show_scale = False
+    ts.orientation = 1
+
+    ts.branch_vertical_margin = 20
+    def my_layout(node):
+        F = TextFace(node.name, fsize=16, ftype='Courier', bold=True)
+        faces.add_face_to_node(F, node, column=10, position="branch-right")
+    ts.layout_fn = my_layout
+    return ts
+"""
+#TYPES_TREE.render("type_tree.png", tree_style=get_tree_style());
 
 
 def init_empty_object_schema():

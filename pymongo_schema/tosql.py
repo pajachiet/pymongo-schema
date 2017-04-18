@@ -1,16 +1,17 @@
 # coding: utf8
 
-import json
 import logging
 logger = logging.getLogger(__name__)
 
 PYTHON_TO_PSQL_TYPE = {
-    'BOOLEAN': 'BOOLEAN',
-    'INTEGER': 'INT',
-    'FLOAT': 'REAL',
-    'DATE': 'TIMESTAMP',
-    'STRING': 'TEXT',
-    'OID': 'TEXT',
+    'boolean': 'BOOLEAN',
+    'integer': 'INT',
+    'biginteger': 'BIGINT',
+    'float': 'REAL',
+    'number': 'DOUBLE PRECISION',
+    'date': 'TIMESTAMP',
+    'string': 'TEXT',
+    'oid': 'TEXT',
 }
 
 AUTO_GENERATED_IDS_TYPE = 'TEXT'

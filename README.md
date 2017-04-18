@@ -63,14 +63,13 @@ Schema are hierarchically nested, with the following structure :
                                 # An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
                 {
                     'count': int,
-                    'types_count': # count for each encountered type  
-                    {
+                    'type', 'type_str',
+                    'types_count': {  # count for each encountered type  
                         'type_str' : 13,
                         'Null' : 3
                     }, 
-
-                    'array_types_count': # (optional) count for each type encountered  in arrays
-                    {
+                    'array_type', 'type_str',
+                    'array_types_count': {  # (optional) count for each type encountered  in arrays
                         'type_str' : 7,
                         'Null' : 3
                     }, 
@@ -85,17 +84,20 @@ Schema are hierarchically nested, with the following structure :
 The code base should be easy to read and improve upon. Contributions are welcomed.
 
 ## Mixed types handling
-Currently, pymongo-schema does not handle inconsistent types in a field. It only check consistency and raise an exception in case of a problem.
+pymongo-schema handles mixed types by looking for the lowest common parent type in the following tree.
+
+<img src="type_tree.png" alt="type_tree" width=150/>
+
+If a field contains both arrays and scalars, it is considered as an array. The 'array_type' is defined as the common parent type of scalars and array_types encountered in this field. 
+
+TODO
 
 - Improve mapping from Python type to name (TYPE_TO_STR dict)
     - see documentation: [bson-types](https://docs.mongodb.com/manual/reference/bson-types/), [spec](http://bsonspec.org/spec.html)
 
-- Raise a proper error in case of inconsistent types and catch it above, to treat it or raise it with more context information (key, type, value…)
-
-- Options to handle mixed-types
-   - Use a more general type, ex INT < LONG < NUMERIC
-   - Allow a field to contains either a type or an array of that type
-   - Store a list of types for a field, eventually with its count 
+- Handle new / unknown types
+- Check a mongo scheme for compatibility to an sql mapping
+- Handle incompatibilities
 
 ## Diff between schemas
 

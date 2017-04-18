@@ -31,7 +31,7 @@ Options:
                                 Extension added automatically if omitted (useful for multi-format outputs)
     
     -f , --format FORMAT        Output format for schema : 'txt', 'yaml' or 'json'
-                                Multiple format may be specified. Default is txt.
+                                Multiple format may be specified. [default: txt]
     
     -i , --input FILENAME       SInput file for schema to filter. json format expected. 
 
