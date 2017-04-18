@@ -58,15 +58,23 @@ Schema are hierarchically nested, with the following structure :
             "object":  # object_schema : An object contains fields.            
              {
                 "field_name_1" : {}, # field_schema, 
-                "field_name_2": # A field maintains 'type', 'count' and 'null_count' information
-                                # An optional 'ARRAY' field maintains an 'array_type' if the field is an ARRAY 
+                "field_name_2": # A field maintains 'types_count_information
+                                # An optional 'array_types_count' field maintains 'types_count' information for values encountered in arrays 
                                 # An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
                 {
-                    'type': "", #type_name,
                     'count': int,
-                    'null_count': int, 
-                    'list_type': 'NULL',
-                    'object': {}, #object_schema
+                    'types_count': # count for each encountered type  
+                    {
+                        'type_str' : 13,
+                        'Null' : 3
+                    }, 
+
+                    'array_types_count': # (optional) count for each type encountered  in arrays
+                    {
+                        'type_str' : 7,
+                        'Null' : 3
+                    }, 
+                    'object': {}, # (optional) object_schema 
                 } 
             } 
         }

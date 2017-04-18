@@ -27,16 +27,13 @@ Objects are initialized as defaultdict(empty_field_schema) to simplify the code
         "field_name_2": field_schema_2 
     }
 
-- A field maintains 'type', 'count' and 'null_count' information 
-An optional 'ARRAY' field maintains an 'array_type' if the field is an ARRAY
-An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
+- A field maintains 'count' and 'types_count' information, and has optional 'array_types_count' and 'object'
     {
-        'type': type_name,
         'count': int,
-        'null_count': int, # DELETED while postprocessing if 0 
-        'array_type': 'NULL' # OPTIONAL : if the field is an ARRAY
-        'object': object_schema # OPTIONAL : if the field is a nested document
-    }    
+        'types_count': defaultdict(int) # count for each encountered type  
+        'array_types_count': defaultdict(int) # (optional) count for each type encountered  in arrays
+        'object': {}, # (optional) object_schema 
+    } 
 """
 
 import bson
@@ -46,18 +43,18 @@ logger = logging.getLogger(__name__)
 
 
 TYPE_TO_STR = {
-    bson.datetime.datetime: "DATE",
-    bson.timestamp.Timestamp: "TIMESTAMP",
-    int: "INTEGER",
-    bson.int64.Int64: "INTEGER",
-    float: "FLOAT",
-    unicode: "STRING",
+    bson.datetime.datetime: "Date",
+    bson.timestamp.Timestamp: "Timestamp",
+    int: "Integer",
+    bson.int64.Int64: "BIGINTEGER",
+    float: "Float",
+    unicode: "String",
     bson.objectid.ObjectId: "OID",
     list: "ARRAY",
     dict: "OBJECT",
-    #    type(None): "NULL",
+    type(None): "Null",
     bson.dbref.DBRef: "DBREF",
-    bool: "BOOLEAN"
+    bool: "Boolean"
 }
 
 
@@ -167,8 +164,6 @@ def post_process_schema(object_count_schema):
     object_count = object_count_schema['count']
     object_schema = object_count_schema['object']
     for field_schema in object_schema.values():
-        if field_schema['null_count'] == 0:
-            del field_schema['null_count']
 
         field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 5)
 
@@ -185,9 +180,8 @@ def init_empty_object_schema():
 
     def empty_field_schema():
         field_dict = {
-            'type': "NULL",
+            'types_count': defaultdict(int),
             'count': 0,
-            'null_count': 0,
         }
         return field_dict
 
@@ -218,13 +212,10 @@ def add_value_to_field_schema(value, field_schema):
     :param field_schema: dict
     subdictionnary of the global schema dict corresponding to a field
     """
-    if value is None or value == []:
-        field_schema['null_count'] += 1
-    else:
-        field_schema['count'] += 1
-        define_or_check_value_type(value, field_schema)
-        add_potential_list_to_field_schema(value, field_schema)
-        add_potential_document_to_field_schema(value, field_schema)
+    field_schema['count'] += 1
+    add_value_type(value, field_schema)
+    add_potential_list_to_field_schema(value, field_schema)
+    add_potential_document_to_field_schema(value, field_schema)
 
 
 def add_potential_document_to_field_schema(document, field_schema):
@@ -252,23 +243,24 @@ def add_potential_list_to_field_schema(value_list, field_schema):
     :param field_schema: dict
     """
     if isinstance(value_list, list):
-        if 'array_type' not in field_schema:
-            field_schema['array_type'] = 'NULL'
+        if 'array_types_count' not in field_schema:
+            field_schema['array_types_count'] = defaultdict(int)
+
+        if not value_list:
+            add_value_type(None, field_schema, type_str='array_types_count')
 
         for value in value_list:
-            define_or_check_value_type(value, field_schema, type_str='array_type')
+            add_value_type(value, field_schema, type_str='array_types_count')
             add_potential_document_to_field_schema(value, field_schema)
 
 
-def define_or_check_value_type(value, field_schema, type_str='type'):
+def add_value_type(value, field_schema, type_str='types_count'):
     """Define the type_str in field_schema, or check it is equal to the one previously defined. 
 
     :param value: 
     :param field_schema: dict
-    :param type_str: str
+    :param type_str: str, either 'types_count' or 'array_types_count'
+    
     """
-    value_type_str = TYPE_TO_STR[type(value)]
-    if field_schema[type_str] == "NULL":
-        field_schema[type_str] = value_type_str
-    else:
-        assert field_schema[type_str] == value_type_str  # TODO: raise an error and catch it above
+    value_type_str = TYPE_TO_STR[type(value)] # TODO : handle UNDEFINED types
+    field_schema[type_str][value_type_str] += 1

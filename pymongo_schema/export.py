@@ -32,7 +32,6 @@ def output_schema(schema, output_format='txt', filename=None):
         yaml.safe_dump(schema, output_file, default_flow_style=False)
 
 
-
 def schema_as_str(schema):
     schema_level = get_schema_level(schema)
     if schema_level == 'collection':
@@ -55,7 +54,7 @@ def get_schema_level(schema):
         return 'collection'
     else:
         sub_schema = schema.values()[0]
-        if 'object' in sub_schema: # Collection
+        if 'object' in sub_schema:  # Collection
             return 'database'
         else:
             return 'mongo'
@@ -82,14 +81,13 @@ def database_schema_as_str(database_schema):
     return '\n\n'.join(collection_str_list)
 
 
-
 def collection_schema_as_str(collection_schema):
     """Pretty format object_schema as string
 
     :param object_schema: dict
     :return object_schema_str: str
     """
-    lines = [('FIELD_NAME', 'TYPE', 'COUNT', 'NULLS', 'PERCENTAGE')]
+    lines = [('FIELD_NAME', 'TYPES_COUNT', 'COUNT', 'PERCENTAGE')]
     lines += object_schema_to_lines_tuples(collection_schema['object'])
 
     format_str = format_str_for_tuple_list(lines)
@@ -120,23 +118,38 @@ def object_schema_to_lines_tuples(object_schema, field_prefix=''):
 
     for field, field_schema in sorted_fields:
         field_name = field_prefix + field
-        field_type = field_schema['type']
-        if field_type == "ARRAY":
-            field_type = "ARRAY({})".format(field_schema['array_type'])
+        field_types_count = format_types_count(field_schema['types_count'], field_schema.get('array_types_count', None))
 
         field_count = str(field_schema['count'])
-        field_null_count = str(field_schema.get('null', ''))
         field_percent = str(100 * field_schema['prop_in_object'])
-        line = (field_name, field_type, field_count, field_null_count, field_percent)
+        line = (field_name, field_types_count, field_count, field_percent)
 
         lines_tuples.append(line)
 
-        if field_type == "ARRAY(OBJECT)":
+
+        if 'ARRAY' in field_schema['types_count'] and 'OBJECT' in field_schema['array_types_count']:
             lines_tuples += object_schema_to_lines_tuples(field_schema['object'], field_prefix=field_prefix + ' X ')
-        if field_type == "OBJECT":
+
+        elif 'OBJECT' in field_schema['types_count']:  # 'elif' rather than 'if' in case of both OBJECT and ARRAY(OBJECT)
             lines_tuples += object_schema_to_lines_tuples(field_schema['object'], field_prefix=field_prefix + ' . ')
 
     return lines_tuples
+
+
+def format_types_count(types_count, array_types_count=None):
+    types_count = sorted(types_count.items(),
+                         key=lambda x: x[1],
+                         reverse=True)
+
+    type_count_list = list()
+    for type_name, count in types_count:
+        if type_name == 'ARRAY':
+            array_type_name = format_types_count(array_types_count)
+            type_count_list.append('ARRAY(' + array_type_name + ') : ' + str(count))
+        else:
+            type_count_list.append(str(type_name) + ' : ' + str(count))
+    return ', '.join(type_count_list)
+
 
 
 def format_str_for_tuple_list(tuple_list, margin=3):
