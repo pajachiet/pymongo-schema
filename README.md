@@ -95,7 +95,6 @@ TODO
 - Improve mapping from Python type to name (TYPE_TO_STR dict)
     - see documentation: [bson-types](https://docs.mongodb.com/manual/reference/bson-types/), [spec](http://bsonspec.org/spec.html)
 
-- Handle new / unknown types
 - Check a mongo scheme for compatibility to an sql mapping
 - Handle incompatibilities
 

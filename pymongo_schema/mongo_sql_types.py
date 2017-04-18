@@ -2,6 +2,9 @@
 
 import bson
 from ete3 import Tree
+import logging
+logger = logging.getLogger(__name__)
+
 
 TYPE_TO_STR = {
     list: "ARRAY",
@@ -30,7 +33,15 @@ def type_name(value):
     :param value: 
     :return type_str: str
     """
-    return TYPE_TO_STR[type(value)]  # TODO : handle UNDEFINED types
+    value_type = type(value)
+    try:
+        mongo_type = TYPE_TO_STR[value_type]
+    except KeyError:
+        logger.warning('Type {} is not mapped to a type_str. We define it as unknown for current schema extraction'.format(value))
+        TYPE_TO_STR[value_type] = 'unknown'
+        mongo_type = 'unknown'
+
+    return mongo_type
 
 
 TYPES_TREE_STR = """
@@ -45,7 +56,8 @@ TYPES_TREE_STR = """
             dbref
         ) str,
         date,
-        timestamp
+        timestamp,
+        unknown
     ) general_scalar,
     object
 ) mixed_scalar_object
