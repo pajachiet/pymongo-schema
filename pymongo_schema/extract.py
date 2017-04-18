@@ -38,52 +38,10 @@ Objects are initialized as defaultdict(empty_field_schema) to simplify the code
     } 
 """
 
-import bson
 from collections import defaultdict
-from ete3 import Tree
 import logging
+from mongo_sql_types import type_name, least_common_parent_type
 logger = logging.getLogger(__name__)
-
-
-
-TYPE_TO_STR = {
-    list: "ARRAY",
-    dict: "OBJECT",
-    type(None): "null",
-
-    bool: "boolean",
-    int: "integer",
-    bson.int64.Int64: "biginteger",
-    float: "float",
-
-    str: "string",
-    unicode: "string",
-
-    bson.datetime.datetime: "date",
-    bson.timestamp.Timestamp: "timestamp",
-
-    bson.dbref.DBRef: "dbref",
-    bson.objectid.ObjectId: "oid",
-}
-
-TYPES_TREE_STR = """
-(
-    (
-        (
-            float, 
-            ((boolean) integer) biginteger
-        ) number,
-        (
-            oid, 
-            dbref
-        ) str,
-        date,
-        timestamp
-    ) general_scalar,
-    object
-) mixed_scalar_object
-;"""
-TYPES_TREE = Tree(TYPES_TREE_STR, format=8)
 
 
 def extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None):
@@ -226,37 +184,6 @@ def summarize_types(field_schema):
         field_schema['type'] = common_type
 
 
-def least_common_parent_type(type_list):
-    """Get the least common parent type from a list of types.
-    
-    :param type_list: list
-    :return common_type: 
-    """
-    if not type_list:
-        return 'null'
-    elif len(type_list) == 1:
-        return type_list[0]
-    else:
-        return TYPES_TREE.get_common_ancestor(*type_list).name
-
-"""
-from ete3 import Tree, faces, TextFace, TreeStyle
-def get_tree_style():
-    ts = TreeStyle()
-    ts.show_leaf_name = False
-    ts.show_scale = False
-    ts.orientation = 1
-
-    ts.branch_vertical_margin = 20
-    def my_layout(node):
-        F = TextFace(node.name, fsize=16, ftype='Courier', bold=True)
-        faces.add_face_to_node(F, node, column=10, position="branch-right")
-    ts.layout_fn = my_layout
-    return ts
-"""
-#TYPES_TREE.render("type_tree.png", tree_style=get_tree_style());
-
-
 def init_empty_object_schema():
     """Generate an empty object schema.
 
@@ -348,5 +275,5 @@ def add_value_type(value, field_schema, type_str='types_count'):
     :param type_str: str, either 'types_count' or 'array_types_count'
     
     """
-    value_type_str = TYPE_TO_STR[type(value)] # TODO : handle UNDEFINED types
+    value_type_str = type_name(value)
     field_schema[type_str][value_type_str] += 1
