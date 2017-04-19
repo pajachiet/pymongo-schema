@@ -103,6 +103,19 @@ TODO
 A way to compare the schema dictionaries and highlights the differences.
 
 
+## Test than a mongo schema can be mapped tosql
+
+- test for the presence of mongo types in the mapping 
+- look for mixes of list and scalar, that are currently not supported by mongo-connector-postgresql
+- look for the presence of an '_id'
+
+
+## Complete filter functionalities
+
+- Implement includeFields 
+
+
+
 ## Tackle bigger databases
 This code has been only used on a relatively small sized Mongo database, on which it was faster than Variety. 
 
