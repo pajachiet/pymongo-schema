@@ -15,7 +15,7 @@ setup(name='pymongo-schema',
       ],
       entry_points={
           'console_scripts': [
-              'pymongo-schema = pymongo-schema:main',
+              'pymongo-schema = pymongo_schema.pymongo_schema:main',
           ],
       },
       author='Pierre-Alain Jachiet',

@@ -54,7 +54,7 @@ TYPES_TREE_STR = """
         (
             oid, 
             dbref
-        ) str,
+        ) string,
         date,
         timestamp,
         unknown
@@ -66,8 +66,8 @@ TYPES_TREE_STR = """
 TYPES_TREE = Tree(TYPES_TREE_STR, format=8)
 
 
-def least_common_parent_type(type_list):
-    """Get the least common parent type from a list of types.
+def common_parent_type(type_list):
+    """Get the common parent type from a list of types.
 
     :param type_list: list
     :return common_type: type_str

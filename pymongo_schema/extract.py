@@ -39,7 +39,7 @@ Objects are initialized as defaultdict(empty_field_schema) to simplify the code
 """
 
 from collections import defaultdict
-from mongo_sql_types import type_name, least_common_parent_type
+from mongo_sql_types import type_name, common_parent_type
 import logging
 logger = logging.getLogger(__name__)
 
@@ -175,7 +175,7 @@ def summarize_types(field_schema):
     type_list += field_schema.get('array_types_count', {}).keys()  # Only exists if 'ARRAY' in 'types_count'
 
     cleaned_type_list = [type_name for type_name in type_list if type_name != 'ARRAY' and type_name != 'null']
-    common_type = least_common_parent_type(cleaned_type_list)
+    common_type = common_parent_type(cleaned_type_list)
 
     if 'ARRAY' in field_schema['types_count']:
         field_schema['type'] = 'ARRAY'
