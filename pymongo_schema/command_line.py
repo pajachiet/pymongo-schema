@@ -13,8 +13,8 @@ Usage:
 
 Commands:
     extract                     Extract schema from a MongoDB instance
-    filter                      Apply a namespace filter to a mongo schema
-    tosql                       Create a mapping from mongo schema to relational schema
+    filter                      Apply a namespace filter to a mongo schema (json input)
+    tosql                       Create a mapping from mongo schema to relational schema (json input and output)
 
 Options:
     -d --database DB            Only analyze this database. 
@@ -56,48 +56,6 @@ from tosql import mongo_schema_to_mapping
 logger = logging.getLogger()
 
 
-def inititialize_logger(arg):
-    logger.setLevel(logging.INFO)
-    logger.addHandler(logging.NullHandler())
-
-    if not arg['--quiet']:
-        steam_handler = logging.StreamHandler()
-        logger.addHandler(steam_handler)
-
-    return logger
-
-
-def extract_schema(arg):
-    start_time = time()
-    logger.info('=== Start MongoDB schema analysis')
-    client = pymongo.MongoClient(host=arg['--host'], port=int(arg['--port']))
-
-    schema = extract_pymongo_client_schema(client,
-                                           database_names=arg['--database'],
-                                           collection_names=arg['--collection'])
-
-    logger.info('--- MongoDB schema analysis took {:.2f} s'.format(time() - start_time))
-    return schema
-
-
-def filter_schema(arg):
-    logger.info('=== Filter mongo schema')
-    with open(arg['--namespace'], 'r') as f:
-        config = json.load(f)
-
-    with open(arg['--input'], 'r') as f:
-        input_schema = json.load(f)
-    return filter_mongo_schema_namespaces(input_schema, config['namespaces'])
-
-
-def schema_to_sql(arg):
-    logger.info('=== Generate mapping from mongo to sql')
-    with open(arg['--input']) as data_file:
-        mongo_schema = json.load(data_file)
-
-    return mongo_schema_to_mapping(mongo_schema)
-
-
 def main():
     """ Launch pymongo_schema (assuming CLI)
     """
@@ -106,24 +64,85 @@ def main():
     if not arg['--collection']:
         arg['--collection'] = None
 
-    logger = inititialize_logger(arg)
+    initialize_logger(arg)
 
-    # Extract schema
+    # Extract mongo schema
     if arg['extract']:
         output_dict = extract_schema(arg)
 
-    # Filter schema
+    # Filter mongo schema by namespace
     if arg['filter']:
         output_dict = filter_schema(arg)
 
+    # Map mongo schema to sql
     if arg['tosql']:
         arg['--format'] = ['json']
         output_dict = schema_to_sql(arg)
 
-    # Output schema
+    # Output dict
     logger.info('=== Write MongoDB schema')
     for output_format in arg['--format']:
         output_schema(output_dict, output_format=output_format, filename=arg['--output'])
+
+
+def initialize_logger(arg):
+    """ Initialize logging to standard output, if not quiet.  
+    """
+    logger.setLevel(logging.INFO)
+    logger.addHandler(logging.NullHandler())
+
+    if not arg['--quiet']:
+        steam_handler = logging.StreamHandler()
+        logger.addHandler(steam_handler)
+
+
+def extract_schema(arg):
+    """ Main entry point function to extract schema  
+    
+    :param arg: 
+    :return mongo_schema: dict 
+    """
+    start_time = time()
+    logger.info('=== Start MongoDB schema analysis')
+    client = pymongo.MongoClient(host=arg['--host'], port=int(arg['--port']))
+
+    mongo_schema = extract_pymongo_client_schema(client,
+                                                 database_names=arg['--database'],
+                                                 collection_names=arg['--collection'])
+
+    logger.info('--- MongoDB schema analysis took {:.2f} s'.format(time() - start_time))
+    return mongo_schema
+
+
+def filter_schema(arg):
+    """ Main entry point function to filter schema by a namespace
+    
+    :param arg: dict
+    :return filtered_mongo_schema: dict
+    """
+    logger.info('=== Filter mongo schema')
+    with open(arg['--namespace'], 'r') as f:
+        config = json.load(f)
+
+    with open(arg['--input'], 'r') as f:
+        input_schema = json.load(f)
+
+    filtered_mongo_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])
+    return filtered_mongo_schema
+
+
+def schema_to_sql(arg):
+    """ Main entry point function to genearate a mapping from mongo to sql
+    
+    :param arg: dict
+    :return mongo_to_sql_mapping: dict 
+    """
+    logger.info('=== Generate mapping from mongo to sql')
+    with open(arg['--input']) as data_file:
+        mongo_schema = json.load(data_file)
+
+    mongo_to_sql_mapping = mongo_schema_to_mapping(mongo_schema)
+    return mongo_to_sql_mapping
 
 
 if __name__ == '__main__':

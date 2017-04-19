@@ -1,12 +1,29 @@
 # coding: utf8
 
+"""
+Module grouping all TYPE's related issues
+ - mapping from pymongo_type to type_string 
+    - used in extract
+    - to be completed
+    
+ - type_string_tree, to get the least common parent type_string from a list of type_string
+    - used in extract while post-processing
+    - to be refactored
+    
+ - mapping from type_string to psql_type 
+    - used while mapping mongo_schema tosql 
+    - to be completed
+"""
+
 import bson
 from ete3 import Tree
 import logging
 logger = logging.getLogger(__name__)
 
+###
+# Mapping from pymongo_type to type_string
 
-TYPE_TO_STR = {
+PYMONGO_TYPE_TO_TYPE_STRING = {
     list: "ARRAY",
     dict: "OBJECT",
     type(None): "null",
@@ -27,24 +44,28 @@ TYPE_TO_STR = {
 }
 
 
-def type_name(value):
-    """Return mongo type string from a value 
+def get_type_string(value):
+    """ Return mongo type string from a value 
     
     :param value: 
-    :return type_str: str
+    :return type_string: str
     """
     value_type = type(value)
     try:
-        mongo_type = TYPE_TO_STR[value_type]
+        type_string = PYMONGO_TYPE_TO_TYPE_STRING[value_type]
     except KeyError:
-        logger.warning('Type {} is not mapped to a type_str. We define it as unknown for current schema extraction'.format(value_type))
-        TYPE_TO_STR[value_type] = 'unknown'
-        mongo_type = 'unknown'
+        logger.warning("Pymongo type {} is not mapped to a type_string. We define it as 'unknown' for current schema extraction".format(value_type))
+        PYMONGO_TYPE_TO_TYPE_STRING[value_type] = 'unknown'
+        type_string = 'unknown'
 
-    return mongo_type
+    return type_string
 
 
-TYPES_TREE_STR = """
+###
+# Define and use type_string_tree,
+# to get the least common parent type_string from a list of type_string
+
+NEWICK_TYPES_STRING_TREE = """
 (
     (
         (
@@ -63,25 +84,40 @@ TYPES_TREE_STR = """
 ) mixed_scalar_object
 ;"""
 
-TYPES_TREE = Tree(TYPES_TREE_STR, format=8)
+TYPES_STRING_TREE = Tree(NEWICK_TYPES_STRING_TREE, format=8)
 
 
-def common_parent_type(type_list):
-    """Get the common parent type from a list of types.
+def common_parent_type(list_of_type_string):
+    """ Get the common parent type from a list of types.
 
-    :param type_list: list
+    :param list_of_type_string: list
     :return common_type: type_str
     """
-    if not type_list:
+    if not list_of_type_string:
         return 'null'
-    elif len(type_list) == 1:
-        return type_list[0]
+    elif len(list_of_type_string) == 1:
+        return list_of_type_string[0]
     else:
-        return TYPES_TREE.get_common_ancestor(*type_list).name
+        return TYPES_STRING_TREE.get_common_ancestor(*list_of_type_string).name
 
 
-def get_tree_style():
-    """Custom tree style to output type tree figure."""
+def generate_type_tree_figure(output_file):
+    """ Generate type_tree.png image. 
+    
+    It needs ETE dependencies installed
+    cf http://etetoolkit.org/new_download/ or use anaconda
+    
+    :param output_file: str
+    """
+    try:
+        from ete3 import faces, TextFace, TreeStyle
+    except ImportError as e:
+        print('ImportError : {}'.format(e))
+        print("Generation of type_tree figure need ETE dependencies to be installed")
+        print("Use from anaconda, or look at installation procedure on http://etetoolkit.org/new_download/")
+        return
+
+    # Define custom tree style
     ts = TreeStyle()
     ts.show_leaf_name = False
     ts.show_scale = False
@@ -91,8 +127,14 @@ def get_tree_style():
     def my_layout(node):
         F = TextFace(node.name, fsize=16, ftype='Courier', bold=True)
         faces.add_face_to_node(F, node, column=10, position="branch-right")
+
     ts.layout_fn = my_layout
-    return ts
+
+    TYPES_STRING_TREE.render(output_file, tree_style=ts);
+
+###
+# Mapping from type_string to psql_type
+
 
 MONGO_TO_PSQL_TYPE = {
     'boolean': 'BOOLEAN',
@@ -107,7 +149,7 @@ MONGO_TO_PSQL_TYPE = {
 
 
 def psql_type(mongo_type_str):
-    """Map a MongoDB type string to a PSQL type string
+    """ Map a MongoDB type string to a PSQL type string
     
     :param mongo_type_str: str
     :return psql_type_str: str
@@ -116,8 +158,4 @@ def psql_type(mongo_type_str):
     return psql_type_str
 
 if __name__ == '__main__':
-    from ete3 import faces, TextFace, TreeStyle
-
-    # Generate type_tree image. It needs ETE dependencies installed
-    # cf http://etetoolkit.org/new_download/ or use anaconda
-    TYPES_TREE.render("type_tree.png", tree_style=get_tree_style());
+    generate_type_tree_figure("type_tree.png")

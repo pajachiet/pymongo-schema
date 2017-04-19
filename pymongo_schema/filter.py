@@ -7,7 +7,7 @@ PRESENT_VALUE = True
 
 
 def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
-    """Filter the schema with namespaces 
+    """ Filter the schema with namespaces 
     
     :param mongo_schema: dict
     :param namespaces_dict: dict
@@ -46,7 +46,7 @@ def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
 
 
 def init_filtered_schema(namespaces_dict):
-    """Initialize filtered_schema dict for databases present in namespace 
+    """ Initialize filtered_schema dict for databases present in namespace 
     
     :param namespaces_dict: dict
     :return filtered_schema: dict
@@ -59,7 +59,7 @@ def init_filtered_schema(namespaces_dict):
 
 
 def exclude_fields_from_collection_schema(exclude_fields_list, collection_schema):
-    """Deep copy collection_schema and exclude fields from it.
+    """ Deep copy collection_schema and exclude fields from it.
     
     :param exclude_fields_list: list
     :param collection_schema: dict
@@ -72,7 +72,7 @@ def exclude_fields_from_collection_schema(exclude_fields_list, collection_schema
 
 
 def exclude_fields_from_object_schema(exclude_fields_dict, object_schema):
-    """Exclude fields from object schema, with no return value.
+    """ Exclude fields from object schema, with no return value.
     
     :param exclude_fields_dict: dict
     :param object_schema: dict 
@@ -87,7 +87,7 @@ def exclude_fields_from_object_schema(exclude_fields_dict, object_schema):
 
 
 def field_list_to_dict(field_list):
-    """Transform a field list to a recursive field dictionary
+    """ Transform a field list to a recursive field dictionary
 
     :param field_list: list
     :return field_dict: dict
@@ -99,7 +99,7 @@ def field_list_to_dict(field_list):
 
 
 def add_field_to_dict(field, fields_dict):
-    """Recursively add a field and its subfield to a field dictionnary. No return value.
+    """ Recursively add a field and its subfield to a field dictionnary. No return value.
     
     :param field: str
     :param fields_dict: dict 

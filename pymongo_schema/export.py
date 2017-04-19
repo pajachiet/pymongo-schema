@@ -7,10 +7,20 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def output_schema(schema, output_format='txt', filename=None):
+def output_schema(output_dict, output_format='txt', filename=None):
+    """ Write output dictionary to file or standard output
+    
+    :param output_dict: dict
+        either schema or mapping
+    :param output_format: str, 
+        either 'json' or 'yaml'
+        a special 'txt' output is possible for mongo schemas
+    :param filename: str, default None => standard output
+    """
     if output_format not in ['txt', 'json', 'yaml']:
         raise ValueError("Ouput format should be txt, json or yaml. {} is not supported".format(output_format))
 
+    # Get output stream
     if filename is None:
         output_file = sys.stdout
         filename = 'standard output'
@@ -19,20 +29,28 @@ def output_schema(schema, output_format='txt', filename=None):
             filename += '.' + output_format
         output_file = open(filename, 'w')
 
-    logger.info('Write schema to {} with format {}'.format(filename, output_format))
+    logger.info('Write output_dict to {} with format {}'.format(filename, output_format))
 
+    # Write to output in the correct format
     if output_format == 'txt':
-        output_str = schema_as_str(schema)
+        output_str = schema_as_str(output_dict)
         output_file.write(output_str + '\n')
 
     elif output_format == 'json':
-        json.dump(schema, output_file, indent=4)
+        json.dump(output_dict, output_file, indent=4)
 
     elif output_format == 'yaml':
-        yaml.safe_dump(schema, output_file, default_flow_style=False)
+        yaml.safe_dump(output_dict, output_file, default_flow_style=False)
 
 
 def schema_as_str(schema):
+    """ Determine mongo schema level and represent it as a string.
+      
+    Schema level can either be MongoDB instance, Database or Collection
+    
+    :param schema: dict 
+    :return: str 
+    """
     schema_level = get_schema_level(schema)
     if schema_level == 'collection':
         return collection_schema_as_str(schema)
@@ -61,6 +79,11 @@ def get_schema_level(schema):
 
 
 def mongo_schema_as_str(mongo_schema):
+    """ Represent a MongoDB schema as a string
+    
+    :param mongo_schema: dict
+    :return: str
+    """
     database_schema_list = []
     for database, database_schema in mongo_schema.iteritems():
         database_schema_str = database_schema_as_str(database_schema)
@@ -71,6 +94,11 @@ def mongo_schema_as_str(mongo_schema):
 
 
 def database_schema_as_str(database_schema):
+    """ Represent a Database schema as a string
+    
+    :param database_schema: dict 
+    :return: str
+    """
     collection_str_list = []
     for collection, collection_schema in database_schema.iteritems():
         count = collection_schema['count']
@@ -82,7 +110,7 @@ def database_schema_as_str(database_schema):
 
 
 def collection_schema_as_str(collection_schema):
-    """Pretty format object_schema as string
+    """ Represent object_schema as readable string
 
     :param object_schema: dict
     :return object_schema_str: str
@@ -100,7 +128,7 @@ def collection_schema_as_str(collection_schema):
 
 
 def object_schema_to_lines_tuples(object_schema, field_prefix=''):
-    """Get the list of tuples describing lines in object_schema
+    """ Get the list of tuples describing lines in object_schema
 
     - Sort fields by count
     - Add the tuples describing each field in object
@@ -139,6 +167,18 @@ def object_schema_to_lines_tuples(object_schema, field_prefix=''):
 
 
 def format_types_count(types_count, array_types_count=None):
+    """ Format types_count to a readable sting.
+    
+    >>> format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
+    'integer : 10, boolean : 5, null : 3'
+    
+    >>> format_types_count({'ARRAY': 10, 'null': 3, }, {'float': 4})
+    'ARRAY(float : 4) : 10, null : 3'
+
+    :param types_count: dict
+    :param array_types_count: dict, default None 
+    :return types_count_string : str
+    """
     types_count = sorted(types_count.items(),
                          key=lambda x: x[1],
                          reverse=True)
@@ -150,12 +190,13 @@ def format_types_count(types_count, array_types_count=None):
             type_count_list.append('ARRAY(' + array_type_name + ') : ' + str(count))
         else:
             type_count_list.append(str(type_name) + ' : ' + str(count))
-    return ', '.join(type_count_list)
 
+    types_count_string = ', '.join(type_count_list)
+    return types_count_string
 
 
 def format_str_for_tuple_list(tuple_list, margin=3):
-    """Create the format string for a list of tuple
+    """ Create the format string for a list of tuple
 
     The format string is in the form '{0:6}{1:10}', where 
       - '0', '1' indicate the position in format tuple
