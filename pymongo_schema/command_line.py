@@ -53,9 +53,10 @@ from extract import extract_pymongo_client_schema
 from filter import filter_mongo_schema_namespaces
 from tosql import mongo_schema_to_mapping
 
+logger = logging.getLogger()
+
 
 def inititialize_logger(arg):
-    logger = logging.getLogger()
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.NullHandler())
 
@@ -97,7 +98,9 @@ def schema_to_sql(arg):
     return mongo_schema_to_mapping(mongo_schema)
 
 
-if __name__ == '__main__':
+def main():
+    """ Launch pymongo_schema (assuming CLI)
+    """
     # Parse command line argument
     arg = docopt(__doc__, help=True)
     if not arg['--collection']:
@@ -121,3 +124,7 @@ if __name__ == '__main__':
     logger.info('=== Write MongoDB schema')
     for output_format in arg['--format']:
         output_schema(output_dict, output_format=output_format, filename=arg['--output'])
+
+
+if __name__ == '__main__':
+    main()
