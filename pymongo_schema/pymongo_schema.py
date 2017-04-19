@@ -33,7 +33,7 @@ Options:
     -f , --format FORMAT        Output format for schema : 'txt', 'yaml' or 'json'
                                 Multiple format may be specified. [default: txt]
     
-    -i , --input FILENAME       SInput file for schema to filter. json format expected. 
+    -i , --input FILENAME       Input schema file, to filter or to map to sql. json format expected. 
 
     -n, --namespace FILENAME    Config file to read namespace to filter. json format expected.
     
@@ -48,10 +48,11 @@ from time import time
 from docopt import docopt
 import json
 import pymongo
-from pymongo_schema.export import output_schema
-from pymongo_schema.extract import extract_pymongo_client_schema
-from pymongo_schema.filter import filter_mongo_schema_namespaces
-from pymongo_schema.tosql import mongo_schema_to_mapping
+from export import output_schema
+from extract import extract_pymongo_client_schema
+from filter import filter_mongo_schema_namespaces
+from tosql import mongo_schema_to_mapping
+
 
 def inititialize_logger(arg):
     logger = logging.getLogger()
