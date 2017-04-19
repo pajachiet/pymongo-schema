@@ -4,7 +4,7 @@
 from setuptools import setup
 
 setup(name='pymongo-schema',
-      version='0.1',
+      version='0.2',
       description='A schema analyser for MongoDB written in Python',
       packages=['pymongo_schema'],
       install_requires=[
