@@ -6,7 +6,7 @@ pymongo-schema extract schemas from MongoDB
 
 Usage:
     pymongo-schema  -h | --help
-    pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST --quiet]
+    pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --columns=COLUMNS --port=PORT --host=HOST --quiet]
     pymongo-schema  filter --input=FILENAME --namespace=FILENAME [--output=FILENAME --format=FORMAT... --quiet]
     pymongo-schema  tosql --input=FILENAME [--output=FILENAME --quiet]
 
@@ -30,8 +30,24 @@ Options:
     -o , --output FILENAME      Output file for schema. Default to standard output. 
                                 Extension added automatically if omitted (useful for multi-format outputs)
     
-    -f , --format FORMAT        Output format for schema : 'txt', 'yaml' or 'json'
+    -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'yaml' or 'json'
                                 Multiple format may be specified. [default: txt]
+
+    --columns HEADER            String listing columns to get in 'txt' or 'csv' format. 
+                                Columns are to be chosen in :
+                                    FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays 
+                                    FIELD_COMPACT_NAME      idem, without parent object names
+                                    FIELD_NAME              
+                                    DEPTH                   
+                                    TYPE                    
+                                    COUNT                   
+                                    PROPORTION_IN_OBJECT    
+                                    PERCENTAGE              
+                                    TYPES_COUNT             
+                                Columns have to be separated by whitespace, and are case insensitive.
+                                Default for 'txt' output is "Field_compact_name Field_name Count Percentage Type_count"
+                                Default for 'csv' output is "Field_full_name Depth Field_name Type"
+                                    
     
     -i , --input FILENAME       Input schema file, to filter or to map to sql. json format expected. 
 
@@ -48,7 +64,7 @@ from time import time
 from docopt import docopt
 import json
 import pymongo
-from export import output_schema
+from export import write_output_dict
 from extract import extract_pymongo_client_schema
 from filter import filter_mongo_schema_namespaces
 from tosql import mongo_schema_to_mapping
@@ -82,7 +98,14 @@ def main():
     # Output dict
     logger.info('=== Write MongoDB schema')
     for output_format in arg['--format']:
-        output_schema(output_dict, output_format=output_format, filename=arg['--output'])
+        write_output_dict(output_dict, output_format=output_format, filename=arg['--output'], columns_to_get=arg['--columns'])
+
+
+def initialize_columns(arg):
+    if arg['--columns'] is None:
+        arg['--columns'] = "FIELD_COMPACT_NAME FIELD_NAME TYPE COUNT PERCENTAGE TYPES_COUNT"
+
+    arg['--columns'] = arg['--columns'].split()
 
 
 def initialize_logger(arg):

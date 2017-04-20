@@ -1,13 +1,14 @@
 # coding: utf8
 
 import sys
+import re
 import json
 import yaml
 import logging
 logger = logging.getLogger(__name__)
 
 
-def output_schema(output_dict, output_format='txt', filename=None):
+def write_output_dict(output_dict, output_format='txt', columns_to_get=None, filename=None):
     """ Write output dictionary to file or standard output
     
     :param output_dict: dict
@@ -16,10 +17,12 @@ def output_schema(output_dict, output_format='txt', filename=None):
         either 'json' or 'yaml'
         a special 'txt' output is possible for mongo schemas
     :param filename: str, default None => standard output
+    :param columns_to_get: iterable
+        columns to create for each field in 'txt' or 'csv' format
     """
-    if output_format not in ['txt', 'json', 'yaml']:
-        raise ValueError("Ouput format should be txt, json or yaml. {} is not supported".format(output_format))
 
+    if output_format not in ['txt', 'csv', 'json', 'yaml']:
+        raise ValueError("Ouput format should be txt, csv, json or yaml. {} is not supported".format(output_format))
     # Get output stream
     if filename is None:
         output_file = sys.stdout
@@ -31,10 +34,19 @@ def output_schema(output_dict, output_format='txt', filename=None):
 
     logger.info('Write output_dict to {} with format {}'.format(filename, output_format))
 
-    # Write to output in the correct format
+    # Write output_dict in the correct format
     if output_format == 'txt':
-        output_str = schema_as_str(output_dict)
+        if columns_to_get is None:
+            columns_to_get = "Field_compact_name Field_name Count Percentage Type_count".split()
+
+        output_str = schema_as_str(output_dict, columns_to_get, output_format)
         output_file.write(output_str + '\n')
+
+    if output_format == 'csv':
+        if columns_to_get is None:
+            columns_to_get = "Field_full_name Depth Field_name Type".split()
+            output_str = mongo_schema_as_csv(output_dict, columns_to_get)
+            output_file.write(output_str + '\n')
 
     elif output_format == 'json':
         json.dump(output_dict, output_file, indent=4)
@@ -43,23 +55,33 @@ def output_schema(output_dict, output_format='txt', filename=None):
         yaml.safe_dump(output_dict, output_file, default_flow_style=False)
 
 
-def schema_as_str(schema):
+def schema_as_str(schema, columns_to_get, output_format):
     """ Determine mongo schema level and represent it as a string.
       
     Schema level can either be MongoDB instance, Database or Collection
     
-    :param schema: dict 
+    :param schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
+    :param output_format: str, 
+        either 'txt' or 'csv'
     :return: str 
     """
+
     schema_level = get_schema_level(schema)
+    if output_format == 'csv':
+        assert schema_level == 'mongo', \
+            "'csv' output is only implemented for MongoDB schema level (not collection or database level)"
+
+
     if schema_level == 'collection':
-        return collection_schema_as_str(schema)
+        return collection_schema_as_str(schema, columns_to_get, output_format)
 
     elif schema_level == 'database':
-        return database_schema_as_str(schema)
+        return database_schema_as_str(schema, columns_to_get, output_format)
 
     elif schema_level == 'mongo':
-        return mongo_schema_as_str(schema)
+        return mongo_schema_as_str(schema, columns_to_get, output_format)
 
 
 def get_schema_level(schema):
@@ -78,56 +100,99 @@ def get_schema_level(schema):
             return 'mongo'
 
 
-def mongo_schema_as_str(mongo_schema):
+def mongo_schema_as_csv(mongo_schema, columns_to_get):
     """ Represent a MongoDB schema as a string
-    
+
     :param mongo_schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
     :return: str
     """
     database_schema_list = []
     for database, database_schema in mongo_schema.iteritems():
-        database_schema_str = database_schema_as_str(database_schema)
+        header = '\t'.join(['Database', 'Collection'] + columns_to_get)
+        collection_str_list = [header]
+        for collection, collection_schema in database_schema.iteritems():
+            collection_schema_str = collection_schema_as_str(collection_schema, columns_to_get, 'csv')
+            for line in collection_schema_str.split('\n'):
+                collection_str_list.append('{}\t{}\t{}'.format(database, collection, line))
+
+        database_schema_str = '\n'.join(collection_str_list)
+        database_schema_list.append(database_schema_str)
+
+    return '\n'.join(database_schema_list)
+
+
+def mongo_schema_as_str(mongo_schema, columns_to_get, output_format):
+    """ Represent a MongoDB schema as a string
+    
+    :param mongo_schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
+    :param output_format: str, 
+        either 'txt' or 'csv'
+    :return: str
+    """
+    database_schema_list = []
+    for database, database_schema in mongo_schema.iteritems():
+        database_schema_str = database_schema_as_str(database_schema, columns_to_get, output_format)
         database_str = '='*20 + '\n' + database + '\n' + database_schema_str
         database_schema_list.append(database_str)
 
     return '\n\n'.join(database_schema_list)
 
 
-def database_schema_as_str(database_schema):
+def database_schema_as_str(database_schema, columns_to_get, output_format):
     """ Represent a Database schema as a string
     
-    :param database_schema: dict 
+    :param database_schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
+    :param output_format: str, 
+        either 'txt' or 'csv'
     :return: str
     """
+
     collection_str_list = []
     for collection, collection_schema in database_schema.iteritems():
         count = collection_schema['count']
-        collection_schema_str = collection_schema_as_str(collection_schema)
+        collection_schema_str = collection_schema_as_str(collection_schema, columns_to_get, output_format)
         collection_str = '{} {}\n{}'.format(collection, count, collection_schema_str)
         collection_str_list.append(collection_str)
 
     return '\n\n'.join(collection_str_list)
 
 
-def collection_schema_as_str(collection_schema):
+def collection_schema_as_str(collection_schema, columns_to_get, output_format):
     """ Represent object_schema as readable string
 
-    :param object_schema: dict
+    :param collection_schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
+    :param output_format: str, 
+        either 'txt' or 'csv'
     :return object_schema_str: str
     """
-    lines = [('FIELD_NAME', 'TYPE', 'COUNT', 'PERCENTAGE', 'TYPES_COUNT')]
-    lines += object_schema_to_lines_tuples(collection_schema['object'])
+    line_tuples = []
+    if output_format == 'txt':
+        line_tuples = [tuple(columns_to_get)]  # Header
+    line_tuples += object_schema_to_line_tuples(collection_schema['object'], columns_to_get, field_prefix='')
 
-    format_str = format_str_for_tuple_list(lines)
-    formated_lines = []
-    for line in lines:
-        formated_lines.append(format_str.format(*line))
+    formatting_str = None
+    if output_format == 'txt':
+        formatting_str = formatting_str_from_tuple_list(line_tuples)
+    elif output_format == 'csv':
+        formatting_str = '\t'.join(['{}'] * len(columns_to_get))
 
-    object_schema_str = '\n'.join(formated_lines)
+    formatted_lines = []
+    for line in line_tuples:
+        formatted_lines.append(formatting_str.format(*line))
+
+    object_schema_str = '\n'.join(formatted_lines)
     return object_schema_str
 
 
-def object_schema_to_lines_tuples(object_schema, field_prefix=''):
+def object_schema_to_line_tuples(object_schema, columns_to_get, field_prefix):
     """ Get the list of tuples describing lines in object_schema
 
     - Sort fields by count
@@ -135,35 +200,87 @@ def object_schema_to_lines_tuples(object_schema, field_prefix=''):
     - Recursively add tuples for nested objects
 
     :param object_schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
     :param field_prefix: str, default ''
-    :return lines_tuples: list of tuples describing lines
+        allows to create full name.
+        '.' is the separator for object subfields
+        ':' is the separator for list of objects subfields
+    :return line_tuples: list of tuples describing lines
     """
-    lines_tuples = list()
-
+    line_tuples = []
     sorted_fields = sorted(object_schema.items(),
                            key=lambda x: x[1]['count'],
                            reverse=True)
 
     for field, field_schema in sorted_fields:
-        field_name = field_prefix + field
-        field_type = field_schema['type']
-        if field_type == 'ARRAY':
-            field_type = 'ARRAY(' + field_schema['array_type'] + ')'
-        field_count = str(field_schema['count'])
-        field_percent = str(100 * field_schema['prop_in_object'])
-        field_types_count = format_types_count(field_schema['types_count'], field_schema.get('array_types_count', None))
-        line = (field_name, field_type, field_count, field_percent, field_types_count)
-
-        lines_tuples.append(line)
-
+        line_columns = field_schema_to_columns(field, field_schema, field_prefix, columns_to_get)
+        line_tuples.append(line_columns)
 
         if 'ARRAY' in field_schema['types_count'] and 'OBJECT' in field_schema['array_types_count']:
-            lines_tuples += object_schema_to_lines_tuples(field_schema['object'], field_prefix=field_prefix + ' X ')
+            line_tuples += object_schema_to_line_tuples(field_schema['object'],
+                                                        columns_to_get,
+                                                        field_prefix=field_prefix + field + ':')
 
         elif 'OBJECT' in field_schema['types_count']:  # 'elif' rather than 'if' in case of both OBJECT and ARRAY(OBJECT)
-            lines_tuples += object_schema_to_lines_tuples(field_schema['object'], field_prefix=field_prefix + ' . ')
+            line_tuples += object_schema_to_line_tuples(field_schema['object'],
+                                                        columns_to_get,
+                                                        field_prefix=field_prefix + field + '.')
 
-    return lines_tuples
+    return line_tuples
+
+
+def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
+    """ 
+    
+    :param field: 
+    :param field_schema: 
+    :param field_prefix: str, default ''
+    :param columns_to_get: iterable
+        columns to create for each field
+    :return field_columns: tuple
+    """
+    # f= field
+    column_functions = {
+        'field_full_name': lambda f, f_schema, f_prefix: f_prefix + f,
+        'field_compact_name': field_compact_name,
+        'field_name': lambda f, f_schema, f_prefix: f,
+        'depth': field_depth,
+        'type': field_type,
+        'count': lambda f, f_schema, f_prefix: f_schema['count'],
+        'proportion_in_object': lambda f, f_schema, f_prefix: f_schema['prop_in_object'],
+        'percentage': lambda f, f_schema, f_prefix: 100 * f_schema['prop_in_object'],
+        'types_count': lambda f, f_schema, f_prefix:
+        format_types_count(f_schema['types_count'], f_schema.get('array_types_count', None)),
+    }
+
+    field_columns = list()
+    for column in columns_to_get:
+        column = column.lower()
+        column_str = column_functions[column](field, field_schema, field_prefix)
+        field_columns.append(column_str)
+
+    field_columns = tuple(field_columns)
+    return field_columns
+
+
+def field_compact_name(field, field_schema, field_prefix):
+    separators = re.sub('[^.:]', '', field_prefix)
+    separators = re.sub('.', ' . ', separators)
+    separators = re.sub(': ', ' : ', separators)
+    return separators + field
+
+
+def field_depth(field, field_schema, field_prefix):
+    separators = re.sub('[^.:]', '', field_prefix)
+    return len(separators)
+
+
+def field_type(field, field_schema, field_prefix):
+    f_type = field_schema['type']
+    if f_type == 'ARRAY':
+        f_type = 'ARRAY(' + field_schema['array_type'] + ')'
+    return f_type
 
 
 def format_types_count(types_count, array_types_count=None):
@@ -195,8 +312,8 @@ def format_types_count(types_count, array_types_count=None):
     return types_count_string
 
 
-def format_str_for_tuple_list(tuple_list, margin=3):
-    """ Create the format string for a list of tuple
+def formatting_str_from_tuple_list(tuple_list, margin=3):
+    """ Create the format string from a list of tuple
 
     The format string is in the form '{0:6}{1:10}', where 
       - '0', '1' indicate the position in format tuple
@@ -208,13 +325,14 @@ def format_str_for_tuple_list(tuple_list, margin=3):
         all tuples are assumed to have the same length
     :param margin: int, default 3
         margin between successive fields
-    :return format_str: str
+    :return formatting_str: str
         string to format tuple_list
     """
-    format_str = ""
+    formatting_str = ""
     n = len(tuple_list[0])
     for i in range(n):
-        field_lengths = [len(line[i]) for line in tuple_list]
+        field_lengths = [len(str(line[i])) for line in tuple_list]
         field_size = max(field_lengths) + margin
-        format_str += '{' + str(i) + ':' + str(field_size) + '}'
-    return format_str
+        formatting_str += '{' + str(i) + ':<' + str(field_size) + '}'
+    return formatting_str
+
