@@ -22,12 +22,12 @@ def write_output_dict(output_dict, arg):
     :param columns_to_get: iterable
         columns to create for each field in 'txt' or 'csv' format
     """
-    filename = arg['--output']
-    columns_to_get = arg['--columns']
 
     for output_format in arg['--format']:
+        filename = arg['--output']
+        columns_to_get = arg['--columns']
         if output_format not in ['txt', 'csv', 'xlsx', 'json', 'yaml']:
-            raise ValueError("Ouput format should be txt, csv, json or yaml. {} is not supported".format(output_format))
+            raise ValueError("Ouput format should be txt, csv, 'xlsx' json or yaml. {} is not supported".format(output_format))
 
         # Get output stream
         if filename is None:
@@ -52,7 +52,6 @@ def write_output_dict(output_dict, arg):
             if output_format == 'xlsx':
                 if filename == 'standard output':
                     print "xlsx format is not supported to standard output. Switching to csv output"
-                    output_file = open(filename, 'w')
                     output_format = 'csv'
                 else:
                     from openpyxl import load_workbook
@@ -65,11 +64,11 @@ def write_output_dict(output_dict, arg):
                         writer = pd.ExcelWriter(filename, engine='openpyxl')
                         writer.book = book
                         writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                        mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=False, float_format='{0:.2f}')
+                        mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=True, float_format='{0:.2f}')
                         writer.save()
 
                     else:
-                        mongo_schema_df.to_excel(filename, sheet_name='Mongo_Schema', index=False, float_format='{0:.2f}')
+                        mongo_schema_df.to_excel(filename, sheet_name='Mongo_Schema', index=True, float_format='{0:.2f}')
 
             if output_format == 'csv':
                 mongo_schema_df.to_csv(output_file, sep='\t', index=False)
