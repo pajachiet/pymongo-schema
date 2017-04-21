@@ -4,3 +4,5 @@ docopt
 ete3
 pandas
 xlwt
+xlsxwriter
+openpyxl
