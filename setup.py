@@ -11,7 +11,9 @@ setup(name='pymongo-schema',
           'pymongo',
           'pyyaml',
           'docopt',
-          'ete3'
+          'ete3',
+          'pandas',
+          'xlwt'
       ],
       entry_points={
           'console_scripts': [

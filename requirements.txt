@@ -2,3 +2,5 @@ pymongo
 pyyaml
 docopt
 ete3
+pandas
+xlwt

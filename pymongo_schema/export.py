@@ -4,6 +4,7 @@ import sys
 import re
 import json
 import yaml
+import pandas as pd
 import logging
 logger = logging.getLogger(__name__)
 
@@ -15,14 +16,15 @@ def write_output_dict(output_dict, output_format='txt', columns_to_get=None, fil
         either schema or mapping
     :param output_format: str, 
         either 'json' or 'yaml'
-        a special 'txt' output is possible for mongo schemas
+        a special 'txt', 'csv' or 'xls' output is possible for mongo schemas
     :param filename: str, default None => standard output
     :param columns_to_get: iterable
         columns to create for each field in 'txt' or 'csv' format
     """
 
-    if output_format not in ['txt', 'csv', 'json', 'yaml']:
+    if output_format not in ['txt', 'csv', 'xls', 'json', 'yaml']:
         raise ValueError("Ouput format should be txt, csv, json or yaml. {} is not supported".format(output_format))
+
     # Get output stream
     if filename is None:
         output_file = sys.stdout
@@ -35,18 +37,34 @@ def write_output_dict(output_dict, output_format='txt', columns_to_get=None, fil
     logger.info('Write output_dict to {} with format {}'.format(filename, output_format))
 
     # Write output_dict in the correct format
-    if output_format == 'txt':
+    if output_format in ['csv', 'xls']:
         if columns_to_get is None:
-            columns_to_get = "Field_compact_name Field_name Count Percentage Type_count".split()
+            columns_to_get = "Field_full_name Depth Field_name Type".split()
 
-        output_str = schema_as_str(output_dict, columns_to_get, output_format)
-        output_file.write(output_str + '\n')
+        mongo_schema_df = mongo_schema_as_dataframe(output_dict, columns_to_get)
+
+        if output_format == 'xls':
+            if output_file == sys.stdout:
+                print "xls format is not supported to standard output. Switching to csv output"
+                output_format = 'csv'
+            else:
+                mongo_schema_df.to_excel(filename, index=False, sheet_name='Mongo_Schema', float_format='{0:.2f}')
+
+        if output_format == 'csv':
+            mongo_schema_df.to_csv(output_file, sep='\t', index=False)
 
     if output_format == 'csv':
         if columns_to_get is None:
             columns_to_get = "Field_full_name Depth Field_name Type".split()
-            output_str = mongo_schema_as_csv(output_dict, columns_to_get)
-            output_file.write(output_str + '\n')
+        mongo_schema_df = mongo_schema_as_dataframe(output_dict, columns_to_get)
+        mongo_schema_df.to_csv(output_file, sep='\t', index=False)
+
+
+    elif output_format == 'txt':
+        if columns_to_get is None:
+            columns_to_get = "Field_compact_name Field_name Count Percentage Types_count".split()
+        output_str = schema_as_txt(output_dict, columns_to_get)
+        output_file.write(output_str + '\n')
 
     elif output_format == 'json':
         json.dump(output_dict, output_file, indent=4)
@@ -55,7 +73,29 @@ def write_output_dict(output_dict, output_format='txt', columns_to_get=None, fil
         yaml.safe_dump(output_dict, output_file, default_flow_style=False)
 
 
-def schema_as_str(schema, columns_to_get, output_format):
+def mongo_schema_as_dataframe(mongo_schema, columns_to_get):
+    """ Represent a MongoDB schema as a dataframe
+    
+    :param mongo_schema: dict
+    :param columns_to_get: iterable
+        columns to create for each field
+    :return mongo_schema_df: Dataframe
+    """
+    line_tuples = list()
+    for database, database_schema in mongo_schema.iteritems():
+        for collection, collection_schema in database_schema.iteritems():
+            collection_line_tuples = object_schema_to_line_tuples(collection_schema['object'],
+                                                                  columns_to_get,
+                                                                  field_prefix='')
+            for t in collection_line_tuples:
+                line_tuples.append([database, collection] + list(t))
+
+    header = tuple(['Database', 'Collection'] + columns_to_get)
+    mongo_schema_df = pd.DataFrame(line_tuples, columns=header)
+    return mongo_schema_df
+
+
+def schema_as_txt(schema, columns_to_get):
     """ Determine mongo schema level and represent it as a string.
       
     Schema level can either be MongoDB instance, Database or Collection
@@ -63,25 +103,19 @@ def schema_as_str(schema, columns_to_get, output_format):
     :param schema: dict
     :param columns_to_get: iterable
         columns to create for each field
-    :param output_format: str, 
-        either 'txt' or 'csv'
     :return: str 
     """
 
     schema_level = get_schema_level(schema)
-    if output_format == 'csv':
-        assert schema_level == 'mongo', \
-            "'csv' output is only implemented for MongoDB schema level (not collection or database level)"
-
 
     if schema_level == 'collection':
-        return collection_schema_as_str(schema, columns_to_get, output_format)
+        return collection_schema_as_txt(schema, columns_to_get)
 
     elif schema_level == 'database':
-        return database_schema_as_str(schema, columns_to_get, output_format)
+        return database_schema_as_txt(schema, columns_to_get)
 
     elif schema_level == 'mongo':
-        return mongo_schema_as_str(schema, columns_to_get, output_format)
+        return mongo_schema_as_txt(schema, columns_to_get)
 
 
 def get_schema_level(schema):
@@ -100,32 +134,9 @@ def get_schema_level(schema):
             return 'mongo'
 
 
-def mongo_schema_as_csv(mongo_schema, columns_to_get):
+def mongo_schema_as_txt(mongo_schema, columns_to_get):
     """ Represent a MongoDB schema as a string
 
-    :param mongo_schema: dict
-    :param columns_to_get: iterable
-        columns to create for each field
-    :return: str
-    """
-    database_schema_list = []
-    for database, database_schema in mongo_schema.iteritems():
-        header = '\t'.join(['Database', 'Collection'] + columns_to_get)
-        collection_str_list = [header]
-        for collection, collection_schema in database_schema.iteritems():
-            collection_schema_str = collection_schema_as_str(collection_schema, columns_to_get, 'csv')
-            for line in collection_schema_str.split('\n'):
-                collection_str_list.append('{}\t{}\t{}'.format(database, collection, line))
-
-        database_schema_str = '\n'.join(collection_str_list)
-        database_schema_list.append(database_schema_str)
-
-    return '\n'.join(database_schema_list)
-
-
-def mongo_schema_as_str(mongo_schema, columns_to_get, output_format):
-    """ Represent a MongoDB schema as a string
-    
     :param mongo_schema: dict
     :param columns_to_get: iterable
         columns to create for each field
@@ -135,55 +146,43 @@ def mongo_schema_as_str(mongo_schema, columns_to_get, output_format):
     """
     database_schema_list = []
     for database, database_schema in mongo_schema.iteritems():
-        database_schema_str = database_schema_as_str(database_schema, columns_to_get, output_format)
-        database_str = '='*20 + '\n' + database + '\n' + database_schema_str
+        database_schema_str = database_schema_as_txt(database_schema, columns_to_get)
+        database_str = '=' * 20 + '\n' + database + '\n' + database_schema_str
         database_schema_list.append(database_str)
 
     return '\n\n'.join(database_schema_list)
 
 
-def database_schema_as_str(database_schema, columns_to_get, output_format):
+def database_schema_as_txt(database_schema, columns_to_get):
     """ Represent a Database schema as a string
-    
+
     :param database_schema: dict
     :param columns_to_get: iterable
         columns to create for each field
-    :param output_format: str, 
-        either 'txt' or 'csv'
     :return: str
     """
-
     collection_str_list = []
     for collection, collection_schema in database_schema.iteritems():
         count = collection_schema['count']
-        collection_schema_str = collection_schema_as_str(collection_schema, columns_to_get, output_format)
+        collection_schema_str = collection_schema_as_txt(collection_schema, columns_to_get)
         collection_str = '{} {}\n{}'.format(collection, count, collection_schema_str)
         collection_str_list.append(collection_str)
 
     return '\n\n'.join(collection_str_list)
 
 
-def collection_schema_as_str(collection_schema, columns_to_get, output_format):
+def collection_schema_as_txt(collection_schema, columns_to_get):
     """ Represent object_schema as readable string
 
     :param collection_schema: dict
     :param columns_to_get: iterable
         columns to create for each field
-    :param output_format: str, 
-        either 'txt' or 'csv'
     :return object_schema_str: str
     """
     line_tuples = []
-    if output_format == 'txt':
-        line_tuples = [tuple(columns_to_get)]  # Header
-    line_tuples += object_schema_to_line_tuples(collection_schema['object'], columns_to_get, field_prefix='')
-
-    formatting_str = None
-    if output_format == 'txt':
-        formatting_str = formatting_str_from_tuple_list(line_tuples)
-    elif output_format == 'csv':
-        formatting_str = '\t'.join(['{}'] * len(columns_to_get))
-
+    line_tuples += object_schema_to_line_tuples(collection_schema['object'], columns_to_get,
+                                                field_prefix='')
+    formatting_str = formatting_str_from_tuple_list(line_tuples)
     formatted_lines = []
     for line in line_tuples:
         formatted_lines.append(formatting_str.format(*line))

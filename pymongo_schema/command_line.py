@@ -30,10 +30,10 @@ Options:
     -o , --output FILENAME      Output file for schema. Default to standard output. 
                                 Extension added automatically if omitted (useful for multi-format outputs)
     
-    -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'yaml' or 'json'
+    -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'xls', 'yaml' or 'json'
                                 Multiple format may be specified. [default: txt]
 
-    --columns HEADER            String listing columns to get in 'txt' or 'csv' format. 
+    --columns HEADER            String listing columns to get in 'txt', 'csv' or 'xls' format. 
                                 Columns are to be chosen in :
                                     FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays 
                                     FIELD_COMPACT_NAME      idem, without parent object names
@@ -45,8 +45,8 @@ Options:
                                     PERCENTAGE              
                                     TYPES_COUNT             
                                 Columns have to be separated by whitespace, and are case insensitive.
-                                Default for 'txt' output is "Field_compact_name Field_name Count Percentage Type_count"
-                                Default for 'csv' output is "Field_full_name Depth Field_name Type"
+                                Default for 'txt' output is "Field_compact_name Field_name Count Percentage Types_count"
+                                Default for 'csv' and 'xls' output is "Field_full_name Depth Field_name Type"
                                     
     
     -i , --input FILENAME       Input schema file, to filter or to map to sql. json format expected. 
