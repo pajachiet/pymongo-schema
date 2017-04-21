@@ -80,6 +80,9 @@ def main():
     if not arg['--collection']:
         arg['--collection'] = None
 
+    if not arg['--format']:
+        arg['--format'] = ['txt']
+
     initialize_logger(arg)
 
     # Extract mongo schema
@@ -97,8 +100,7 @@ def main():
 
     # Output dict
     logger.info('=== Write MongoDB schema')
-    for output_format in arg['--format']:
-        write_output_dict(output_dict, output_format=output_format, filename=arg['--output'], columns_to_get=arg['--columns'])
+    write_output_dict(output_dict, arg)
 
 
 def initialize_columns(arg):

@@ -10,7 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def write_output_dict(output_dict, output_format='txt', columns_to_get=None, filename=None):
+def write_output_dict(output_dict, arg):
     """ Write output dictionary to file or standard output
     
     :param output_dict: dict
@@ -22,67 +22,69 @@ def write_output_dict(output_dict, output_format='txt', columns_to_get=None, fil
     :param columns_to_get: iterable
         columns to create for each field in 'txt' or 'csv' format
     """
+    filename = arg['--output']
+    columns_to_get = arg['--columns']
 
-    if output_format not in ['txt', 'csv', 'xlsx', 'json', 'yaml']:
-        raise ValueError("Ouput format should be txt, csv, json or yaml. {} is not supported".format(output_format))
+    for output_format in arg['--format']:
+        if output_format not in ['txt', 'csv', 'xlsx', 'json', 'yaml']:
+            raise ValueError("Ouput format should be txt, csv, json or yaml. {} is not supported".format(output_format))
 
-    # Get output stream
-    if filename is None:
-        output_file = sys.stdout
-        filename = 'standard output'
-    else:
-        if not filename.endswith('.' + output_format):  # Add extension
-            filename += '.' + output_format
+        # Get output stream
+        if filename is None:
+            output_file = sys.stdout
+            filename = 'standard output'
+        else:
+            if not filename.endswith('.' + output_format):  # Add extension
+                filename += '.' + output_format
 
-        if output_format != 'xlsx':  # Do not open for 'xlsx'
-            output_file = open(filename, 'w')
-
-    logger.info('Write output_dict to {} with format {}'.format(filename, output_format))
-
-    # Write output_dict in the correct format
-    if output_format in ['csv', 'xlsx']:
-        if columns_to_get is None:
-            columns_to_get = "Field_full_name Depth Field_name Type".split()
-
-        mongo_schema_df = mongo_schema_as_dataframe(output_dict, columns_to_get)
-
-        if output_format == 'xlsx':
-            if filename == 'standard output':
-                print "xlsx format is not supported to standard output. Switching to csv output"
+            if output_format != 'xlsx':  # Do not open for 'xlsx'
                 output_file = open(filename, 'w')
-                output_format = 'csv'
-            else:
-                from openpyxl import load_workbook
 
-                if os.path.isfile(filename):
-                    # Keep existing data
-                    # Solution from : http://stackoverflow.com/questions/20219254/how-to-write-to-an-existing-excel-file-without-overwriting-data-using-pandas
-                    # May not work for formulaes
-                    book = load_workbook(filename)
-                    writer = pd.ExcelWriter(filename, engine='openpyxl')
-                    writer.book = book
-                    writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-                    mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=False, float_format='{0:.2f}')
-                    writer.save()
+        logger.info('Write output_dict to {} with format {}'.format(filename, output_format))
 
+        # Write output_dict in the correct format
+        if output_format in ['csv', 'xlsx']:
+            if columns_to_get is None:
+                columns_to_get = "Field_full_name Depth Field_name Type".split()
+
+            mongo_schema_df = mongo_schema_as_dataframe(output_dict, columns_to_get)
+
+            if output_format == 'xlsx':
+                if filename == 'standard output':
+                    print "xlsx format is not supported to standard output. Switching to csv output"
+                    output_file = open(filename, 'w')
+                    output_format = 'csv'
                 else:
-                    mongo_schema_df.to_excel(filename, sheet_name='Mongo_Schema', index=False, float_format='{0:.2f}')
+                    from openpyxl import load_workbook
 
-        if output_format == 'csv':
-            mongo_schema_df.to_csv(output_file, sep='\t', index=False)
+                    if os.path.isfile(filename):
+                        # Keep existing data
+                        # Solution from : http://stackoverflow.com/questions/20219254/how-to-write-to-an-existing-excel-file-without-overwriting-data-using-pandas
+                        # May not work for formulaes
+                        book = load_workbook(filename)
+                        writer = pd.ExcelWriter(filename, engine='openpyxl')
+                        writer.book = book
+                        writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
+                        mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=False, float_format='{0:.2f}')
+                        writer.save()
 
+                    else:
+                        mongo_schema_df.to_excel(filename, sheet_name='Mongo_Schema', index=False, float_format='{0:.2f}')
 
-    elif output_format == 'txt':
-        if columns_to_get is None:
-            columns_to_get = "Field_compact_name Field_name Count Percentage Types_count".split()
-        output_str = schema_as_txt(output_dict, columns_to_get)
-        output_file.write(output_str + '\n')
+            if output_format == 'csv':
+                mongo_schema_df.to_csv(output_file, sep='\t', index=False)
 
-    elif output_format == 'json':
-        json.dump(output_dict, output_file, indent=4)
+        elif output_format == 'txt':
+            if columns_to_get is None:
+                columns_to_get = "Field_compact_name Field_name Count Percentage Types_count".split()
+            output_str = schema_as_txt(output_dict, columns_to_get)
+            output_file.write(output_str + '\n')
 
-    elif output_format == 'yaml':
-        yaml.safe_dump(output_dict, output_file, default_flow_style=False)
+        elif output_format == 'json':
+            json.dump(output_dict, output_file, indent=4)
+
+        elif output_format == 'yaml':
+            yaml.safe_dump(output_dict, output_file, default_flow_style=False)
 
 
 def mongo_schema_as_dataframe(mongo_schema, columns_to_get):

@@ -13,7 +13,9 @@ setup(name='pymongo-schema',
           'docopt',
           'ete3',
           'pandas',
-          'xlwt'
+          'xlwt',
+          'xlsxwriter',
+          'openpyxl'
       ],
       entry_points={
           'console_scripts': [
