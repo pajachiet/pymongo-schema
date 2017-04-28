@@ -7,8 +7,8 @@ pymongo-schema extract schemas from MongoDB
 Usage:
     pymongo-schema  -h | --help
     pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --columns=COLUMNS --port=PORT --host=HOST --quiet]
-    pymongo-schema  filter --input=FILENAME --namespace=FILENAME [--output=FILENAME --format=FORMAT... --quiet]
-    pymongo-schema  tosql --input=FILENAME [--output=FILENAME --quiet]
+    pymongo-schema  filter --namespace=FILENAME [--input=FILENAME --output=FILENAME --format=FORMAT... --quiet]
+    pymongo-schema  tosql [--input=FILENAME --output=FILENAME --quiet]
 
 
 Commands:
@@ -27,11 +27,15 @@ Options:
     
     --host HOST                 Server to connect to [default: localhost]
     
+    -i , --input FILENAME       Input schema file, to filter or to map to sql. json format expected. 
+                                Default to standard input
+
     -o , --output FILENAME      Output file for schema. Default to standard output. 
                                 Extension added automatically if omitted (useful for multi-format outputs)
     
     -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'xlsx', 'yaml' or 'json'
                                 Multiple format may be specified. [default: txt]
+                                Note : Output format for mongo to sql mapping is json
 
     --columns HEADER            String listing columns to get in 'txt', 'csv' or 'xlsx' format. 
                                 Columns are to be chosen in :
@@ -47,10 +51,7 @@ Options:
                                 Columns have to be separated by whitespace, and are case insensitive.
                                 Default for 'txt' output is "Field_compact_name Field_name Count Percentage Types_count"
                                 Default for 'csv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
-                                    
-    
-    -i , --input FILENAME       Input schema file, to filter or to map to sql. json format expected. 
-
+                                
     -n, --namespace FILENAME    Config file to read namespace to filter. json format expected.
     
     --quiet                     Set logging level to WARN on standard output
@@ -60,6 +61,7 @@ Options:
 """
 
 import logging
+import sys
 from time import time
 from docopt import docopt
 import json
@@ -96,6 +98,7 @@ def main():
     # Output dict
     logger.info('=== Write MongoDB schema')
     write_output_dict(output_dict, arg)
+
 
 def preprocess_arg(arg):
     """Preprocess arguments from command line
@@ -154,9 +157,7 @@ def filter_schema(arg):
     with open(arg['--namespace'], 'r') as f:
         config = json.load(f)
 
-    with open(arg['--input'], 'r') as f:
-        input_schema = json.load(f)
-
+    input_schema = load_input_schema(arg)
     filtered_mongo_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])
     return filtered_mongo_schema
 
@@ -168,12 +169,19 @@ def schema_to_sql(arg):
     :return mongo_to_sql_mapping: dict 
     """
     logger.info('=== Generate mapping from mongo to sql')
-    with open(arg['--input']) as data_file:
-        mongo_schema = json.load(data_file)
-
-    mongo_to_sql_mapping = mongo_schema_to_mapping(mongo_schema)
+    input_schema = load_input_schema(arg)
+    mongo_to_sql_mapping = mongo_schema_to_mapping(input_schema)
     return mongo_to_sql_mapping
 
+
+def load_input_schema(arg):
+    if arg['--input'] is None:
+        input_schema = json.load(sys.stdin)
+    else:
+        with open(arg['--input'], 'r') as f:
+            input_schema = json.load(f)
+
+    return input_schema
 
 if __name__ == '__main__':
     main()
