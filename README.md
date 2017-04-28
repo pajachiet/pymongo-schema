@@ -6,7 +6,7 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 - extract the **hierarchical structure** of the schema 
 - Several output options : python dictionnary, json, yaml or text
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
-- ways to **filter** and **manipulate** the output schema
+- ways to **filter** and **transform** the output schema
 
 # Install
 
@@ -19,15 +19,14 @@ pip install --upgrade -e git+https://github.com/pajachiet/pymongo-schema.git#egg
 ```shell
 Usage:
     pymongo-schema  -h | --help
-    pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --port=PORT --host=HOST --quiet]
-    pymongo-schema  filter --input=FILENAME --namespace=FILENAME [--output=FILENAME --format=FORMAT... --quiet]
-    pymongo-schema  tosql --input=FILENAME [--output=FILENAME --quiet]
+    pymongo-schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
+    pymongo-schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
+    pymongo-schema  tosql [--input=FILENAME --output=FILENAME --quiet]
 
-
-Commands: 
+Commands:
     extract                     Extract schema from a MongoDB instance
-    filter                      Apply a namespace filter to a mongo schema
-    tosql                       Create a mapping from mongo schema to relational schema
+    transform                   Transform a json schema to another format, eventually filtering or changing columns outputs
+    tosql                       Create a mapping from mongo schema to relational schema (json input and output)
 ```
 
 To display full usage, with options description, run:
@@ -63,6 +62,7 @@ Schema are hierarchically nested, with the following structure :
                                 # An 'OBJECT' or 'ARRAY(OBJECT)' field recursively contains 1 'object'
                 {
                     'count': int,
+                    'prop_in_object': float,
                     'type', 'type_str',
                     'types_count': {  # count for each encountered type  
                         'type_str' : 13,

@@ -43,10 +43,17 @@ def write_output_dict(output_dict, arg):
 
         # Write output_dict in the correct format
         if output_format == 'json':
-            json.dump(output_dict, output_file, indent=4)
+            if arg['--without-counts']:
+                json.dump(remove_counts_from_schema(output_dict), output_file, indent=4)
+            else:
+                json.dump(output_dict, output_file, indent=4)
 
         elif output_format == 'yaml':
-            yaml.safe_dump(output_dict, output_file, default_flow_style=False)
+            if arg['--without-counts']:
+                yaml.safe_dump(remove_counts_from_schema(output_dict), output_file, default_flow_style=False)
+            else:
+                yaml.safe_dump(output_dict, output_file, default_flow_style=False)
+
 
         elif output_format in ['txt', 'csv', 'xlsx']:
             if columns_to_get is None:
@@ -173,7 +180,7 @@ def object_schema_to_line_tuples(object_schema, columns_to_get, field_prefix):
 
 
 def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
-    """ 
+    """ Given fields informations, returns a tuple representing columns_to_get
     
     :param field: 
     :param field_schema: 
@@ -182,7 +189,7 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
         columns to create for each field
     :return field_columns: tuple
     """
-    # f= field
+    # 'f' for field
     column_functions = {
         'field_full_name': lambda f, f_schema, f_prefix: f_prefix + f,
         'field_compact_name': field_compact_name,
@@ -207,7 +214,7 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
 
 
 def field_compact_name(field, field_schema, field_prefix):
-    """Return a compact version of field name, without parent object names.
+    """ Return a compact version of field name, without parent object names.
     
     >>> field_compact_name('foo.bar:', None, 'baz')
     " .  : baz"
@@ -219,14 +226,14 @@ def field_compact_name(field, field_schema, field_prefix):
 
 
 def field_depth(field, field_schema, field_prefix):
-    """Return the level of imbrication of a field
+    """ Return the level of imbrication of a field
     """
     separators = re.sub('[^.:]', '', field_prefix)
     return len(separators)
 
 
 def field_type(field, field_schema, field_prefix):
-    """Return a string describing the type of a field 
+    """ Return a string describing the type of a field 
     """
     f_type = field_schema['type']
     if f_type == 'ARRAY':
@@ -263,3 +270,17 @@ def format_types_count(types_count, array_types_count=None):
     return types_count_string
 
 
+def remove_counts_from_schema(value):
+    """ Recursively remove counts fields from schema 
+
+    :param value: 
+    :return d: dict or original value
+    """
+    if isinstance(value, dict):
+        d = dict()
+        for k, v in value.iteritems():
+            if k not in ['count', 'types_count', 'prop_in_object', 'array_types_count']:
+                d[k] = remove_counts_from_schema(v)
+        return d
+    else:
+        return value

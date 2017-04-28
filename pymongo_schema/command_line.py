@@ -6,14 +6,13 @@ pymongo-schema extract schemas from MongoDB
 
 Usage:
     pymongo-schema  -h | --help
-    pymongo-schema  extract [--database=DB --collection=COLLECTION... --output=FILENAME --format=FORMAT... --columns=COLUMNS --port=PORT --host=HOST --quiet]
-    pymongo-schema  filter --namespace=FILENAME [--input=FILENAME --output=FILENAME --format=FORMAT... --quiet]
+    pymongo-schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
+    pymongo-schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
     pymongo-schema  tosql [--input=FILENAME --output=FILENAME --quiet]
-
 
 Commands:
     extract                     Extract schema from a MongoDB instance
-    filter                      Apply a namespace filter to a mongo schema (json input)
+    transform                   Transform a json schema to another format, eventually filtering or changing columns outputs
     tosql                       Create a mapping from mongo schema to relational schema (json input and output)
 
 Options:
@@ -27,14 +26,14 @@ Options:
     
     --host HOST                 Server to connect to [default: localhost]
     
-    -i , --input FILENAME       Input schema file, to filter or to map to sql. json format expected. 
+    -i , --input FILENAME       Input schema file, to transform or to map to sql. json format expected. 
                                 Default to standard input
 
     -o , --output FILENAME      Output file for schema. Default to standard output. 
                                 Extension added automatically if omitted (useful for multi-format outputs)
     
     -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'xlsx', 'yaml' or 'json'
-                                Multiple format may be specified. [default: txt]
+                                Multiple format may be specified. [default: json]
                                 Note : Output format for mongo to sql mapping is json
 
     --columns HEADER            String listing columns to get in 'txt', 'csv' or 'xlsx' format. 
@@ -52,7 +51,9 @@ Options:
                                 Default for 'txt' output is "Field_compact_name Field_name Count Percentage Types_count"
                                 Default for 'csv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
                                 
-    -n, --namespace FILENAME    Config file to read namespace to filter. json format expected.
+    -n, --filter FILENAME       Config file to read namespace to filter. json format expected.
+    
+    --without-counts            Remove counts information from json and yaml outputs
     
     --quiet                     Set logging level to WARN on standard output
     
@@ -86,9 +87,9 @@ def main():
     if arg['extract']:
         output_dict = extract_schema(arg)
 
-    # Filter mongo schema by namespace
-    if arg['filter']:
-        output_dict = filter_schema(arg)
+    # Transform mongo schema
+    if arg['transform']:
+        output_dict = transform_schema(arg)
 
     # Map mongo schema to sql
     if arg['tosql']:
@@ -147,19 +148,22 @@ def extract_schema(arg):
     return mongo_schema
 
 
-def filter_schema(arg):
-    """ Main entry point function to filter schema by a namespace
+def transform_schema(arg):
+    """ Main entry point function to transform a schema
     
     :param arg: dict
     :return filtered_mongo_schema: dict
     """
     logger.info('=== Filter mongo schema')
-    with open(arg['--namespace'], 'r') as f:
-        config = json.load(f)
-
     input_schema = load_input_schema(arg)
-    filtered_mongo_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])
-    return filtered_mongo_schema
+    namespace = arg['--filter']
+    if namespace is not None:
+        with open(arg['--filter'], 'r') as f:
+            config = json.load(f)
+        output_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])
+    else:
+        output_schema = input_schema
+    return output_schema
 
 
 def schema_to_sql(arg):
