@@ -53,7 +53,7 @@ Options:
 
     -n, --namespace FILENAME    Config file to read namespace to filter. json format expected.
     
-    --quiet                     Disable logging to standard output
+    --quiet                     Set logging level to WARN on standard output
     
     -h, --help                  show this usage information
 
@@ -77,13 +77,8 @@ def main():
     """
     # Parse command line argument
     arg = docopt(__doc__, help=True)
-    if not arg['--collection']:
-        arg['--collection'] = None
-
-    if not arg['--format']:
-        arg['--format'] = ['txt']
-
     initialize_logger(arg)
+    preprocess_arg(arg)
 
     # Extract mongo schema
     if arg['extract']:
@@ -102,12 +97,20 @@ def main():
     logger.info('=== Write MongoDB schema')
     write_output_dict(output_dict, arg)
 
+def preprocess_arg(arg):
+    """Preprocess arguments from command line
+    """
+    if not arg['--collection']:
+        arg['--collection'] = None
 
-def initialize_columns(arg):
-    if arg['--columns'] is None:
-        arg['--columns'] = "FIELD_COMPACT_NAME FIELD_NAME TYPE COUNT PERCENTAGE TYPES_COUNT"
+    if not arg['--format']:
+        arg['--format'] = ['txt']
 
-    arg['--columns'] = arg['--columns'].split()
+    if arg['--output'] is None and 'xlsx' in arg['--format']:
+        logger.warn("WARNING : xlsx format is not supported on standard output. Switching to csv output.")
+        arg['--format'].remove('xlsx')
+        arg['--format'].append('csv')
+
 
 
 def initialize_logger(arg):
@@ -115,10 +118,12 @@ def initialize_logger(arg):
     """
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.NullHandler())
+    steam_handler = logging.StreamHandler()
+    logger.addHandler(steam_handler)
 
-    if not arg['--quiet']:
-        steam_handler = logging.StreamHandler()
-        logger.addHandler(steam_handler)
+    if arg['--quiet']:
+        logger.setLevel(logging.WARN)
+
 
 
 def extract_schema(arg):
