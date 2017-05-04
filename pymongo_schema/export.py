@@ -101,6 +101,7 @@ def write_mongo_df_as_xlsx(mongo_schema_df, filename):
 def write_mongo_df_as_txt(mongo_schema_df, output_file):
     """Write mongo schema dataframe to an easy to an easy to read text format
     """
+    pd.options.display.max_colwidth = 1000
     formaters = dict()
     for col in mongo_schema_df.columns:
         col_len = mongo_schema_df[col].map(lambda s: len(str(s))).max()
