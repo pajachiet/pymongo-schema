@@ -12,7 +12,7 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 
 Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
 ```shell
-pip install --upgrade -e git+https://github.com/pajachiet/pymongo-schema.git#egg=Package
+pip install --upgrade git+https://github.com/pajachiet/pymongo-schema.git
 ```
 # Usage
 
