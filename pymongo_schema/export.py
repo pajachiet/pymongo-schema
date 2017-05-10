@@ -44,15 +44,13 @@ def write_output_dict(output_dict, arg):
         # Write output_dict in the correct format
         if output_format == 'json':
             if arg['--without-counts']:
-                json.dump(remove_counts_from_schema(output_dict), output_file, indent=4)
-            else:
-                json.dump(output_dict, output_file, indent=4)
+                output_dict = remove_counts_from_schema(output_dict)
+            json.dump(output_dict, output_file, indent=4, ensure_ascii=False)
 
         elif output_format == 'yaml':
             if arg['--without-counts']:
-                yaml.safe_dump(remove_counts_from_schema(output_dict), output_file, default_flow_style=False)
-            else:
-                yaml.safe_dump(output_dict, output_file, default_flow_style=False)
+                output_dict = remove_counts_from_schema(output_dict)
+            yaml.safe_dump(output_dict, output_file, default_flow_style=False)
 
 
         elif output_format in ['txt', 'csv', 'xlsx']:
