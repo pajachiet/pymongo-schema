@@ -63,12 +63,12 @@ Schema are hierarchically nested, with the following structure :
                 {
                     'count': int,
                     'prop_in_object': float,
-                    'type', 'type_str',
+                    'type': 'type_str', 
                     'types_count': {  # count for each encountered type  
                         'type_str' : 13,
                         'Null' : 3
                     }, 
-                    'array_type', 'type_str',
+                    'array_type': 'type_str',
                     'array_types_count': {  # (optional) count for each type encountered  in arrays
                         'type_str' : 7,
                         'Null' : 3
