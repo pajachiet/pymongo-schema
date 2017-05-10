@@ -109,10 +109,17 @@ A way to compare the schema dictionaries and highlights the differences.
 - look for mixes of list and scalar, that are currently not supported by mongo-connector-postgresql
 - look for the presence of an '_id'
 
+=> It may be donne directly in mongo-connector-postgresql doc_manager
 
-## Complete filter functionalities
 
-- Implement includeFields 
+## Adding fields in json/yaml outputs
+
+- for example to add comments
+
+
+## Other option to sort text outputs
+
+- It is currently based on counts
 
 
 
