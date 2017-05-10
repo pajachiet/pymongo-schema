@@ -7,6 +7,7 @@ import json
 import yaml
 import pandas as pd
 import logging
+import codecs
 logger = logging.getLogger(__name__)
 
 
@@ -45,20 +46,25 @@ def write_output_dict(output_dict, arg):
         if output_format == 'json':
             if arg['--without-counts']:
                 output_dict = remove_counts_from_schema(output_dict)
+            if filename != 'standard output':
+                output_file.close()
+                output_file = codecs.open(filename, 'w', encoding="utf-8")  # hack from http://stackoverflow.com/questions/28824647/python-2-7-json-dump-unicodeencodeerror
+
             json.dump(output_dict, output_file, indent=4, ensure_ascii=False)
 
         elif output_format == 'yaml':
             if arg['--without-counts']:
                 output_dict = remove_counts_from_schema(output_dict)
-            yaml.safe_dump(output_dict, output_file, default_flow_style=False)
+            yaml.safe_dump(output_dict, output_file, default_flow_style=False, encoding='utf-8')
 
 
         elif output_format in ['txt', 'csv', 'xlsx']:
             if columns_to_get is None:
                 if output_format == 'txt':
-                    columns_to_get = "Field_compact_name Field_name Count Percentage Types_count".split()
+                    columns_to_get = "Field_compact_name Field_name Count Percentage Types_count"
                 elif output_format in ['csv', 'xlsx']:
-                    columns_to_get = "Field_full_name Depth Field_name Type".split()
+                    columns_to_get = "Field_full_name Depth Field_name Type"
+            columns_to_get = columns_to_get.split()
 
             mongo_schema_df = mongo_schema_as_dataframe(output_dict, columns_to_get)
 
@@ -81,7 +87,7 @@ def write_mongo_df_as_xlsx(mongo_schema_df, filename):
     from openpyxl import load_workbook
 
     if os.path.isfile(filename):
-        print filename, 'exists'
+        print(filename, 'exists')
         # Keep existing data
         # Solution from : http://stackoverflow.com/questions/20219254/how-to-write-to-an-existing-excel-file-without-overwriting-data-using-pandas
         # May not work for formulaes
@@ -204,7 +210,7 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
     for column in columns_to_get:
         column = column.lower()
         if column not in column_functions:
-            columns_str = field_schema[column]
+            column_str = field_schema[column]
         else:
             column_str = column_functions[column](field, field_schema, field_prefix)
         field_columns.append(column_str)

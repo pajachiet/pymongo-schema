@@ -98,6 +98,11 @@ TODO
 - Check a mongo scheme for compatibility to an sql mapping
 - Handle incompatibilities
 
+## Support Python 3 version
+
+- fix encoding issues when exporting manually added non-ascii characters
+- test for support of multiple Python versions
+
 ## Diff between schemas
 
 A way to compare the schema dictionaries and highlights the differences.
@@ -137,8 +142,6 @@ The codebase is not tested. It should not be trusted blindly.
 
 Distribute in PyPi
 
-## Support multiple Python version
 
-And test for it
 
 
