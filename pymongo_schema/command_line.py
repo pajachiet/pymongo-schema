@@ -44,7 +44,7 @@ Options:
                                     DEPTH                   
                                     TYPE                    
                                     COUNT                   
-                                    PROPORTION_IN_OBJECT    
+                                    PROP_IN_OBJECT    
                                     PERCENTAGE              
                                     TYPES_COUNT             
                                 Columns have to be separated by whitespace, and are case insensitive.

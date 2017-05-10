@@ -195,8 +195,6 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
         'field_name': lambda f, f_schema, f_prefix: f,
         'depth': field_depth,
         'type': field_type,
-        'count': lambda f, f_schema, f_prefix: f_schema['count'],
-        'proportion_in_object': lambda f, f_schema, f_prefix: f_schema['prop_in_object'],
         'percentage': lambda f, f_schema, f_prefix: 100 * f_schema['prop_in_object'],
         'types_count': lambda f, f_schema, f_prefix:
             format_types_count(f_schema['types_count'], f_schema.get('array_types_count', None)),
@@ -205,7 +203,10 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
     field_columns = list()
     for column in columns_to_get:
         column = column.lower()
-        column_str = column_functions[column](field, field_schema, field_prefix)
+        if column not in column_functions:
+            columns_str = field_schema[column]
+        else:
+            column_str = column_functions[column](field, field_schema, field_prefix)
         field_columns.append(column_str)
 
     field_columns = tuple(field_columns)
