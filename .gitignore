@@ -1,0 +1,11 @@
+# pycharm files
+.idea/
+
+# virtual env
+venv/
+
+# compilation
+*.pyc
+
+# installation
+/*.egg-info
