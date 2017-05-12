@@ -8,6 +8,9 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
 - ways to **filter** and **transform** the output schema
 
+[![Build Status](https://travis-ci.org/pajachiet/pymongo-schema.svg?branch=master)](https://travis-ci.org/pajachiet/pymongo-schema)
+
+
 # Install
 
 Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
