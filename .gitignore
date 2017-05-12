@@ -9,3 +9,6 @@ venv/
 
 # installation
 /*.egg-info
+
+# folder for extractions
+extract/

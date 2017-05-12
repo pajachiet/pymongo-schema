@@ -108,7 +108,7 @@ TODO
 A way to compare the schema dictionaries and highlights the differences.
 
 
-## Test than a mongo schema can be mapped tosql
+## Test if a mongo schema can be mapped tosql
 
 - test for the presence of mongo types in the mapping 
 - look for mixes of list and scalar, that are currently not supported by mongo-connector-postgresql
