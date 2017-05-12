@@ -7,8 +7,9 @@ services:
   - mongodb
 before_script:
   - sleep 5  # wait for mongoDB to accept connections
-  - mongo mydb_test --eval 'db.test_col.insert({"test_field":"test_value"});'
+  - mongoimport --db test_db --collection test_col --drop --file tests/test_db.json
 script:
+  - mongo test_db --eval 'db.test_col.count() == 25359;'
   - python setup.py install
   - nosetests  --with-coverage
 after_success:
