@@ -28,7 +28,9 @@ class TestExport(unittest.TestCase):
         with open('tests/test_schema.json') as data_file:
             mongo_schema_expected = json.load(data_file, encoding='utf-8')
 
-        mongo_schema_got = extract.extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None)
+        mongo_schema_got = extract.extract_pymongo_client_schema(pymongo_client,
+                                                                 database_names='test_db',
+                                                                 collection_names='test_col')
 
         self.assertEqual(mongo_schema_got, mongo_schema_expected)
 
