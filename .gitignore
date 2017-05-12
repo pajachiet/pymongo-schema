@@ -16,6 +16,8 @@ dist/
 # folder for extractions
 extract/
 
+# database folder for local testing
+tests/mongodb
+
 # reports
 .coverage
-
