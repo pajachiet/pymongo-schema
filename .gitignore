@@ -7,8 +7,15 @@ venv/
 # compilation
 *.pyc
 
-# installation
+# distribution / packaging
 /*.egg-info
+*.egg
+build/
+dist/
 
 # folder for extractions
 extract/
+
+# reports
+.coverage
+
