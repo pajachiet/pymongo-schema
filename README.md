@@ -9,6 +9,7 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 - ways to **filter** and **transform** the output schema
 
 [![Build Status](https://travis-ci.org/pajachiet/pymongo-schema.svg?branch=master)](https://travis-ci.org/pajachiet/pymongo-schema)
+[![Coverage Status](https://coveralls.io/repos/github/pajachiet/pymongo-schema/badge.svg?branch=master)](https://coveralls.io/github/pajachiet/pymongo-schema?branch=master)
 
 
 # Install
