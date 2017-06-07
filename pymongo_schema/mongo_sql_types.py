@@ -146,6 +146,7 @@ MONGO_TO_PSQL_TYPE = {
     'string': 'TEXT',
     'oid': 'TEXT',
     'dbref': 'TEXT',
+    'null': 'ANY'
 }
 
 
