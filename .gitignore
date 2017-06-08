@@ -1,0 +1,23 @@
+# pycharm files
+.idea/
+
+# virtual env
+venv/
+
+# compilation
+*.pyc
+
+# distribution / packaging
+/*.egg-info
+*.egg
+build/
+dist/
+
+# folder for extractions
+extract/
+
+# database folder for local testing
+tests/mongodb
+
+# reports
+.coverage

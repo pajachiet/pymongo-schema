@@ -6,3 +6,4 @@ pandas
 xlwt
 xlsxwriter
 openpyxl
+python-coveralls

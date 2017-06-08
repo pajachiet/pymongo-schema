@@ -8,6 +8,10 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
 - ways to **filter** and **transform** the output schema
 
+[![Build Status](https://travis-ci.org/pajachiet/pymongo-schema.svg?branch=master)](https://travis-ci.org/pajachiet/pymongo-schema)
+[![Coverage Status](https://coveralls.io/repos/github/pajachiet/pymongo-schema/badge.svg?branch=master)](https://coveralls.io/github/pajachiet/pymongo-schema?branch=master)
+
+
 # Install
 
 Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
@@ -108,7 +112,7 @@ TODO
 A way to compare the schema dictionaries and highlights the differences.
 
 
-## Test than a mongo schema can be mapped tosql
+## Test if a mongo schema can be mapped tosql
 
 - test for the presence of mongo types in the mapping 
 - look for mixes of list and scalar, that are currently not supported by mongo-connector-postgresql
