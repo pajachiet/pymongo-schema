@@ -1,2 +1,3 @@
 FROM python:2.7
-RUN python setup.py install
+RUN pip install git+https://github.com/pajachiet/pymongo-schema.git
+
