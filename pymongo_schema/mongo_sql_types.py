@@ -145,7 +145,7 @@ MONGO_TO_PSQL_TYPE = {
     'date': 'TIMESTAMP',
     'string': 'TEXT',
     'oid': 'TEXT',
-    'dbref': 'TEXT',
+    'dbref': 'TEXT'
 }
 
 
