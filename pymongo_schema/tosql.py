@@ -154,8 +154,8 @@ def add_field_to_table_mapping(mongo_field_name, table_mapping, mongo_type, comm
     try:
         field_psql_type = psql_type(mongo_type)
     except KeyError:
-        logger.warning("WARNING : Mongo type '{}' is not mapped to an SQL type. Field '{}' from table '{}' is skipped from the mapping."
-                       .format(mongo_type, mongo_field_name, table_mapping))
+        logger.warning("WARNING : Mongo type '{}' is not mapped to an SQL type. Field '{}' is skipped from the mapping."
+                       .format(mongo_type, mongo_field_name))
         return
 
     table_mapping[mongo_field_name] = {
