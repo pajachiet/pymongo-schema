@@ -1,3 +1,6 @@
 FROM python:2.7
-RUN pip install git+https://github.com/pajachiet/pymongo-schema.git
 
+COPY requirements.txt /tmp/
+RUN pip install --requirement /tmp/requirements.txt
+COPY . /tmp/
+RUN pip install /tmp/
