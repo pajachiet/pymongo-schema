@@ -97,7 +97,7 @@ def main():
         output_dict = schema_to_sql(arg)
 
     # Output dict
-    logger.info('=== Write MongoDB schema')
+    logger.info('=== Write output')
     write_output_dict(output_dict, arg)
 
 
@@ -116,7 +116,6 @@ def preprocess_arg(arg):
         arg['--format'].append('csv')
 
 
-
 def initialize_logger(arg):
     """ Initialize logging to standard output, if not quiet.  
     """
@@ -127,7 +126,6 @@ def initialize_logger(arg):
 
     if arg['--quiet']:
         logger.setLevel(logging.WARN)
-
 
 
 def extract_schema(arg):
