@@ -75,11 +75,13 @@ from tosql import mongo_schema_to_mapping
 logger = logging.getLogger()
 
 
-def main():
+def main(argv=None):
     """ Launch pymongo_schema (assuming CLI)
+    
+    :param argv: command line arguments to pass directly to docopt. Useful for usage from another python program. 
     """
     # Parse command line argument
-    arg = docopt(__doc__, help=True)
+    arg = docopt(__doc__, argv=argv, help=True)
     initialize_logger(arg)
     preprocess_arg(arg)
 
@@ -102,7 +104,7 @@ def main():
 
 
 def preprocess_arg(arg):
-    """Preprocess arguments from command line
+    """ Preprocess arguments from command line
     """
     if not arg['--collection']:
         arg['--collection'] = None

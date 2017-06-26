@@ -5,6 +5,7 @@ logger = logging.getLogger(__name__)
 
 PRESENT_VALUE = 'present'
 
+
 def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
     """ Filter the schema with namespaces 
     
