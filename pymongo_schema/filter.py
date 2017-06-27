@@ -26,24 +26,35 @@ def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
             continue
         database_schema = mongo_schema[db]
 
-        if collection not in database_schema:
-            logger.warning('WARNING : Collection {} is supposed to be filtered from database {}, but is not present in mongo schema'.format(collection, db))
-            continue
-        collection_schema = database_schema[collection]
-
-        if filt is True:
-            filtered_schema[db][collection] = collection_schema
+        if collection == '*':
+            collection_list = database_schema.keys()
         else:
-            if 'excludeFields' in filt:
-                logger.info("Exclude fields from collection " + collection)
-                exclude_fields = filt['excludeFields']
-                filtered_schema[db][collection] = exclude_fields_from_collection_schema(exclude_fields, collection_schema)
-            elif 'includeFields' in filt:
-                logger.info("Include fields from collection " + collection)
-                include_fields = filt['includeFields']
-                filtered_schema[db][collection] = include_fields_from_collection_schema(include_fields, collection_schema)
+            collection_list = [collection]
+
+        for collection in collection_list:
+            if collection not in database_schema:
+                logger.warning('WARNING : Collection {} is supposed to be filtered from database {}, but is not present in mongo schema'.format(collection, db))
+                continue
+            collection_schema = database_schema[collection]
+
+
+            if filt is True:
+                filtered_schema[db][collection] = collection_schema
             else:
-                raise NotImplementedError('unknown option, not implemented : {}'.format(filt.keys()))
+                if 'excludeFields' in filt:
+                    logger.info("Exclude fields from collection " + collection)
+                    exclude_fields = filt['excludeFields']
+                    filtered_schema[db][collection] = exclude_fields_from_collection_schema(exclude_fields, collection_schema)
+                elif 'includeFields' in filt:
+                    logger.info("Include fields from collection " + collection)
+                    include_fields = filt['includeFields']
+                    filtered_schema[db][collection] = include_fields_from_collection_schema(include_fields, collection_schema)
+                else:
+                    raise NotImplementedError('unknown option, not implemented : {}'.format(filt.keys()))
+
+    for db in filtered_schema.keys():
+        if not filtered_schema[db]:
+            del filtered_schema[db]
     return filtered_schema
 
 
