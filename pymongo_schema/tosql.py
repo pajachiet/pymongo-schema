@@ -21,7 +21,10 @@ def mongo_schema_to_mapping(mongo_schema):
         db_mapping = dict()
 
         for collection, collection_schema in database_schema.iteritems():
-            init_collection_mapping(collection, db_mapping, collection_schema)
+            if not collection_schema['object']: # Skip collection with empty schema
+                continue
+            if not init_collection_mapping(collection, db_mapping, collection_schema): # in case of False initialization
+                continue
             add_object_to_mapping(collection_schema['object'], db_mapping, collection)
 
         mapping[db] = db_mapping
@@ -32,7 +35,14 @@ def init_collection_mapping(collection, mapping, collection_schema):
     """ Initialize a mapping for a collection
     """
     id_mongo_type = collection_schema['object']['_id']['type']
-    id_psql_type = psql_type(id_mongo_type)
+
+    try:
+        id_psql_type = psql_type(id_mongo_type)
+    except KeyError:
+        logger.warning("WARNING : Mongo type '{}' is not mapped to an SQL type. As this field is an '_id', the entire collection is skipped from the mapping."
+                       .format(id_mongo_type, '_id'))
+        return False
+
     mapping[collection] = {
         'pk': '_id',
         '_id': {'type': id_psql_type}
@@ -40,6 +50,8 @@ def init_collection_mapping(collection, mapping, collection_schema):
     comment = collection_schema.get('comment', '')
     if comment:
         mapping[collection]['comment'] = comment
+
+    return True
 
 
 def add_object_to_mapping(object_schema, mapping, table_name, field_prefix=''):
