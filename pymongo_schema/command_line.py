@@ -100,7 +100,10 @@ def main(argv=None):
 
     # Output dict
     logger.info('=== Write output')
-    write_output_dict(output_dict, arg)
+    if output_dict:
+        write_output_dict(output_dict, arg)
+    else:
+        logger.warn("WARNING : output is empty, we do not write any file.")
 
 
 def preprocess_arg(arg):
@@ -154,7 +157,7 @@ def transform_schema(arg):
     :param arg: dict
     :return filtered_mongo_schema: dict
     """
-    logger.info('=== Filter mongo schema')
+    logger.info('=== Transform existing mongo schema (filter, new format, and/or select infos)')
     input_schema = load_input_schema(arg)
     namespace = arg['--filter']
     if namespace is not None:

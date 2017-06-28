@@ -66,7 +66,9 @@ def extract_pymongo_client_schema(pymongo_client, database_names=None, collectio
     for database in database_names:
         logger.info('Extract schema of database ' + database)
         pymongo_database = pymongo_client[database]
-        mongo_schema[database] = extract_database_schema(pymongo_database, collection_names)
+        database_schema = extract_database_schema(pymongo_database, collection_names)
+        if database_schema:  # Do not add a schema if it is empty
+            mongo_schema[database] = database_schema
 
     return mongo_schema
 
