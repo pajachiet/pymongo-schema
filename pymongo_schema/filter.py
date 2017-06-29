@@ -3,7 +3,7 @@ from copy import deepcopy
 import logging
 logger = logging.getLogger(__name__)
 
-PRESENT_VALUE = 'present'
+PRESENT_VALUE = 'present'  # Schema of fields to include is based on keys of a dict. PRESENT_VALUE is used as the value for thoses keys...
 
 
 def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
@@ -37,8 +37,8 @@ def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
                 continue
             collection_schema = database_schema[collection]
 
-
             if filt is True:
+                logger.info("Include the whole collection" + collection)
                 filtered_schema[db][collection] = collection_schema
             else:
                 if 'excludeFields' in filt:
@@ -107,7 +107,7 @@ def include_fields_from_object_schema(include_fields_dict, object_count_schema):
     object_schema = object_count_schema['object']
     for field, value in include_fields_dict.iteritems():
         if field not in object_schema:
-            logger.warn("WARNING: Field '{}' is not in schema but is present in includeFields".format(field))
+            logger.warn("WARNING: Field '{}' is present in includeFields but not in schema".format(field))
             continue
 
         if value is PRESENT_VALUE:
@@ -118,6 +118,7 @@ def include_fields_from_object_schema(include_fields_dict, object_count_schema):
             object_schema_filtered['object'][field] = include_fields_from_object_schema(subfield_dict, field_schema)
 
     return object_schema_filtered
+
 
 def exclude_fields_from_collection_schema(exclude_fields_list, collection_schema):
     """ Deep copy collection_schema and exclude fields from it.
@@ -154,10 +155,11 @@ def exclude_fields_from_object_schema(exclude_fields_dict, object_schema):
     :param object_schema: dict 
     """
     for field, value in exclude_fields_dict.iteritems():
+        if field not in object_schema:
+            logger.warn("WARNING: Field '{}' is present in excludeFields, but not in schema".format(field))
+            continue
+
         if value is PRESENT_VALUE:
-            if field not in object_schema:
-                logger.warn("WARNING: Field '{}' is not in schema but is present in excludeFields".format(field))
-                continue
             object_schema.pop(field)
         else:
             subfield_dict = value
@@ -194,8 +196,7 @@ def add_field_to_dict(field, fields_dict):
             fields_dict[parent_field] = dict()
             add_field_to_dict(subfield, fields_dict[parent_field])
         else:
-            if not fields_dict[parent_field] is PRESENT_VALUE:  # Parent field is not already forced to be included
-                                                                 # (priority to upper levels)
+            if not fields_dict[parent_field] is PRESENT_VALUE:  # Test if parent field is not already forced to be included
                 add_field_to_dict(subfield, fields_dict[parent_field])
 
 
