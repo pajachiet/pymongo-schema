@@ -7,3 +7,4 @@ xlwt
 xlsxwriter
 openpyxl
 python-coveralls
+jinja2

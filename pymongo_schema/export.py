@@ -8,6 +8,8 @@ import yaml
 import pandas as pd
 import logging
 import codecs
+import jinja2
+
 logger = logging.getLogger(__name__)
 
 
@@ -18,17 +20,17 @@ def write_output_dict(output_dict, arg):
         either schema or mapping
     :param output_format: str, 
         either 'json' or 'yaml'
-        a special 'txt', 'csv' or 'xlsx' output is possible for mongo schemas
+        a special 'txt', 'csv', 'html' or 'xlsx' output is possible for mongo schemas
     :param filename: str, default None => standard output
     :param columns_to_get: iterable
-        columns to create for each field in 'txt' or 'csv' format
+        columns to create for each field in 'txt', 'html' or 'csv' format
     """
 
     for output_format in arg['--format']:
         filename = arg['--output']
         columns_to_get = arg['--columns']
-        if output_format not in ['txt', 'csv', 'xlsx', 'json', 'yaml']:
-            raise ValueError("Ouput format should be txt, csv, 'xlsx' json or yaml. {} is not supported".format(output_format))
+        if output_format not in ['txt', 'csv', 'xlsx', 'json', 'yaml', 'html']:
+            raise ValueError("Ouput format should be txt, csv, xlsx, html json or yaml. {} is not supported".format(output_format))
 
         # Get output stream
         if filename is None:
@@ -58,10 +60,13 @@ def write_output_dict(output_dict, arg):
             yaml.safe_dump(output_dict, output_file, default_flow_style=False, encoding='utf-8')
 
 
-        elif output_format in ['txt', 'csv', 'xlsx']:
+        elif output_format in ['txt', 'csv', 'xlsx', 'html']:
             if columns_to_get is None:
                 if output_format == 'txt':
                     columns_to_get = "Field_compact_name Field_name Count Percentage Types_count"
+                if output_format == 'html':
+                    columns_to_get = "Field_compact_name Field_name Full_name Description " \
+                                     "Count Percentage Types_count"
                 elif output_format in ['csv', 'xlsx']:
                     columns_to_get = "Field_full_name Depth Field_name Type"
             columns_to_get = columns_to_get.split()
@@ -77,6 +82,9 @@ def write_output_dict(output_dict, arg):
 
             elif output_format == 'txt':
                 write_mongo_df_as_txt(mongo_schema_df, output_file)
+
+            elif output_format == 'html':
+                write_mongo_df_as_html(mongo_schema_df, output_file)
 
 
 def write_mongo_df_as_xlsx(mongo_schema_df, filename):
@@ -122,6 +130,23 @@ def write_mongo_df_as_txt(mongo_schema_df, output_file):
             output_str += '\n\n'
 
     output_file.write(output_str)
+
+
+def write_mongo_df_as_html(mongo_schema_df, output_file):
+    mongo_schema_tmpl = {}
+    for db in mongo_schema_df.Database.unique():
+        mongo_schema_tmpl[db] = {}
+        df_db = mongo_schema_df.query('Database == @db').iloc[:, 1:]
+        for col in df_db.Collection.unique():
+            df_col = df_db.query('Collection == @col').iloc[:, 1:]
+            mongo_schema_tmpl[db][col] = df_col.values.tolist()
+
+    tmpl_filename = os.path.join(os.path.dirname(__file__), 'data_dict.tmpl')
+    with open(tmpl_filename) as tmpl_fd:
+        tmpl = jinja2.Template(tmpl_fd.read())
+
+    output_file.write(tmpl.render(col_titles=list(mongo_schema_df)[2:],
+                                  mongo_schema=mongo_schema_tmpl))
 
 
 def mongo_schema_as_dataframe(mongo_schema, columns_to_get):
@@ -210,7 +235,7 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
     for column in columns_to_get:
         column = column.lower()
         if column not in column_functions:
-            column_str = field_schema[column]
+            column_str = field_schema.get(column, None)
         else:
             column_str = column_functions[column](field, field_schema, field_prefix)
         field_columns.append(column_str)
