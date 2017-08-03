@@ -1,4 +1,15 @@
 # coding: utf8
+"""
+This module intends to filter a mongo schema based on given namespace dictionary.
+
+The mongo schema comes from the 'extract' module.
+The namespace uses mongo-connector config format:
+
+    {db_name_1.coll_name_1 : True,
+     db_name_1.coll_name_2 : False,
+     db_name_1.coll_name_1 : {"includeFields: [field1, field2.subfield1]},
+     db_name_1.coll_name_1 : {"excludeFields: [field1, field2.subfield1]}}
+"""
 from copy import deepcopy
 import logging
 
