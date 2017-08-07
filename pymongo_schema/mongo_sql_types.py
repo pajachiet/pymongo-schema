@@ -80,7 +80,7 @@ NEWICK_TYPES_STRING_TREE = """
         timestamp,
         unknown
     ) general_scalar,
-    object
+    OBJECT
 ) mixed_scalar_object
 ;"""
 
