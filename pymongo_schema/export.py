@@ -247,12 +247,12 @@ def field_schema_to_columns(field, field_schema, field_prefix, columns_to_get):
 def field_compact_name(field, field_schema, field_prefix):
     """ Return a compact version of field name, without parent object names.
     
-    >>> field_compact_name('foo.bar:', None, 'baz')
+    >>> field_compact_name('baz', None, 'foo.bar:')
     " .  : baz"
     """
     separators = re.sub('[^.:]', '', field_prefix)
-    separators = re.sub('.', ' . ', separators)
-    separators = re.sub(': ', ' : ', separators)
+    separators = re.sub('\.', ' . ', separators)
+    separators = re.sub(':', ' : ', separators)
     return separators + field
 
 
