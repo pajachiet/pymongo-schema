@@ -137,7 +137,7 @@ def initiate_array_mapping(mongo_field_name, mapping, parent_table_name):
     :return linked_table_name: str
     """
     linked_table_name = parent_table_name + '.' + mongo_field_name
-    linked_table_name = to_sql_identifier(linked_table_name).replace('.', '__')
+    linked_table_name = to_sql_identifier(linked_table_name)
     fk_name = 'id_' + parent_table_name
 
     mapping[parent_table_name][mongo_field_name] = {
