@@ -17,6 +17,7 @@ class TestMongoSqlTypes(unittest.TestCase):
         self.assertEqual(common_parent_type([]), 'null')
         self.assertEqual(common_parent_type(['string']), 'string')
         self.assertEqual(common_parent_type(['integer', 'boolean']), 'integer')
+        self.assertEqual(common_parent_type(['integer', 'integer']), 'integer')
         self.assertEqual(common_parent_type(['integer', 'float']), 'number')
         self.assertEqual(common_parent_type(['integer', 'unknown']), 'general_scalar')
         self.assertEqual(common_parent_type(['integer', 'OBJECT']), 'mixed_scalar_object')

@@ -95,7 +95,9 @@ def common_parent_type(list_of_type_string):
     """
     if not list_of_type_string:
         return 'null'
-    elif len(list_of_type_string) == 1:
+    # avoid duplicates as get_common_ancestor('integer', 'integer') -> 'number'
+    list_of_type_string = list(set(list_of_type_string))
+    if len(list_of_type_string) == 1:
         return list_of_type_string[0]
     else:
         return TYPES_STRING_TREE.get_common_ancestor(*list_of_type_string).name
