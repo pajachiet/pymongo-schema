@@ -24,3 +24,6 @@ class TestFunctinonal(unittest.TestCase):
 
         mapping = mongo_schema_to_mapping(mongo_schema)
         self.assertEqual(mapping, exp_mapping)
+
+if __name__ == '__main__':
+    unittest.main()

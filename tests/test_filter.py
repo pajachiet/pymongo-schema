@@ -128,3 +128,6 @@ class TestFilter(unittest.TestCase):
         expected["db2"]["coll2"]["object"]["field3"]["object"].pop("subfield1")
         expected["db2"].pop("coll1")
         self.assertEqual(filter_mongo_schema_namespaces(schema, namespaces), expected)
+
+if __name__ == '__main__':
+    unittest.main()
