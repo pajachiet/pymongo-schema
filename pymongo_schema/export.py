@@ -103,11 +103,11 @@ def write_mongo_df_as_xlsx(mongo_schema_df, filename):
         writer = pd.ExcelWriter(filename, engine='openpyxl')
         writer.book = book
         writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-        mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=True, float_format='{0:.2f}')
+        mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=True, float_format='%.2f')
         writer.save()
 
     else:
-        mongo_schema_df.to_excel(filename, sheet_name='Mongo_Schema', index=True, float_format='{0:.2f}')
+        mongo_schema_df.to_excel(filename, sheet_name='Mongo_Schema', index=True, float_format='%.2f')
 
 
 def write_mongo_df_as_txt(mongo_schema_df, output_file):
