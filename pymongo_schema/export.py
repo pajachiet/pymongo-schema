@@ -152,7 +152,8 @@ def write_mongo_df_as_html(mongo_schema_df, output_file):
             df_col = df_db.query('Collection == @col').iloc[:, 1:]
             mongo_schema_tmpl[db][col] = df_col.values.tolist()
 
-    tmpl_filename = os.path.join(os.path.dirname(__file__), 'data_dict.tmpl')
+    tmpl_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)),
+                                 'resources', 'data_dict.tmpl')
     with open(tmpl_filename) as tmpl_fd:
         tmpl = jinja2.Template(tmpl_fd.read())
 
