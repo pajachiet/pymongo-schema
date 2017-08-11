@@ -2,7 +2,7 @@
 # coding: utf8
 
 """
-pymongo-schema extract schemas from MongoDB 
+pymongo-schema extract schemas from MongoDB
 
 Usage:
     pymongo-schema  -h | --help
@@ -16,58 +16,60 @@ Commands:
     tosql                       Create a mapping from mongo schema to relational schema (json input and output)
 
 Options:
-    -d --database DB            Only analyze this database. 
+    -d --database DB            Only analyze this database.
                                 By default analyze all databases in Mongo instance
-                                
+
     -c --collection COL         Only analyze this collection.
                                 Multiple collections may be specified this way.
-                                
+
     --port PORT                 Port to connect to [default: 27017]
-    
+
     --host HOST                 Server to connect to [default: localhost]
-    
-    -i , --input FILENAME       Input schema file, to transform or to map to sql. json format expected. 
+
+    -i , --input FILENAME       Input schema file, to transform or to map to sql. json format expected.
                                 Default to standard input
 
-    -o , --output FILENAME      Output file for schema. Default to standard output. 
+    -o , --output FILENAME      Output file for schema. Default to standard output.
                                 Extension added automatically if omitted (useful for multi-format outputs)
-    
+
     -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'xlsx', 'yaml', 'html' or 'json'
                                 Multiple format may be specified. [default: json]
                                 Note : Output format for mongo to sql mapping is json
 
     --columns HEADER            String listing columns to get in 'txt', 'csv', 'html' or 'xlsx' format.
                                 Columns are to be chosen in :
-                                    FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays 
+                                    FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays
                                     FIELD_COMPACT_NAME      idem, without parent object names
-                                    FIELD_NAME              
-                                    DEPTH                   
-                                    TYPE                    
-                                    COUNT                   
-                                    PROP_IN_OBJECT    
-                                    PERCENTAGE              
-                                    TYPES_COUNT             
+                                    FIELD_NAME
+                                    DEPTH
+                                    TYPE
+                                    COUNT
+                                    PROP_IN_OBJECT
+                                    PERCENTAGE
+                                    TYPES_COUNT
                                 Columns have to be separated by whitespace, and are case insensitive.
                                 Default for 'txt' output is "Field_compact_name Field_name Count Percentage Types_count"
                                 Default for 'html' output is "Field_compact_name Field_name Full_name Description Count Percentage Types_count"
                                 Default for 'csv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
-                                
+
     -n, --filter FILENAME       Config file to read namespace to filter. json format expected.
-    
+
     --without-counts            Remove counts information from json and yaml outputs
-    
+
     --quiet                     Set logging level to WARN on standard output
-    
+
     -h, --help                  show this usage information
 
 """
 
+import json
 import logging
 import sys
 from time import time
-from docopt import docopt
-import json
+
 import pymongo
+from docopt import docopt
+
 from export import write_output_dict
 from extract import extract_pymongo_client_schema
 from filter import filter_mongo_schema_namespaces
@@ -77,9 +79,10 @@ logger = logging.getLogger()
 
 
 def main(argv=None):
-    """ Launch pymongo_schema (assuming CLI)
-    
-    :param argv: command line arguments to pass directly to docopt. Useful for usage from another python program. 
+    """ Launch pymongo_schema (assuming CLI).
+
+    :param argv: command line arguments to pass directly to docopt.
+            Useful for usage from another python program.
     """
     # Parse command line argument
     arg = docopt(__doc__, argv=argv, help=True)
@@ -108,8 +111,7 @@ def main(argv=None):
 
 
 def preprocess_arg(arg):
-    """ Preprocess arguments from command line
-    """
+    """ Preprocess arguments from command line."""
     if not arg['--collection']:
         arg['--collection'] = None
 
@@ -117,14 +119,14 @@ def preprocess_arg(arg):
         arg['--format'] = ['txt']
 
     if arg['--output'] is None and 'xlsx' in arg['--format']:
-        logger.warn("WARNING : xlsx format is not supported on standard output. Switching to csv output.")
+        logger.warn("WARNING : xlsx format is not supported on standard output. "
+                    "Switching to csv output.")
         arg['--format'].remove('xlsx')
         arg['--format'].append('csv')
 
 
 def initialize_logger(arg):
-    """ Initialize logging to standard output, if not quiet.  
-    """
+    """ Initialize logging to standard output, if not quiet."""
     logger.setLevel(logging.INFO)
     logger.addHandler(logging.NullHandler())
     steam_handler = logging.StreamHandler()
@@ -135,10 +137,10 @@ def initialize_logger(arg):
 
 
 def extract_schema(arg):
-    """ Main entry point function to extract schema  
-    
-    :param arg: 
-    :return mongo_schema: dict 
+    """ Main entry point function to extract schema.
+
+    :param arg:
+    :return mongo_schema: dict
     """
     start_time = time()
     logger.info('=== Start MongoDB schema analysis')
@@ -148,13 +150,13 @@ def extract_schema(arg):
                                                  database_names=arg['--database'],
                                                  collection_names=arg['--collection'])
 
-    logger.info('--- MongoDB schema analysis took {:.2f} s'.format(time() - start_time))
+    logger.info('--- MongoDB schema analysis took %.2f s', time() - start_time)
     return mongo_schema
 
 
 def transform_schema(arg):
-    """ Main entry point function to transform a schema
-    
+    """ Main entry point function to transform a schema.
+
     :param arg: dict
     :return filtered_mongo_schema: dict
     """
@@ -171,10 +173,10 @@ def transform_schema(arg):
 
 
 def schema_to_sql(arg):
-    """ Main entry point function to genearate a mapping from mongo to sql
-    
+    """ Main entry point function to generate a mapping from mongo to sql.
+
     :param arg: dict
-    :return mongo_to_sql_mapping: dict 
+    :return mongo_to_sql_mapping: dict
     """
     logger.info('=== Generate mapping from mongo to sql')
     input_schema = load_input_schema(arg)
@@ -183,6 +185,7 @@ def schema_to_sql(arg):
 
 
 def load_input_schema(arg):
+    """Load schema from file or stdin."""
     if arg['--input'] is None:
         input_schema = json.load(sys.stdin)
     else:
@@ -190,6 +193,7 @@ def load_input_schema(arg):
             input_schema = json.load(f)
 
     return input_schema
+
 
 if __name__ == '__main__':
     main()
