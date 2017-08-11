@@ -115,9 +115,6 @@ def preprocess_arg(arg):
     if not arg['--collection']:
         arg['--collection'] = None
 
-    if not arg['--format']:
-        arg['--format'] = ['txt']
-
     if arg['--output'] is None and 'xlsx' in arg['--format']:
         logger.warn("WARNING : xlsx format is not supported on standard output. "
                     "Switching to csv output.")
