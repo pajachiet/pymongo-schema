@@ -29,7 +29,7 @@ def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
     """
     filtered_schema = init_filtered_schema(namespaces_dict)
 
-    for namespace, filt in namespaces_dict.iteritems():
+    for namespace, filt in namespaces_dict.items():
         if filt is False:
             continue
 
@@ -68,7 +68,7 @@ def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
                 else:
                     raise NotImplementedError('unknown option, not implemented : %s', filt.keys())
 
-    for db in filtered_schema.keys():
+    for db in list(filtered_schema):
         if not filtered_schema[db]:
             del filtered_schema[db]
     return filtered_schema
@@ -117,11 +117,11 @@ def include_fields_from_object_schema(include_fields_dict, object_count_schema):
     :param include_fields_dict: dict
     :param object_count_schema: dict
     """
-    object_schema_filtered = {k: v for k, v in object_count_schema.iteritems() if k != 'object'}
+    object_schema_filtered = {k: v for k, v in object_count_schema.items() if k != 'object'}
     object_schema_filtered['object'] = {}
 
     object_schema = object_count_schema['object']
-    for field, value in include_fields_dict.iteritems():
+    for field, value in include_fields_dict.items():
         if field not in object_schema:
             logger.warn("WARNING: Field '%s' is present in includeFields but not in schema", field)
             continue
@@ -172,7 +172,7 @@ def exclude_fields_from_object_schema(exclude_fields_dict, object_schema):
     :param exclude_fields_dict: dict
     :param object_schema: dict
     """
-    for field, value in exclude_fields_dict.iteritems():
+    for field, value in exclude_fields_dict.items():
         if field not in object_schema:
             logger.warn("WARNING: Field '%s' is present in excludeFields, but not in schema", field)
             continue

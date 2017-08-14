@@ -8,3 +8,4 @@ xlsxwriter
 openpyxl
 python-coveralls
 jinja2
+future==0.16.0

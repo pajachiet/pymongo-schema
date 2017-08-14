@@ -29,7 +29,7 @@ def mongo_schema_to_mapping(mongo_schema):
         database_schema = mongo_schema[db]
         db_mapping = dict()
 
-        for collection, collection_schema in database_schema.iteritems():
+        for collection, collection_schema in database_schema.items():
             if not collection_schema['object']:
                 # Skip collection with empty schema
                 continue
@@ -77,7 +77,7 @@ def add_object_to_mapping(object_schema, mapping, table_name, field_prefix=''):
         used to get full name of nested object,
         from table's parent object (either collection or ARRAY(OBJECT))
     """
-    for field, field_info in object_schema.iteritems():
+    for field, field_info in object_schema.items():
         # Assemble mongo_field_name, the full field name from table's parent object,
         # either collection or ARRAY(OBJECT)
         mongo_field_name = field_prefix + field

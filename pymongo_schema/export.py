@@ -171,8 +171,8 @@ def mongo_schema_as_dataframe(mongo_schema, columns_to_get):
     :return mongo_schema_df: Dataframe
     """
     line_tuples = list()
-    for database, database_schema in sorted(mongo_schema.items()):
-        for collection, collection_schema in sorted(database_schema.items()):
+    for database, database_schema in sorted(list(mongo_schema.items())):
+        for collection, collection_schema in sorted(list(database_schema.items())):
             collection_line_tuples = object_schema_to_line_tuples(collection_schema['object'],
                                                                   columns_to_get,
                                                                   field_prefix='')
@@ -201,7 +201,7 @@ def object_schema_to_line_tuples(object_schema, columns_to_get, field_prefix):
     :return line_tuples: list of tuples describing lines
     """
     line_tuples = []
-    sorted_fields = sorted(object_schema.items(), key=lambda x: (-x[1]['count'], x[0]))
+    sorted_fields = sorted(list(object_schema.items()), key=lambda x: (-x[1]['count'], x[0]))
 
     for field, field_schema in sorted_fields:
         line_columns = field_schema_to_columns(field, field_schema, field_prefix, columns_to_get)
@@ -318,7 +318,7 @@ def remove_counts_from_schema(value):
     """
     if isinstance(value, dict):
         d = dict()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if k not in ['count', 'types_count', 'prop_in_object', 'array_types_count']:
                 d[k] = remove_counts_from_schema(v)
         return d

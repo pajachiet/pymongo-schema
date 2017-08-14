@@ -133,7 +133,8 @@ class TestCommandLine(unittest.TestCase):
         argv = ['tosql', '--input', self.schema, '--output', self.output]
         main(argv)
 
-        self.assertTrue(filecmp.cmp(self.output, exp))
+        with open(self.output) as out_fd, open(exp) as exp_fd:
+            self.assertEqual(json.load(out_fd), json.load(exp_fd))
 
 
 if __name__ == '__main__':
