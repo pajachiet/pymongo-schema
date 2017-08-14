@@ -36,7 +36,6 @@ PYMONGO_TYPE_TO_TYPE_STRING = {
     float: "float",
 
     str: "string",
-    unicode: "string",
 
     bson.datetime.datetime: "date",
     bson.timestamp.Timestamp: "timestamp",
@@ -45,6 +44,10 @@ PYMONGO_TYPE_TO_TYPE_STRING = {
     bson.objectid.ObjectId: "oid",
 }
 
+try:
+    PYMONGO_TYPE_TO_TYPE_STRING[unicode] = 'string'
+except NameError:
+    pass
 
 def get_type_string(value):
     """ Return mongo type string from a value
