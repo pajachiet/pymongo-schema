@@ -137,7 +137,8 @@ def write_mongo_df_as_txt(mongo_schema_df, output_file):
         for col in df_db.Collection.unique():
             output_str += '--- Collection: {} \n'.format(col)
             df_col = df_db.query('Collection == @col').iloc[:, 1:]
-            output_str += df_col.to_string(index=False, formatters=formaters, justify='left')
+            output_str += df_col.to_string(index=False, formatters=formaters, justify='left',
+                                           float_format=lambda x: '%.2f' % x)
             output_str += '\n\n'
 
     output_file.write(output_str)

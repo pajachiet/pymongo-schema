@@ -11,8 +11,8 @@ address            address           None      None       25359    100.0       O
 borough            borough           None      None       25359    100.0       string : 25359                              
 cuisine            cuisine           None      None       25359    100.0       string : 25359                              
 grades             grades            None      None       25359    100.0       ARRAY(OBJECT : 93463, null : 738) : 25359   
- : grade           grade             None      None       93463    368.559     string : 93463                              
- : score           score             None      None       93463    368.559     integer : 93450, null : 13                  
+ : grade           grade             None      None       93463    368.56      string : 93463                              
+ : score           score             None      None       93463    368.56      integer : 93450, null : 13                  
 restaurant_id      restaurant_id     None      None       25359    100.0       string : 25359
 
 --- Collection: test_col2 
@@ -26,9 +26,9 @@ address            address           None      None       25359    100.0       O
 borough            borough           None      None       25359    100.0       string : 25359                              
 cuisine            cuisine           None      None       25359    100.0       string : 25359                              
 grades             grades            None      None       25359    100.0       ARRAY(OBJECT : 93463, null : 738) : 25359   
- : date            date              None      None       93463    368.559     date : 93463                                
- : grade           grade             None      None       93463    368.559     string : 93463                              
- : score           score             None      None       93463    368.559     integer : 93450, null : 13                  
+ : date            date              None      None       93463    368.56      date : 93463                                
+ : grade           grade             None      None       93463    368.56      string : 93463                              
+ : score           score             None      None       93463    368.56      integer : 93450, null : 13                  
 name               name              None      None       25359    100.0       string : 25359                              
 restaurant_id      restaurant_id     None      None       25359    100.0       string : 25359
 

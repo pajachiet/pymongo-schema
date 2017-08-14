@@ -11,9 +11,9 @@ address            address          25359    100.0       OBJECT : 25359
 borough            borough          25359    100.0       string : 25359                              
 cuisine            cuisine          25359    100.0       string : 25359                              
 grades             grades           25359    100.0       ARRAY(OBJECT : 93463, null : 738) : 25359   
- : date            date             93463    368.559     date : 93463                                
- : grade           grade            93463    368.559     string : 93463                              
- : score           score            93463    368.559     integer : 93450, null : 13                  
+ : date            date             93463    368.56      date : 93463                                
+ : grade           grade            93463    368.56      string : 93463                              
+ : score           score            93463    368.56      integer : 93450, null : 13                  
 name               name             25359    100.0       string : 25359                              
 restaurant_id      restaurant_id    25359    100.0       string : 25359
 
@@ -28,9 +28,9 @@ address            address          25359    100.0       OBJECT : 25359
 borough            borough          25359    100.0       string : 25359                              
 cuisine            cuisine          25359    100.0       string : 25359                              
 grades             grades           25359    100.0       ARRAY(OBJECT : 93463, null : 738) : 25359   
- : date            date             93463    368.559     date : 93463                                
- : grade           grade            93463    368.559     string : 93463                              
- : score           score            93463    368.559     integer : 93450, null : 13                  
+ : date            date             93463    368.56      date : 93463                                
+ : grade           grade            93463    368.56      string : 93463                              
+ : score           score            93463    368.56      integer : 93450, null : 13                  
 name               name             25359    100.0       string : 25359                              
 restaurant_id      restaurant_id    25359    100.0       string : 25359
 
@@ -47,9 +47,9 @@ address            address          25359    100.0       OBJECT : 25359
 borough            borough          25359    100.0       string : 25359                              
 cuisine            cuisine          25359    100.0       string : 25359                              
 grades             grades           25359    100.0       ARRAY(OBJECT : 93463, null : 738) : 25359   
- : date            date             93463    368.559     date : 93463                                
- : grade           grade            93463    368.559     string : 93463                              
- : score           score            93463    368.559     integer : 93450, null : 13                  
+ : date            date             93463    368.56      date : 93463                                
+ : grade           grade            93463    368.56      string : 93463                              
+ : score           score            93463    368.56      integer : 93450, null : 13                  
 name               name             25359    100.0       string : 25359                              
 restaurant_id      restaurant_id    25359    100.0       string : 25359
 

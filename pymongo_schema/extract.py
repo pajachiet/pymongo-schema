@@ -158,8 +158,7 @@ def post_process_schema(object_count_schema):
     for field_schema in object_schema.values():
 
         summarize_types(field_schema)
-        field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 5)
-
+        field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 4)
         if 'object' in field_schema:
             post_process_schema(field_schema)
 
