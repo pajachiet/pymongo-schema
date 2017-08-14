@@ -10,7 +10,7 @@ from pymongo import MongoClient
 
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.tosql import mongo_schema_to_mapping
-from pymongo_schema.command_line import main
+from pymongo_schema.__main__ import main
 
 TEST_DIR = os.path.dirname(__file__)
 

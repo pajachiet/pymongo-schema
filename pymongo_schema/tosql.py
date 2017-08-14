@@ -9,7 +9,7 @@ https://github.com/Hopwork/mongo-connector-postgresql
 
 import logging
 
-from mongo_sql_types import psql_type
+from pymongo_schema.mongo_sql_types import psql_type
 
 logger = logging.getLogger(__name__)
 
