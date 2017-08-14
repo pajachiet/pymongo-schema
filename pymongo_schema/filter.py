@@ -123,7 +123,8 @@ def include_fields_from_object_schema(include_fields_dict, object_count_schema):
     object_schema = object_count_schema['object']
     for field, value in include_fields_dict.items():
         if field not in object_schema:
-            logger.warn("WARNING: Field '%s' is present in includeFields but not in schema", field)
+            logger.warning("WARNING: Field '%s' is present in includeFields but not in schema",
+                           field)
             continue
 
         if value is PRESENT_VALUE:
@@ -174,7 +175,8 @@ def exclude_fields_from_object_schema(exclude_fields_dict, object_schema):
     """
     for field, value in exclude_fields_dict.items():
         if field not in object_schema:
-            logger.warn("WARNING: Field '%s' is present in excludeFields, but not in schema", field)
+            logger.warning("WARNING: Field '%s' is present in excludeFields, but not in schema",
+                           field)
             continue
 
         if value is PRESENT_VALUE:
