@@ -119,10 +119,9 @@ def generate_type_tree_figure(output_file):
     try:
         from ete3 import faces, TextFace, TreeStyle
     except ImportError as e:
-        print 'ImportError : {}'.format(e)
-        print "Generation of type_tree figure need ETE dependencies to be installed"
-        print "Use from anaconda, or look at installation procedure on " \
-              "http://etetoolkit.org/new_download/"
+        logger.warning('ImportError : %s Generation of type_tree figure need ETE dependencies to '
+                       'be installed Use from anaconda, or look at installation procedure on '
+                       'http://etetoolkit.org/new_download/', e)
         return
 
     # Define custom tree style
@@ -169,4 +168,5 @@ def psql_type(mongo_type_str):
 
 
 if __name__ == '__main__':
+    logging.basicConfig()
     generate_type_tree_figure("type_tree.png")
