@@ -104,14 +104,14 @@ class TestExportUnit(unittest.TestCase):
             ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count', 'Types_count'],
             'foo.bar:')
         exp = [
-            ('foo.bar:field2', ' .  : field2', 'field2', 'string', 25359, 'string : 25359'),
             ('foo.bar:field', ' .  : field', 'field', 'string', 25359, 'string : 25359'),
+            ('foo.bar:field2', ' .  : field2', 'field2', 'string', 25359, 'string : 25359'),
             ('foo.bar:field3', ' .  : field3', 'field3', 'ARRAY(OBJECT)', 25359,
              'ARRAY(OBJECT : 25359) : 25359'),
-            ('foo.bar:field3:subfield2', ' .  :  : subfield2', 'subfield2', 'ARRAY(string)',
-             25359, 'object : 25359'),
             ('foo.bar:field3:subfield1', ' .  :  : subfield1', 'subfield1', 'string', 25359,
-             'string : 25359')]
+             'string : 25359'),
+            ('foo.bar:field3:subfield2', ' .  :  : subfield2', 'subfield2', 'ARRAY(string)',
+             25359, 'object : 25359')]
         self.assertEqual(res, exp)
 
     def test11_mongo_schema_as_dataframe_simple(self):
@@ -125,16 +125,16 @@ class TestExportUnit(unittest.TestCase):
         columns = ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count',
                    'Types_count']
         res = mongo_schema_as_dataframe(self.long_full_schema, columns)
-        exp = [['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
-               ['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
+        exp = [['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
+               ['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
                ['db1', 'coll', 'field3', 'field3', 'field3', 'ARRAY(OBJECT)', 25359,
                 'ARRAY(OBJECT : 25359) : 25359'],
-               ['db1', 'coll', 'field3:subfield2', ' : subfield2', 'subfield2', 'ARRAY(string)',
-                25359, 'object : 25359'],
                ['db1', 'coll', 'field3:subfield1', ' : subfield1', 'subfield1', 'string', 25359,
                 'string : 25359'],
-               ['db2', 'coll2', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
-               ['db2', 'coll1', 'field', 'field', 'field', 'string', 25359, 'string : 25359']]
+               ['db1', 'coll', 'field3:subfield2', ' : subfield2', 'subfield2', 'ARRAY(string)',
+                25359, 'object : 25359'],
+               ['db2', 'coll1', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
+               ['db2', 'coll2', 'field', 'field', 'field', 'string', 25359, 'string : 25359']]
         exp = pd.DataFrame(exp, columns=['Database', 'Collection'] + columns)
         assert_frame_equal(res, exp)
 
