@@ -1,7 +1,7 @@
 pymongo
 pyyaml
 docopt
-ete3
+git+https://github.com/etetoolkit/ete.git
 pandas
 xlwt
 xlsxwriter
