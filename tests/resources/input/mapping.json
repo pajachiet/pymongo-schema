@@ -1,0 +1,78 @@
+{
+  "test_db": {
+    "test_col__address__coord": {
+      "pk": "id",
+      "id_test_col": {
+        "type": "TEXT"
+      },
+      "coord": {
+        "dest": "coord",
+        "type": "REAL"
+      }
+    },
+    "test_col__grades": {
+      "date": {
+        "dest": "date",
+        "type": "TIMESTAMP"
+      },
+      "pk": "id",
+      "id_test_col": {
+        "type": "TEXT"
+      },
+      "score": {
+        "dest": "score",
+        "type": "INT"
+      },
+      "grade": {
+        "dest": "grade",
+        "type": "TEXT"
+      }
+    },
+    "test_col": {
+      "cuisine": {
+        "dest": "cuisine",
+        "type": "TEXT"
+      },
+      "borough": {
+        "dest": "borough",
+        "type": "TEXT"
+      },
+      "name": {
+        "dest": "name",
+        "type": "TEXT"
+      },
+      "restaurant_id": {
+        "dest": "restaurant_id",
+        "type": "TEXT"
+      },
+      "address.street": {
+        "dest": "address__street",
+        "type": "TEXT"
+      },
+      "grades": {
+        "dest": "test_col__grades",
+        "fk": "id_test_col",
+        "type": "_ARRAY"
+      },
+      "address.zipcode": {
+        "dest": "address__zipcode",
+        "type": "TEXT"
+      },
+      "address.coord": {
+        "dest": "test_col__address__coord",
+        "fk": "id_test_col",
+        "type": "_ARRAY_OF_SCALARS",
+        "valueField": "coord"
+      },
+      "pk": "_id",
+      "_id": {
+        "dest": "_id",
+        "type": "TEXT"
+      },
+      "address.building": {
+        "dest": "address__building",
+        "type": "TEXT"
+      }
+    }
+  }
+}

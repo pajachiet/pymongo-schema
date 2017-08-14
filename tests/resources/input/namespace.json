@@ -1,0 +1,11 @@
+{
+  "namespaces": {
+    "test_db1.test_col1": {
+      "excludeFields": [
+        "grades.date", "name"
+      ]
+    },
+    "test_db2.test_col": false,
+    "test_db1.test_col2": true
+  }
+}

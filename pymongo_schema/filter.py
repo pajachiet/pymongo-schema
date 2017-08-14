@@ -68,7 +68,7 @@ def filter_mongo_schema_namespaces(mongo_schema, namespaces_dict):
                 else:
                     raise NotImplementedError('unknown option, not implemented : %s', filt.keys())
 
-    for db in filtered_schema:
+    for db in filtered_schema.keys():
         if not filtered_schema[db]:
             del filtered_schema[db]
     return filtered_schema

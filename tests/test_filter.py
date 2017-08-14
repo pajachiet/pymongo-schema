@@ -15,12 +15,14 @@ class TestFilter(unittest.TestCase):
                                   "count": 25359, "type": "string",
                                   "prop_in_object": 1.0},
                        "field3": {"types_count": {"ARRAY": 25359},
-                                  "count": 25359, "type": "OBJECT", "prop_in_object": 1.0,
+                                  'array_types_count': {'OBJECT': 25359}, 'array_type': 'OBJECT',
+                                  "count": 25359, "type": "ARRAY", "prop_in_object": 1.0,
                                   "object": {"subfield1": {"types_count": {"string": 25359},
                                                            "count": 25359, "type": "string",
                                                            "prop_in_object": 1.0},
                                              "subfield2": {"types_count": {"object": 25359},
                                                            "count": 25359, "type": "ARRAY",
+                                                           'array_type': 'string',
                                                            "prop_in_object": 1.0,
                                                            "array_types_count": {"string": 93463,
                                                                                  "null": 738}}}}}}
@@ -78,7 +80,8 @@ class TestFilter(unittest.TestCase):
         fields = {"field3": {"subfield1": "present"}}
         expected = {"count": 25359, "object": {"field3": {
             "types_count": {"ARRAY": 25359},
-            "count": 25359, "type": "OBJECT", "prop_in_object": 1.0,
+            "count": 25359, "type": "ARRAY", 'array_types_count': {'OBJECT': 25359},
+            'array_type': 'OBJECT',"prop_in_object": 1.0,
             "object": {"subfield1": self.schema["object"]["field3"]["object"]["subfield1"]}}}}
         self.assertEqual(include_fields_from_object_schema(fields, self.schema), expected)
 
@@ -125,3 +128,6 @@ class TestFilter(unittest.TestCase):
         expected["db2"]["coll2"]["object"]["field3"]["object"].pop("subfield1")
         expected["db2"].pop("coll1")
         self.assertEqual(filter_mongo_schema_namespaces(schema, namespaces), expected)
+
+if __name__ == '__main__':
+    unittest.main()

@@ -100,3 +100,6 @@ class TestExtractUsingMongo(unittest.TestCase):
                                                          collection_names='test_col')
 
         self.assertEqual(mongo_schema_got, mongo_schema_expected)
+
+if __name__ == '__main__':
+    unittest.main()
