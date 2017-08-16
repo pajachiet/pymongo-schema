@@ -1,7 +1,6 @@
 import filecmp
 import json
 import os
-import sys
 import unittest
 from itertools import chain
 
@@ -10,12 +9,13 @@ from pymongo import MongoClient
 
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.tosql import mongo_schema_to_mapping
-from pymongo_schema.command_line import main
+from pymongo_schema.__main__ import main
+from tests.tools import TestRemovingOutputOnSuccess
 
 TEST_DIR = os.path.dirname(__file__)
 
 
-class TestFunctinonal(unittest.TestCase):
+class TestFunctional(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.pymongo_client = MongoClient()
@@ -31,21 +31,14 @@ class TestFunctinonal(unittest.TestCase):
         self.assertEqual(mapping, exp_mapping)
 
 
-class TestCommandLine(unittest.TestCase):
+class TestCommandLine(TestRemovingOutputOnSuccess):
     @classmethod
     def setUpClass(cls):
+        super(TestCommandLine, cls).setUpClass()
         cls.schema = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema.json')
 
     def setUp(self):
         self.output = None
-
-    def tearDown(self):
-        if self.output and not all(sys.exc_info()):
-            if isinstance(self.output, str):
-                os.remove(self.output)
-            else:
-                for output in self.output:
-                    os.remove(output)
 
     def test01_extract(self):
         self.output = os.path.join(TEST_DIR, "output_fctl_schema.json")
@@ -133,7 +126,8 @@ class TestCommandLine(unittest.TestCase):
         argv = ['tosql', '--input', self.schema, '--output', self.output]
         main(argv)
 
-        self.assertTrue(filecmp.cmp(self.output, exp))
+        with open(self.output) as out_fd, open(exp) as exp_fd:
+            self.assertEqual(json.load(out_fd), json.load(exp_fd))
 
 
 if __name__ == '__main__':

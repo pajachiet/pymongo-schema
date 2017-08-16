@@ -51,7 +51,7 @@
               },
               "count": 93463,
               "type": "date",
-              "prop_in_object": 3.68559
+              "prop_in_object": 3.6856
             },
             "grade": {
               "types_count": {
@@ -59,7 +59,7 @@
               },
               "count": 93463,
               "type": "string",
-              "prop_in_object": 3.68559
+              "prop_in_object": 3.6856
             },
             "score": {
               "types_count": {
@@ -68,7 +68,7 @@
               },
               "count": 93463,
               "type": "integer",
-              "prop_in_object": 3.68559
+              "prop_in_object": 3.6856
             }
           },
           "prop_in_object": 1.0,

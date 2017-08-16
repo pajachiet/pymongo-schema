@@ -5,10 +5,10 @@
 pymongo-schema extract schemas from MongoDB
 
 Usage:
-    pymongo-schema  -h | --help
-    pymongo-schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
-    pymongo-schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
-    pymongo-schema  tosql [--input=FILENAME --output=FILENAME --quiet]
+    pymongo_schema  -h | --help
+    pymongo_schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
+    pymongo_schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
+    pymongo_schema  tosql [--input=FILENAME --output=FILENAME --quiet]
 
 Commands:
     extract                     Extract schema from a MongoDB instance
@@ -70,10 +70,10 @@ from time import time
 import pymongo
 from docopt import docopt
 
-from export import write_output_dict
-from extract import extract_pymongo_client_schema
-from filter import filter_mongo_schema_namespaces
-from tosql import mongo_schema_to_mapping
+from pymongo_schema.export import write_output_dict
+from pymongo_schema.extract import extract_pymongo_client_schema
+from pymongo_schema.filter import filter_mongo_schema_namespaces
+from pymongo_schema.tosql import mongo_schema_to_mapping
 
 logger = logging.getLogger()
 

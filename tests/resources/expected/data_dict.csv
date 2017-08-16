@@ -1,43 +1,43 @@
 Database	Collection	Field_compact_name	Field_name	Full_name	Description	Count	Percentage	Types_count
-test_db2	test_col	cuisine	cuisine			25359	100.0	string : 25359
-test_db2	test_col	_id	_id			25359	100.0	oid : 25359
-test_db2	test_col	name	name			25359	100.0	string : 25359
-test_db2	test_col	restaurant_id	restaurant_id			25359	100.0	string : 25359
-test_db2	test_col	grades	grades			25359	100.0	ARRAY(OBJECT : 93463, null : 738) : 25359
-test_db2	test_col	 : date	date			93463	368.559	date : 93463
-test_db2	test_col	 : grade	grade			93463	368.559	string : 93463
-test_db2	test_col	 : score	score			93463	368.559	integer : 93450, null : 13
-test_db2	test_col	address	address			25359	100.0	OBJECT : 25359
-test_db2	test_col	 . building	building			25359	100.0	string : 25359
-test_db2	test_col	 . street	street			25359	100.0	string : 25359
-test_db2	test_col	 . zipcode	zipcode			25359	100.0	string : 25359
-test_db2	test_col	 . coord	coord			25359	100.0	ARRAY(float : 50714, null : 2) : 25359
-test_db2	test_col	borough	borough			25359	100.0	string : 25359
-test_db1	test_col1	cuisine	cuisine			25359	100.0	string : 25359
 test_db1	test_col1	_id	_id			25359	100.0	oid : 25359
-test_db1	test_col1	name	name			25359	100.0	string : 25359
-test_db1	test_col1	restaurant_id	restaurant_id			25359	100.0	string : 25359
-test_db1	test_col1	grades	grades			25359	100.0	ARRAY(OBJECT : 93463, null : 738) : 25359
-test_db1	test_col1	 : date	date			93463	368.559	date : 93463
-test_db1	test_col1	 : grade	grade			93463	368.559	string : 93463
-test_db1	test_col1	 : score	score			93463	368.559	integer : 93450, null : 13
 test_db1	test_col1	address	address			25359	100.0	OBJECT : 25359
 test_db1	test_col1	 . building	building			25359	100.0	string : 25359
+test_db1	test_col1	 . coord	coord			25359	100.0	ARRAY(float : 50714, null : 2) : 25359
 test_db1	test_col1	 . street	street			25359	100.0	string : 25359
 test_db1	test_col1	 . zipcode	zipcode			25359	100.0	string : 25359
-test_db1	test_col1	 . coord	coord			25359	100.0	ARRAY(float : 50714, null : 2) : 25359
 test_db1	test_col1	borough	borough			25359	100.0	string : 25359
-test_db1	test_col2	cuisine	cuisine			25359	100.0	string : 25359
+test_db1	test_col1	cuisine	cuisine			25359	100.0	string : 25359
+test_db1	test_col1	grades	grades			25359	100.0	ARRAY(OBJECT : 93463, null : 738) : 25359
+test_db1	test_col1	 : date	date			93463	368.56	date : 93463
+test_db1	test_col1	 : grade	grade			93463	368.56	string : 93463
+test_db1	test_col1	 : score	score			93463	368.56	integer : 93450, null : 13
+test_db1	test_col1	name	name			25359	100.0	string : 25359
+test_db1	test_col1	restaurant_id	restaurant_id			25359	100.0	string : 25359
 test_db1	test_col2	_id	_id			25359	100.0	oid : 25359
-test_db1	test_col2	name	name			25359	100.0	string : 25359
-test_db1	test_col2	restaurant_id	restaurant_id			25359	100.0	string : 25359
-test_db1	test_col2	grades	grades			25359	100.0	ARRAY(OBJECT : 93463, null : 738) : 25359
-test_db1	test_col2	 : date	date			93463	368.559	date : 93463
-test_db1	test_col2	 : grade	grade			93463	368.559	string : 93463
-test_db1	test_col2	 : score	score			93463	368.559	integer : 93450, null : 13
 test_db1	test_col2	address	address			25359	100.0	OBJECT : 25359
 test_db1	test_col2	 . building	building			25359	100.0	string : 25359
+test_db1	test_col2	 . coord	coord			25359	100.0	ARRAY(float : 50714, null : 2) : 25359
 test_db1	test_col2	 . street	street			25359	100.0	string : 25359
 test_db1	test_col2	 . zipcode	zipcode			25359	100.0	string : 25359
-test_db1	test_col2	 . coord	coord			25359	100.0	ARRAY(float : 50714, null : 2) : 25359
 test_db1	test_col2	borough	borough			25359	100.0	string : 25359
+test_db1	test_col2	cuisine	cuisine			25359	100.0	string : 25359
+test_db1	test_col2	grades	grades			25359	100.0	ARRAY(OBJECT : 93463, null : 738) : 25359
+test_db1	test_col2	 : date	date			93463	368.56	date : 93463
+test_db1	test_col2	 : grade	grade			93463	368.56	string : 93463
+test_db1	test_col2	 : score	score			93463	368.56	integer : 93450, null : 13
+test_db1	test_col2	name	name			25359	100.0	string : 25359
+test_db1	test_col2	restaurant_id	restaurant_id			25359	100.0	string : 25359
+test_db2	test_col	_id	_id			25359	100.0	oid : 25359
+test_db2	test_col	address	address			25359	100.0	OBJECT : 25359
+test_db2	test_col	 . building	building			25359	100.0	string : 25359
+test_db2	test_col	 . coord	coord			25359	100.0	ARRAY(float : 50714, null : 2) : 25359
+test_db2	test_col	 . street	street			25359	100.0	string : 25359
+test_db2	test_col	 . zipcode	zipcode			25359	100.0	string : 25359
+test_db2	test_col	borough	borough			25359	100.0	string : 25359
+test_db2	test_col	cuisine	cuisine			25359	100.0	string : 25359
+test_db2	test_col	grades	grades			25359	100.0	ARRAY(OBJECT : 93463, null : 738) : 25359
+test_db2	test_col	 : date	date			93463	368.56	date : 93463
+test_db2	test_col	 : grade	grade			93463	368.56	string : 93463
+test_db2	test_col	 : score	score			93463	368.56	integer : 93450, null : 13
+test_db2	test_col	name	name			25359	100.0	string : 25359
+test_db2	test_col	restaurant_id	restaurant_id			25359	100.0	string : 25359

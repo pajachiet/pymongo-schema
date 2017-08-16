@@ -43,7 +43,9 @@ Objects are initialized as defaultdict(empty_field_schema) to simplify the code
 import logging
 from collections import defaultdict
 
-from mongo_sql_types import get_type_string, common_parent_type
+from past.builtins import basestring
+
+from pymongo_schema.mongo_sql_types import get_type_string, common_parent_type
 
 logger = logging.getLogger(__name__)
 
@@ -137,7 +139,7 @@ def recursive_default_to_regular_dict(value):
     :return d: dict or original value
     """
     if isinstance(value, dict):
-        d = {k: recursive_default_to_regular_dict(v) for k, v in value.iteritems()}
+        d = {k: recursive_default_to_regular_dict(v) for k, v in value.items()}
         return d
     else:
         return value
@@ -158,8 +160,7 @@ def post_process_schema(object_count_schema):
     for field_schema in object_schema.values():
 
         summarize_types(field_schema)
-        field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 5)
-
+        field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 4)
         if 'object' in field_schema:
             post_process_schema(field_schema)
 
@@ -176,9 +177,9 @@ def summarize_types(field_schema):
     :param field_schema:
     """
 
-    type_list = field_schema['types_count'].keys()
+    type_list = list(field_schema['types_count'])
     # Only if 'ARRAY' in 'types_count':
-    type_list += field_schema.get('array_types_count', {}).keys()
+    type_list += list(field_schema.get('array_types_count', {}))
 
     cleaned_type_list = [type_name for type_name in type_list
                          if type_name != 'ARRAY' and type_name != 'null']
@@ -216,7 +217,7 @@ def add_document_to_object_schema(document, object_schema):
     contains a MongoDB Object
     :param object_schema: dict
     """
-    for field, value in document.iteritems():
+    for field, value in document.items():
         add_value_to_field_schema(value, object_schema[field])
 
 

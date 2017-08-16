@@ -1,10 +1,11 @@
 pymongo
 pyyaml
 docopt
-ete3
+git+https://github.com/etetoolkit/ete.git
 pandas
 xlwt
 xlsxwriter
 openpyxl
 python-coveralls
 jinja2
+future==0.16.0

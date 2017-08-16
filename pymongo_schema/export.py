@@ -13,6 +13,7 @@ import sys
 import yaml
 
 import jinja2
+from future.moves.collections import OrderedDict
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -136,7 +137,8 @@ def write_mongo_df_as_txt(mongo_schema_df, output_file):
         for col in df_db.Collection.unique():
             output_str += '--- Collection: {} \n'.format(col)
             df_col = df_db.query('Collection == @col').iloc[:, 1:]
-            output_str += df_col.to_string(index=False, formatters=formaters, justify='left')
+            output_str += df_col.to_string(index=False, formatters=formaters, justify='left',
+                                           float_format=lambda x: '%.2f' % x)
             output_str += '\n\n'
 
     output_file.write(output_str)
@@ -144,9 +146,9 @@ def write_mongo_df_as_txt(mongo_schema_df, output_file):
 
 def write_mongo_df_as_html(mongo_schema_df, output_file):
     """Write mongo schema dataframe to an easy to read html format."""
-    mongo_schema_tmpl = {}
+    mongo_schema_tmpl = OrderedDict()
     for db in mongo_schema_df.Database.unique():
-        mongo_schema_tmpl[db] = {}
+        mongo_schema_tmpl[db] = OrderedDict()
         df_db = mongo_schema_df.query('Database == @db').iloc[:, 1:]
         for col in df_db.Collection.unique():
             df_col = df_db.query('Collection == @col').iloc[:, 1:]
@@ -170,8 +172,8 @@ def mongo_schema_as_dataframe(mongo_schema, columns_to_get):
     :return mongo_schema_df: Dataframe
     """
     line_tuples = list()
-    for database, database_schema in mongo_schema.iteritems():
-        for collection, collection_schema in database_schema.iteritems():
+    for database, database_schema in sorted(list(mongo_schema.items())):
+        for collection, collection_schema in sorted(list(database_schema.items())):
             collection_line_tuples = object_schema_to_line_tuples(collection_schema['object'],
                                                                   columns_to_get,
                                                                   field_prefix='')
@@ -200,9 +202,7 @@ def object_schema_to_line_tuples(object_schema, columns_to_get, field_prefix):
     :return line_tuples: list of tuples describing lines
     """
     line_tuples = []
-    sorted_fields = sorted(object_schema.items(),
-                           key=lambda x: x[1]['count'],
-                           reverse=True)
+    sorted_fields = sorted(list(object_schema.items()), key=lambda x: (-x[1]['count'], x[0]))
 
     for field, field_schema in sorted_fields:
         line_columns = field_schema_to_columns(field, field_schema, field_prefix, columns_to_get)
@@ -319,7 +319,7 @@ def remove_counts_from_schema(value):
     """
     if isinstance(value, dict):
         d = dict()
-        for k, v in value.iteritems():
+        for k, v in value.items():
             if k not in ['count', 'types_count', 'prop_in_object', 'array_types_count']:
                 d[k] = remove_counts_from_schema(v)
         return d

@@ -5,6 +5,7 @@ from openpyxl import load_workbook
 from pandas.util.testing import assert_frame_equal
 
 from pymongo_schema.export import *
+from tests.tools import TestRemovingOutputOnSuccess
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -104,14 +105,14 @@ class TestExportUnit(unittest.TestCase):
             ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count', 'Types_count'],
             'foo.bar:')
         exp = [
-            ('foo.bar:field2', ' .  : field2', 'field2', 'string', 25359, 'string : 25359'),
             ('foo.bar:field', ' .  : field', 'field', 'string', 25359, 'string : 25359'),
+            ('foo.bar:field2', ' .  : field2', 'field2', 'string', 25359, 'string : 25359'),
             ('foo.bar:field3', ' .  : field3', 'field3', 'ARRAY(OBJECT)', 25359,
              'ARRAY(OBJECT : 25359) : 25359'),
-            ('foo.bar:field3:subfield2', ' .  :  : subfield2', 'subfield2', 'ARRAY(string)',
-             25359, 'object : 25359'),
             ('foo.bar:field3:subfield1', ' .  :  : subfield1', 'subfield1', 'string', 25359,
-             'string : 25359')]
+             'string : 25359'),
+            ('foo.bar:field3:subfield2', ' .  :  : subfield2', 'subfield2', 'ARRAY(string)',
+             25359, 'object : 25359')]
         self.assertEqual(res, exp)
 
     def test11_mongo_schema_as_dataframe_simple(self):
@@ -125,23 +126,24 @@ class TestExportUnit(unittest.TestCase):
         columns = ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count',
                    'Types_count']
         res = mongo_schema_as_dataframe(self.long_full_schema, columns)
-        exp = [['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
-               ['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
+        exp = [['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
+               ['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
                ['db1', 'coll', 'field3', 'field3', 'field3', 'ARRAY(OBJECT)', 25359,
                 'ARRAY(OBJECT : 25359) : 25359'],
-               ['db1', 'coll', 'field3:subfield2', ' : subfield2', 'subfield2', 'ARRAY(string)',
-                25359, 'object : 25359'],
                ['db1', 'coll', 'field3:subfield1', ' : subfield1', 'subfield1', 'string', 25359,
                 'string : 25359'],
-               ['db2', 'coll2', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
-               ['db2', 'coll1', 'field', 'field', 'field', 'string', 25359, 'string : 25359']]
+               ['db1', 'coll', 'field3:subfield2', ' : subfield2', 'subfield2', 'ARRAY(string)',
+                25359, 'object : 25359'],
+               ['db2', 'coll1', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
+               ['db2', 'coll2', 'field', 'field', 'field', 'string', 25359, 'string : 25359']]
         exp = pd.DataFrame(exp, columns=['Database', 'Collection'] + columns)
         assert_frame_equal(res, exp)
 
 
-class TestExportIntegration(unittest.TestCase):
+class TestExportIntegration(TestRemovingOutputOnSuccess):
     @classmethod
     def setUpClass(cls):
+        super(TestExportIntegration, cls).setUpClass()
         with open(os.path.join(TEST_DIR, 'resources', 'input', 'mapping.json')) as f:
             cls.mapping_ex_dict = json.loads(f.read())
         with open(os.path.join(TEST_DIR, 'resources', 'input', 'test_schema.json')) as f:
@@ -150,73 +152,66 @@ class TestExportIntegration(unittest.TestCase):
                        'Percentage', 'Types_count']
         cls.schema_ex_df = mongo_schema_as_dataframe(cls.schema_ex_dict, cls.columns)
 
-    def setUp(self):
-        self.cur_output = None
-
-    def tearDown(self):
-        if self.cur_output and not all(sys.exc_info()):
-            os.remove(self.cur_output)
-
     def test01_write_txt(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict.txt')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict.txt')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
-        with open(self.cur_output, 'w') as out_fd:
+        with open(self.output, 'w') as out_fd:
             write_mongo_df_as_txt(self.schema_ex_df, out_fd)
-        self.assertTrue(filecmp.cmp(self.cur_output, expected_file))
+        self.assertTrue(filecmp.cmp(self.output, expected_file))
 
     def test02_write_html(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict.html')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict.html')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
-        with open(self.cur_output, 'w') as out_fd:
+        with open(self.output, 'w') as out_fd:
             write_mongo_df_as_html(self.schema_ex_df, out_fd)
-        with open(self.cur_output) as out_fd, open(expected_file) as exp_fd:
+        with open(self.output) as out_fd, open(expected_file) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
 
     def test03_write_xlsx(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict.xlsx')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict.xlsx')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
-        write_mongo_df_as_xlsx(self.schema_ex_df, self.cur_output)
-        res = [cell.value for row in load_workbook(self.cur_output).active for cell in row]
+        write_mongo_df_as_xlsx(self.schema_ex_df, self.output)
+        res = [cell.value for row in load_workbook(self.output).active for cell in row]
         exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
         self.assertEqual(res, exp)
 
     def test04_write_output_dict_schema_txt(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.txt')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.txt')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
-        arg = {'--format': ['txt', 'txt'], '--output': self.cur_output,
+        arg = {'--format': ['txt', 'txt'], '--output': self.output,
                '--columns': " ".join(self.columns)}
         write_output_dict(self.schema_ex_dict, arg)
-        self.assertTrue(filecmp.cmp(self.cur_output, expected_file))
+        self.assertTrue(filecmp.cmp(self.output, expected_file))
 
     def test05_write_output_dict_schema_html(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.html')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.html')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
-        arg = {'--format': ['html'], '--output': self.cur_output,
+        arg = {'--format': ['html'], '--output': self.output,
                '--columns': " ".join(self.columns)}
         write_output_dict(self.schema_ex_dict, arg)
-        with open(self.cur_output) as out_fd, open(expected_file) as exp_fd:
+        with open(self.output) as out_fd, open(expected_file) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
 
     def test05_write_output_dict_schema_xlsx(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.xlsx')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.xlsx')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
-        arg = {'--format': ['xlsx'], '--output': self.cur_output,
+        arg = {'--format': ['xlsx'], '--output': self.output,
                '--columns': " ".join(self.columns)}
         write_output_dict(self.schema_ex_dict, arg)
-        res = [cell.value for row in load_workbook(self.cur_output).active for cell in row]
+        res = [cell.value for row in load_workbook(self.output).active for cell in row]
         exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
         self.assertEqual(res, exp)
 
     def test06_write_output_dict_mapping_yaml(self):
-        self.cur_output = os.path.join(TEST_DIR, 'output_data_dict_from_mapping.yaml')
+        self.output = os.path.join(TEST_DIR, 'output_data_dict_from_mapping.yaml')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.yaml')
-        arg = {'--format': ['yaml'], '--output': self.cur_output,
+        arg = {'--format': ['yaml'], '--output': self.output,
                '--columns': None, '--without-counts': True}
         write_output_dict(self.mapping_ex_dict, arg)
-        self.assertTrue(filecmp.cmp(self.cur_output, expected_file))
+        self.assertTrue(filecmp.cmp(self.output, expected_file))
 
     def test07_write_output_dict_wrong_format(self):
-        arg = {'--format': ['fake'], '--output': self.cur_output,
+        arg = {'--format': ['fake'], '--output': self.output,
                '--columns': None, '--without-counts': True}
         with self.assertRaises(ValueError):
             write_output_dict(self.mapping_ex_dict, arg)
