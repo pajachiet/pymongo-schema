@@ -52,7 +52,7 @@ class TestCommandLine(TestRemovingOutputOnSuccess):
     def test02_transform(self):
         base_output = "output_fctl_data_dict"
         outputs = {}
-        extensions = ["txt", 'html', 'xlsx', 'csv']
+        extensions = ["txt", 'html', 'xlsx', 'csv', 'md']
         for ext in extensions:
             outputs[ext] = "{}.{}".format(base_output, ext)
         self.output = outputs.values()
@@ -65,6 +65,7 @@ class TestCommandLine(TestRemovingOutputOnSuccess):
 
         self.assertTrue(filecmp.cmp(outputs['txt'], "{}.txt".format(exp)))
         self.assertTrue(filecmp.cmp(outputs['csv'], "{}.csv".format(exp)))
+        self.assertTrue(filecmp.cmp(outputs['md'], "{}.md".format(exp)))
         with open(outputs['html']) as out_fd, \
                 open("{}.html".format(exp)) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
@@ -75,7 +76,7 @@ class TestCommandLine(TestRemovingOutputOnSuccess):
     def test03_transform_filter(self):
         base_output = "output_fctl_data_dict_filtered"
         outputs = {}
-        extensions = ["txt", 'html', 'xlsx', 'csv']
+        extensions = ["txt", 'html', 'xlsx', 'csv', 'md']
         for ext in extensions:
             outputs[ext] = "{}.{}".format(base_output, ext)
         self.output = outputs.values()
@@ -90,6 +91,7 @@ class TestCommandLine(TestRemovingOutputOnSuccess):
 
         self.assertTrue(filecmp.cmp(outputs['txt'], "{}.txt".format(exp)))
         self.assertTrue(filecmp.cmp(outputs['csv'], "{}.csv".format(exp)))
+        self.assertTrue(filecmp.cmp(outputs['md'], "{}.md".format(exp)))
         with open(outputs['html']) as out_fd, \
                 open("{}.html".format(exp)) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
@@ -100,7 +102,7 @@ class TestCommandLine(TestRemovingOutputOnSuccess):
     def test04_transform_default_cols(self):
         base_output = "output_fctl_data_dict_default"
         outputs = {}
-        extensions = ["txt", 'html', 'xlsx', 'csv']
+        extensions = ["txt", 'html', 'xlsx', 'csv', 'md']
         for ext in extensions:
             outputs[ext] = "{}.{}".format(base_output, ext)
         self.output = outputs.values()
@@ -112,6 +114,7 @@ class TestCommandLine(TestRemovingOutputOnSuccess):
 
         self.assertTrue(filecmp.cmp(outputs['txt'], "{}.txt".format(exp)))
         self.assertTrue(filecmp.cmp(outputs['csv'], "{}.csv".format(exp)))
+        self.assertTrue(filecmp.cmp(outputs['md'], "{}.md".format(exp)))
         with open(outputs['html']) as out_fd, \
                 open("{}.html".format(exp)) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
