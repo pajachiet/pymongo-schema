@@ -12,6 +12,6 @@ before_script:
 script:
   - mongo test_db --eval 'db.test_col.count() == 25359;'
   - python setup.py install
-  - nosetests  --with-coverage
+  - py.test tests
 after_success:
   - coveralls
