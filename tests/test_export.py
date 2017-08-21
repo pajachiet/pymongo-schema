@@ -159,32 +159,41 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         self.output = os.path.join(TEST_DIR, 'output_data_dict.txt')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
         output_maker = TxtOutput({})
-        output_maker.mongo_schema_df = self.schema_ex_df
+        output_maker.mongo_schema_df = self.schema_ex_df.copy()
         with open(self.output, 'w') as out_fd:
             output_maker.write_output_data(out_fd)
         self.assertTrue(filecmp.cmp(self.output, expected_file))
 
-    def test02_write_html(self):
+    def test02_write_md(self):
+        self.output = os.path.join(TEST_DIR, 'output_data_dict.md')
+        expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.md')
+        output_maker = MdOutput({})
+        output_maker.mongo_schema_df = self.schema_ex_df.copy()
+        with open(self.output, 'w') as out_fd:
+            output_maker.write_output_data(out_fd)
+        self.assertTrue(filecmp.cmp(self.output, expected_file))
+
+    def test03_write_html(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict.html')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
         output_maker = HtmlOutput({})
-        output_maker.mongo_schema_df = self.schema_ex_df
+        output_maker.mongo_schema_df = self.schema_ex_df.copy()
         with open(self.output, 'w') as out_fd:
             output_maker.write_output_data(out_fd)
         with open(self.output) as out_fd, open(expected_file) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
 
-    def test03_write_xlsx(self):
+    def test04_write_xlsx(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict.xlsx')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
         output_maker = XlsxOutput({})
-        output_maker.mongo_schema_df = self.schema_ex_df
+        output_maker.mongo_schema_df = self.schema_ex_df.copy()
         output_maker.write_output_data(self.output)
         res = [cell.value for row in load_workbook(self.output).active for cell in row]
         exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
         self.assertEqual(res, exp)
 
-    def test04_write_output_dict_schema_txt(self):
+    def test05_write_output_dict_schema_txt(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.txt')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
         arg = {'--format': ['txt', 'txt'], '--output': self.output,
@@ -192,7 +201,15 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         write_output_dict(self.schema_ex_dict, arg)
         self.assertTrue(filecmp.cmp(self.output, expected_file))
 
-    def test05_write_output_dict_schema_html(self):
+    def test06_write_output_dict_schema_md(self):
+        self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.md')
+        expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.md')
+        arg = {'--format': ['md'], '--output': self.output,
+               '--columns': " ".join(self.columns)}
+        write_output_dict(self.schema_ex_dict, arg)
+        self.assertTrue(filecmp.cmp(self.output, expected_file))
+
+    def test07_write_output_dict_schema_html(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.html')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
         arg = {'--format': ['html'], '--output': self.output,
@@ -201,7 +218,7 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         with open(self.output) as out_fd, open(expected_file) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
 
-    def test05_write_output_dict_schema_xlsx(self):
+    def test08_write_output_dict_schema_xlsx(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.xlsx')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
         arg = {'--format': ['xlsx'], '--output': self.output,
@@ -211,7 +228,7 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
         self.assertEqual(res, exp)
 
-    def test06_write_output_dict_schema_json_without_count(self):
+    def test09_write_output_dict_schema_json_without_count(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.json')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected',
                                      'data_dict_without_counts.json')
@@ -221,7 +238,7 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         with open(self.output) as out_fd, open(expected_file) as exp_fd:
             self.assertEqual(json.load(out_fd), json.load(exp_fd))
 
-    def test07_write_output_dict_mapping_yaml(self):
+    def test10_write_output_dict_mapping_yaml(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict_from_mapping.yaml')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.yaml')
         arg = {'--format': ['yaml'], '--output': self.output,
@@ -229,16 +246,17 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         write_output_dict(self.mapping_ex_dict, arg)
         self.assertTrue(filecmp.cmp(self.output, expected_file))
 
-    def test08_write_output_dict_wrong_format(self):
+    def test11_write_output_dict_wrong_format(self):
         arg = {'--format': ['fake'], '--output': self.output,
                '--columns': None, '--without-counts': True}
         with self.assertRaises(ValueError):
             write_output_dict(self.mapping_ex_dict, arg)
 
-    def test09_write_output_dict_schema_non_ascii(self):
+    def test12_write_output_dict_schema_non_ascii(self):
         base_output = "output_fctl_data_dict"
         outputs = {}
-        extensions = ['txt', 'json', 'html', 'csv', 'xlsx']  # WARNING: xlsx not actually tested
+        # WARNING: xlsx not actually tested
+        extensions = ['txt', 'json', 'html', 'csv', 'xlsx', 'md']
         for ext in extensions:
             outputs[ext] = "{}.{}".format(base_output, ext)
         self.output = outputs.values()

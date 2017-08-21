@@ -15,12 +15,12 @@ The opener method should be overridden as well if open method is not enough
 
 It is inherited by two base classes, that represent two groups of outputs:
 HierarchicalOutput for nested formats (yaml and json)
-ListOutput for table like formats (txt, csv, html - since this format displays a table, xlsx).
+ListOutput for table like formats (txt, csv, md, html - since this format displays a table, xlsx).
 They intend to setup prepare data as this is common to each group of output.
 ListOutput defines a default_columns class attribute that can be overridden as well.
 
 Then those base classes are used (inherited from) to define each format:
-JsonOutput, YamlOutput, TxtOutput, CsvOutput, HtmlOutput, XlsxOutput
+JsonOutput, YamlOutput, TxtOutput, CsvOutput, HtmlOutput, MdOutput, XlsxOutput
 """
 import abc
 import codecs
@@ -51,7 +51,7 @@ class BaseOutput(object):
 
     Abstract methods to override:
     property output_format (can be class attribute): string representing the format expected
-        ('json', 'yaml', 'txt', 'csv', 'html', 'xlsx', ... it should match file extension)
+        ('json', 'yaml', 'txt', 'csv', 'html', 'md, 'xlsx', ... it should match file extension)
     write_output_data: define how to write into the object given by the open method
 
     Other public method (should not be overridden):
@@ -411,6 +411,57 @@ class HtmlOutput(ListOutput):
                                      mongo_schema=mongo_schema_tmpl))
 
 
+class MdOutput(ListOutput):
+    """
+    Write data from self.mongo_schema_df as a table in markdown file, one table per Collection.
+    """
+    output_format = 'md'
+    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+                       'Percentage', 'Types_count']
+
+    def _opener(self):
+        """Use codecs module open function to support non ascii characters."""
+        return partial(codecs.open, mode='w', encoding="utf-8")
+
+    def write_output_data(self, file_descr):
+        """
+        Format data from self.mongo_schema_df, write into file_descr (opened with _opener).
+        """
+        columns = list(self.mongo_schema_df.columns)[2:]  # skip Database and Collection
+        columns_length = []
+        for col in columns:
+            columns_length.append(max(self.mongo_schema_df[col].map(
+                lambda s: len(s) if isinstance(s, basestring) else len(str(s))).max(),
+                                      len(col)) + 5)
+
+        def format_column(col_name, value, repeat=False):
+            """Closure - format columns based on existing data length."""
+            col_length = columns_length[columns.index(col_name)]
+            if repeat:
+                return value * col_length
+            return u'{{:<{}}}'.format(col_length).format(value if value is not None else str(value))
+
+        str_column_names = self._make_line([format_column(col, col) for col in columns])
+        str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
+        output_str = []
+        for db in self.mongo_schema_df.Database.unique():
+            output_str.append('\n### Database: {}\n'.format(db))
+            df_db = self.mongo_schema_df.query('Database == @db').iloc[:, 1:]
+            for col in df_db.Collection.unique():
+                output_str.append('#### Collection: {} \n'.format(col))
+                df_col = df_db.query('Collection == @col').iloc[:, 1:]
+                output_str.append("\n".join([str_column_names, str_sep_header] +
+                                            [self._make_line([format_column(columns[i], value)
+                                                              for i, value in enumerate(line)])
+                                             for line in df_col.values.tolist()]))
+                output_str.append('\n\n')
+
+        file_descr.write("".join(output_str))
+
+    def _make_line(self, values):
+        return u'|{}|'.format('|'.join(values))
+
+
 class XlsxOutput(ListOutput):
     """
     Write data from self.mongo_schema_df as a table in csv file.
@@ -462,7 +513,7 @@ def write_output_dict(output_dict, arg):
     :param output_dict: dict (schema or mapping)
     :param arg: dict (from docopt)
            if output_dict is schema
-               {'--format': str in 'json', 'yaml', 'txt', 'csv', 'html' or 'xlsx',
+               {'--format': str in 'json', 'yaml', 'txt', 'csv', 'html', 'md' or 'xlsx',
                 '--output': str full path to file where formatted output will be saved saved
                             (default is std out),
                 '--columns': list of columns to display in the output not used for json and yaml}
@@ -477,10 +528,10 @@ def write_output_dict(output_dict, arg):
     columns_to_get = arg.get('--columns', None)
     without_counts = arg.get('--without-counts', False)
 
-    wrong_formats = set(output_formats) - {'txt', 'csv', 'xlsx', 'json', 'yaml', 'html'}
+    wrong_formats = set(output_formats) - {'txt', 'csv', 'xlsx', 'json', 'yaml', 'html', 'md'}
 
     if wrong_formats:
-        raise ValueError("Output format should be txt, csv, xlsx, html json or yaml. "
+        raise ValueError("Output format should be txt, csv, xlsx, html, md, json or yaml. "
                          "{} is/are not supported".format(wrong_formats))
 
     for output_format in output_formats:
