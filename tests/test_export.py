@@ -1,7 +1,7 @@
+# coding: utf8
 import unittest
 
 import filecmp
-from openpyxl import load_workbook
 from pandas.util.testing import assert_frame_equal
 
 from pymongo_schema.export import *
@@ -41,34 +41,36 @@ class TestExportUnit(unittest.TestCase):
                                 'db2': {'coll1': cls.simple_schema, 'coll2': cls.simple_schema}}
 
     def test00_field_compact_name(self):
-        self.assertEqual(field_compact_name('baz', None, 'foo.bar:'), ' .  : baz')
-        self.assertEqual(field_compact_name('baz', None, 'foo.foo.bar:'), ' .  .  : baz')
+        self.assertEqual(ListOutput._field_compact_name('baz', None, 'foo.bar:'), ' .  : baz')
+        self.assertEqual(
+            ListOutput._field_compact_name('baz', None, 'foo.foo.bar:'), ' .  .  : baz')
 
     def test01_field_depth(self):
-        self.assertEqual(field_depth(None, None, ''), 0)
-        self.assertEqual(field_depth(None, None, 'foo'), 0)
-        self.assertEqual(field_depth(None, None, 'foo.bar'), 1)
-        self.assertEqual(field_depth(None, None, 'foo.bar:'), 2)
-        self.assertEqual(field_depth(None, None, 'foo.foo.bar:'), 3)
+        self.assertEqual(ListOutput._field_depth(None, None, ''), 0)
+        self.assertEqual(ListOutput._field_depth(None, None, 'foo'), 0)
+        self.assertEqual(ListOutput._field_depth(None, None, 'foo.bar'), 1)
+        self.assertEqual(ListOutput._field_depth(None, None, 'foo.bar:'), 2)
+        self.assertEqual(ListOutput._field_depth(None, None, 'foo.foo.bar:'), 3)
 
     def test02_field_type(self):
-        self.assertEqual(field_type(None, {'type': 'string'}, None), 'string')
-        self.assertEqual(field_type(None, {'type': 'ARRAY', 'array_type': 'string'}, None),
-                         'ARRAY(string)')
+        self.assertEqual(ListOutput._field_type(None, {'type': 'string'}, None), 'string')
+        self.assertEqual(
+            ListOutput._field_type(None, {'type': 'ARRAY', 'array_type': 'string'}, None),
+            'ARRAY(string)')
 
     def test03_format_types_count(self):
-        res = format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
+        res = ListOutput._format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
         self.assertEqual(res, 'integer : 10, boolean : 5, null : 3')
-        res = format_types_count({'ARRAY': 10, 'null': 3, }, {'float': 4})
+        res = ListOutput._format_types_count({'ARRAY': 10, 'null': 3, }, {'float': 4})
         self.assertEqual(res, 'ARRAY(float : 4) : 10, null : 3')
 
     def test04_remove_counts_from_schema_simple(self):
         schema = self.simple_schema
         exp = {'object': {'field': {'type': 'string'}}}
-        self.assertEqual(remove_counts_from_schema(schema), exp)
+        self.assertEqual(HierarchicalOutput.remove_counts_from_schema(schema), exp)
 
     def test05_remove_counts_from_schema_empty(self):
-        self.assertEqual(remove_counts_from_schema({}), {})
+        self.assertEqual(HierarchicalOutput.remove_counts_from_schema({}), {})
 
     def test06_remove_counts_from_schema_long(self):
         schema = self.long_schema
@@ -78,29 +80,30 @@ class TestExportUnit(unittest.TestCase):
                                      'object': {'subfield1': {'type': 'string'},
                                                 'subfield2': {'type': 'ARRAY',
                                                               'array_type': 'string'}}}}}
-        self.assertEqual(remove_counts_from_schema(schema), exp)
+        self.assertEqual(HierarchicalOutput.remove_counts_from_schema(schema), exp)
 
     def test07_field_schema_to_columns_simple(self):
-        res = field_schema_to_columns('field', self.simple_schema['object']['field'], '',
-                                      ['Field_compact_name', 'Field_name',
-                                       'Count', 'Percentage', 'Types_count'])
+        res = ListOutput._field_schema_to_columns(
+            'field', self.simple_schema['object']['field'], '',
+            ['Field_compact_name', 'Field_name', 'Count', 'Percentage', 'Types_count'])
         self.assertEqual(res, ('field', 'field', 25359, 100.0, 'string : 25359'))
 
     def test08_field_schema_to_columns_long(self):
-        res = field_schema_to_columns('field3', self.long_schema['object']['field3'], 'foo.bar:',
-                                      ['Field_full_name', 'Field_compact_name', 'Field_name',
-                                       'Depth', 'Type', 'Count', 'Percentage', 'Types_count'])
+        res = ListOutput._field_schema_to_columns(
+            'field3', self.long_schema['object']['field3'], 'foo.bar:',
+            ['Field_full_name', 'Field_compact_name', 'Field_name', 'Depth', 'Type', 'Count',
+             'Percentage', 'Types_count'])
         exp = ('foo.bar:field3', ' .  : field3', 'field3', 2, 'ARRAY(OBJECT)', 25359, 100.0,
                'ARRAY(OBJECT : 25359) : 25359')
         self.assertEqual(res, exp)
 
     def test09_object_schema_to_line_tuples_simple(self):
-        res = object_schema_to_line_tuples(
+        res = ListOutput._object_schema_to_line_tuples(
             self.simple_schema['object'], ['Field_compact_name', 'Types_count'], '')
         self.assertEqual(res, [('field', 'string : 25359')])
 
     def test10_object_schema_to_line_tuples_long(self):
-        res = object_schema_to_line_tuples(
+        res = ListOutput._object_schema_to_line_tuples(
             self.long_schema['object'],
             ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count', 'Types_count'],
             'foo.bar:')
@@ -117,7 +120,7 @@ class TestExportUnit(unittest.TestCase):
 
     def test11_mongo_schema_as_dataframe_simple(self):
         columns = ['Field_compact_name', 'Types_count']
-        res = mongo_schema_as_dataframe(self.simple_full_schema, columns)
+        res = ListOutput.mongo_schema_as_dataframe(self.simple_full_schema, columns)
         exp = pd.DataFrame([['db', 'coll', 'field', 'string : 25359']],
                            columns=['Database', 'Collection'] + columns)
         assert_frame_equal(res, exp)
@@ -125,7 +128,7 @@ class TestExportUnit(unittest.TestCase):
     def test12_mongo_schema_as_dataframe_long(self):
         columns = ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count',
                    'Types_count']
-        res = mongo_schema_as_dataframe(self.long_full_schema, columns)
+        res = ListOutput.mongo_schema_as_dataframe(self.long_full_schema, columns)
         exp = [['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
                ['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
                ['db1', 'coll', 'field3', 'field3', 'field3', 'ARRAY(OBJECT)', 25359,
@@ -150,27 +153,33 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
             cls.schema_ex_dict = json.loads(f.read())
         cls.columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                        'Percentage', 'Types_count']
-        cls.schema_ex_df = mongo_schema_as_dataframe(cls.schema_ex_dict, cls.columns)
+        cls.schema_ex_df = ListOutput.mongo_schema_as_dataframe(cls.schema_ex_dict, cls.columns)
 
     def test01_write_txt(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict.txt')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
+        output_maker = TxtOutput({})
+        output_maker.mongo_schema_df = self.schema_ex_df
         with open(self.output, 'w') as out_fd:
-            write_mongo_df_as_txt(self.schema_ex_df, out_fd)
+            output_maker.write_output_data(out_fd)
         self.assertTrue(filecmp.cmp(self.output, expected_file))
 
     def test02_write_html(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict.html')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
+        output_maker = HtmlOutput({})
+        output_maker.mongo_schema_df = self.schema_ex_df
         with open(self.output, 'w') as out_fd:
-            write_mongo_df_as_html(self.schema_ex_df, out_fd)
+            output_maker.write_output_data(out_fd)
         with open(self.output) as out_fd, open(expected_file) as exp_fd:
             self.assertEqual(out_fd.read().replace(' ', ''), exp_fd.read().replace(' ', ''))
 
     def test03_write_xlsx(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict.xlsx')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
-        write_mongo_df_as_xlsx(self.schema_ex_df, self.output)
+        output_maker = XlsxOutput({})
+        output_maker.mongo_schema_df = self.schema_ex_df
+        output_maker.write_output_data(self.output)
         res = [cell.value for row in load_workbook(self.output).active for cell in row]
         exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
         self.assertEqual(res, exp)
@@ -202,7 +211,17 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
         self.assertEqual(res, exp)
 
-    def test06_write_output_dict_mapping_yaml(self):
+    def test06_write_output_dict_schema_json_without_count(self):
+        self.output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.json')
+        expected_file = os.path.join(TEST_DIR, 'resources', 'expected',
+                                     'data_dict_without_counts.json')
+        arg = {'--format': ['json'], '--output': self.output,
+               '--without-counts': True}
+        write_output_dict(self.schema_ex_dict, arg)
+        with open(self.output) as out_fd, open(expected_file) as exp_fd:
+            self.assertEqual(json.load(out_fd), json.load(exp_fd))
+
+    def test07_write_output_dict_mapping_yaml(self):
         self.output = os.path.join(TEST_DIR, 'output_data_dict_from_mapping.yaml')
         expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.yaml')
         arg = {'--format': ['yaml'], '--output': self.output,
@@ -210,11 +229,30 @@ class TestExportIntegration(TestRemovingOutputOnSuccess):
         write_output_dict(self.mapping_ex_dict, arg)
         self.assertTrue(filecmp.cmp(self.output, expected_file))
 
-    def test07_write_output_dict_wrong_format(self):
+    def test08_write_output_dict_wrong_format(self):
         arg = {'--format': ['fake'], '--output': self.output,
                '--columns': None, '--without-counts': True}
         with self.assertRaises(ValueError):
             write_output_dict(self.mapping_ex_dict, arg)
+
+    def test09_write_output_dict_schema_non_ascii(self):
+        base_output = "output_fctl_data_dict"
+        outputs = {}
+        extensions = ['txt', 'json', 'html', 'csv', 'xlsx']  # WARNING: xlsx not actually tested
+        for ext in extensions:
+            outputs[ext] = "{}.{}".format(base_output, ext)
+        self.output = outputs.values()
+        input_file = os.path.join(TEST_DIR, 'resources', 'input',
+                                  'test_schema_fr.json')
+        arg = {'--format': extensions, '--output': base_output, '--columns': " ".join(self.columns),
+               '--without-counts': False}
+        with open(input_file) as f:
+            schema_fr = json.loads(f.read())
+        write_output_dict(schema_fr, arg)
+        extensions.remove('xlsx')
+        for ext in extensions:
+            with open(outputs[ext]) as f:
+                self.assertIn('ÀàÂâÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûÜü', f.read())
 
 
 if __name__ == '__main__':
