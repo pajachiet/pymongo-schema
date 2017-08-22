@@ -1,0 +1,7 @@
+{"field_int": 10, "field_float": 1.0, "field_string": "a string", "field_date": {"$date": 1466423048561}, "field_bool": true}
+{"field_oid": {"$oid": "563729736ec0a1755d9c0b87"}, "field_empty_list": [], "field_empty_obj": {}, "field_list_string": ["a", "b"], "field_list_number": [1, 1.0], "field_list_string_copy": ["a", "b"], "field_list_number_copy": [1, 1.0]}
+{"field_str_obj": {"subfield1": "a", "subfield2": "b"}, "field_str_obj_copy": {"subfield1": "a", "subfield2": "b"}, "field_number_obj": {"subfield1": 1, "subfield2": 5.0}, "field_number_obj_copy": {"subfield1": 1, "subfield2": 5.0}}
+{"field_date_obj": {"subfield": {"$date": 1466423048561}}, "field_list_obj": {"subfield_list": [{"$oid": "563729736ec0a1755d9c0b87"}]}}
+{"field_super_nested": [{"subfield_list": [{"subsubfield_list": [5]}]}]}
+
+

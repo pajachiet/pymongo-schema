@@ -35,6 +35,16 @@ def test00_from_mongo_to_mapping(pymongo_client):
     assert mapping == exp_mapping
 
 
+def test00_from_mongo_to_mapping_long(pymongo_client):
+    with open(os.path.join(TEST_DIR, 'resources', "functional", "exp_mapping.json")) as f:
+        exp_mapping = json.load(f)
+    mongo_schema = extract_pymongo_client_schema(pymongo_client,
+                                                 database_names=['test_db', 'test_db1', 'test_db2'])
+
+    mapping = mongo_schema_to_mapping(mongo_schema)
+    assert mapping == exp_mapping
+
+
 def test01_extract():
     output = os.path.join(TEST_DIR, "output_fctl_schema.json")
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'schema.json')
