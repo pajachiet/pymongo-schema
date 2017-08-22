@@ -109,7 +109,7 @@ def test12_summarize_types_long():
 
 
 def test_extract_schema(pymongo_client):
-    with open(os.path.join(TEST_DIR, 'test_schema.json')) as data_file:
+    with open(os.path.join(TEST_DIR, 'resources', 'expected', 'schema.json')) as data_file:
         mongo_schema_expected = json.load(data_file, encoding='utf-8')
 
     mongo_schema_got = extract_pymongo_client_schema(pymongo_client,
