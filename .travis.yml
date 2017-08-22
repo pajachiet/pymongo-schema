@@ -6,6 +6,12 @@ install:
   - pip install -r requirements.txt
 services:
   - mongodb
+addons:
+  apt:
+    sources:
+    - mongodb-3.0-precise
+    packages:
+    - mongodb-org
 before_script:
   - sleep 5  # wait for mongoDB to accept connections
   - ./tests/db_init.sh
