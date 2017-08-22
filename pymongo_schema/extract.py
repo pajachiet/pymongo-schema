@@ -90,7 +90,7 @@ def extract_database_schema(pymongo_database, collection_names=None):
         collection_names = [collection_names]
 
     if collection_names is None:
-        collection_names = pymongo_database.collection_names()
+        collection_names = pymongo_database.collection_names(include_system_collections=False)
 
     database_schema = dict()
     for collection in collection_names:
