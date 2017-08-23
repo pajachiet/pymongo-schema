@@ -1,0 +1,2687 @@
+{
+  "test_db1": {
+    "col2__field_141__field_80": {
+      "pk": "id",
+      "field_80": {
+        "type": "TEXT",
+        "dest": "field_80"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_165__field_80": {
+      "pk": "id",
+      "field_80": {
+        "type": "TEXT",
+        "dest": "field_80"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_146__field_151": {
+      "pk": "id",
+      "id_col2__field_146": {
+        "type": "TEXT"
+      },
+      "field_151": {
+        "type": "TEXT",
+        "dest": "field_151"
+      }
+    },
+    "col0__field_22": {
+      "field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_34"
+      },
+      "field_40": {
+        "type": "TEXT",
+        "dest": "field_40"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_57": {
+        "type": "TEXT",
+        "dest": "field_57"
+      },
+      "field_41": {
+        "type": "TEXT",
+        "dest": "field_41"
+      },
+      "field_42": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0__field_22",
+        "dest": "col0__field_22__field_42",
+        "valueField": "field_42"
+      },
+      "field_58": {
+        "type": "TIMESTAMP",
+        "dest": "field_58"
+      },
+      "field_39": {
+        "type": "TIMESTAMP",
+        "dest": "field_39"
+      }
+    },
+    "col2__field_141__field_81": {
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_165__field_79": {
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_149__field_26": {
+      "field_49": {
+        "type": "TIMESTAMP",
+        "dest": "field_49"
+      },
+      "field_47": {
+        "type": "TEXT",
+        "dest": "field_47"
+      },
+      "id_col2__field_149": {
+        "type": "TEXT"
+      },
+      "field_51": {
+        "type": "BOOLEAN",
+        "dest": "field_51"
+      },
+      "field_46": {
+        "type": "TEXT",
+        "dest": "field_46"
+      },
+      "pk": "id",
+      "field_50": {
+        "type": "BOOLEAN",
+        "dest": "field_50"
+      },
+      "field_48": {
+        "type": "TIMESTAMP",
+        "dest": "field_48"
+      },
+      "field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_43__field_44"
+      },
+      "field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_43__field_45"
+      }
+    },
+    "col2__field_141__field_100": {
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_141__field_79": {
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_149": {
+      "field_155": {
+        "type": "INT",
+        "dest": "field_155"
+      },
+      "field_92.field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_92__field_43__field_45"
+      },
+      "field_128.field_129": {
+        "type": "TIMESTAMP",
+        "dest": "field_128__field_129"
+      },
+      "field_70": {
+        "type": "TEXT",
+        "dest": "field_70"
+      },
+      "field_115": {
+        "type": "TEXT",
+        "dest": "field_115"
+      },
+      "field_105": {
+        "type": "TEXT",
+        "dest": "field_105"
+      },
+      "field_157": {
+        "type": "INT",
+        "dest": "field_157"
+      },
+      "field_98": {
+        "type": "TEXT",
+        "dest": "field_98"
+      },
+      "field_92.field_118": {
+        "type": "TEXT",
+        "dest": "field_92__field_118"
+      },
+      "field_84": {
+        "type": "TEXT",
+        "dest": "field_84"
+      },
+      "field_143": {
+        "type": "BOOLEAN",
+        "dest": "field_143"
+      },
+      "field_16": {
+        "type": "BOOLEAN",
+        "dest": "field_16"
+      },
+      "field_10": {
+        "type": "TIMESTAMP",
+        "dest": "field_10"
+      },
+      "field_117": {
+        "type": "TEXT",
+        "dest": "field_117"
+      },
+      "field_101": {
+        "type": "TEXT",
+        "dest": "field_101"
+      },
+      "field_100": {
+        "type": "_ARRAY",
+        "fk": "id_col2__field_149",
+        "dest": "col2__field_149__field_100"
+      },
+      "field_158": {
+        "type": "TEXT",
+        "dest": "field_158"
+      },
+      "field_92.field_113": {
+        "type": "TEXT",
+        "dest": "field_92__field_113"
+      },
+      "field_140": {
+        "type": "TEXT",
+        "dest": "field_140"
+      },
+      "field_92.field_94": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2__field_149",
+        "dest": "col2__field_149__field_92__field_94",
+        "valueField": "field_94"
+      },
+      "field_138": {
+        "type": "BOOLEAN",
+        "dest": "field_138"
+      },
+      "field_18": {
+        "type": "TEXT",
+        "dest": "field_18"
+      },
+      "field_92.field_119": {
+        "type": "TEXT",
+        "dest": "field_92__field_119"
+      },
+      "field_96": {
+        "type": "TEXT",
+        "dest": "field_96"
+      },
+      "field_78": {
+        "type": "INT",
+        "dest": "field_78"
+      },
+      "field_86": {
+        "type": "TEXT",
+        "dest": "field_86"
+      },
+      "field_160": {
+        "type": "TEXT",
+        "dest": "field_160"
+      },
+      "field_52": {
+        "type": "BOOLEAN",
+        "dest": "field_52"
+      },
+      "field_141": {
+        "type": "INT",
+        "dest": "field_141"
+      },
+      "field_71": {
+        "type": "BOOLEAN",
+        "dest": "field_71"
+      },
+      "field_106": {
+        "type": "TEXT",
+        "dest": "field_106"
+      },
+      "field_108": {
+        "type": "TEXT",
+        "dest": "field_108"
+      },
+      "field_17": {
+        "type": "TIMESTAMP",
+        "dest": "field_17"
+      },
+      "field_126": {
+        "type": "BOOLEAN",
+        "dest": "field_126"
+      },
+      "field_165": {
+        "type": "INT",
+        "dest": "field_165"
+      },
+      "field_92.field_93": {
+        "type": "INT",
+        "dest": "field_92__field_93"
+      },
+      "field_92.field_114": {
+        "type": "TEXT",
+        "dest": "field_92__field_114"
+      },
+      "field_92.field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_92__field_43__field_44"
+      },
+      "field_13": {
+        "type": "BOOLEAN",
+        "dest": "field_13"
+      },
+      "pk": "id",
+      "id_col2": {
+        "type": "TEXT"
+      },
+      "field_142": {
+        "type": "BOOLEAN",
+        "dest": "field_142"
+      },
+      "field_136": {
+        "type": "TEXT",
+        "dest": "field_136"
+      },
+      "field_92.field_111": {
+        "type": "TEXT",
+        "dest": "field_92__field_111"
+      },
+      "field_137": {
+        "type": "TEXT",
+        "dest": "field_137"
+      },
+      "field_144": {
+        "type": "TEXT",
+        "dest": "field_144"
+      },
+      "field_24": {
+        "type": "TEXT",
+        "dest": "field_24"
+      },
+      "field_156": {
+        "type": "INT",
+        "dest": "field_156"
+      },
+      "field_79": {
+        "type": "_ARRAY",
+        "fk": "id_col2__field_149",
+        "dest": "col2__field_149__field_79"
+      },
+      "field_116": {
+        "type": "TEXT",
+        "dest": "field_116"
+      },
+      "field_26": {
+        "type": "_ARRAY",
+        "fk": "id_col2__field_149",
+        "dest": "col2__field_149__field_26"
+      },
+      "field_122": {
+        "type": "TEXT",
+        "dest": "field_122"
+      },
+      "field_92.field_110": {
+        "type": "TEXT",
+        "dest": "field_92__field_110"
+      },
+      "field_92.field_127": {
+        "type": "TEXT",
+        "dest": "field_92__field_127"
+      },
+      "field_62": {
+        "type": "BOOLEAN",
+        "dest": "field_62"
+      },
+      "field_121": {
+        "type": "TEXT",
+        "dest": "field_121"
+      },
+      "field_82.field_45": {
+        "type": "TEXT",
+        "dest": "field_82__field_45"
+      },
+      "field_82.field_44": {
+        "type": "TEXT",
+        "dest": "field_82__field_44"
+      },
+      "field_92.field_112": {
+        "type": "TEXT",
+        "dest": "field_92__field_112"
+      },
+      "field_102": {
+        "type": "TEXT",
+        "dest": "field_102"
+      },
+      "field_1": {
+        "type": "TIMESTAMP",
+        "dest": "field_1"
+      },
+      "field_8": {
+        "type": "TEXT",
+        "dest": "field_8"
+      },
+      "field_81": {
+        "type": "_ARRAY",
+        "fk": "id_col2__field_149",
+        "dest": "col2__field_149__field_81"
+      },
+      "field_159": {
+        "type": "TEXT",
+        "dest": "field_159"
+      },
+      "field_120": {
+        "type": "TIMESTAMP",
+        "dest": "field_120"
+      },
+      "field_128.field_132": {
+        "type": "BOOLEAN",
+        "dest": "field_128__field_132"
+      },
+      "field_80": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2__field_149",
+        "dest": "col2__field_149__field_80",
+        "valueField": "field_80"
+      },
+      "field_88": {
+        "type": "TIMESTAMP",
+        "dest": "field_88"
+      },
+      "field_85": {
+        "type": "TEXT",
+        "dest": "field_85"
+      }
+    },
+    "col1__field_80": {
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_80": {
+        "type": "TEXT",
+        "dest": "field_80"
+      }
+    },
+    "col2__field_166__field_151": {
+      "pk": "id",
+      "field_151": {
+        "type": "TEXT",
+        "dest": "field_151"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col1__field_109": {
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_109": {
+        "type": "TEXT",
+        "dest": "field_109"
+      }
+    },
+    "col0__field_22__field_42": {
+      "pk": "id",
+      "id_col0__field_22": {
+        "type": "TEXT"
+      },
+      "field_42": {
+        "type": "TEXT",
+        "dest": "field_42"
+      }
+    },
+    "col0__field_53": {
+      "field_76": {
+        "type": "TEXT",
+        "dest": "field_76"
+      },
+      "field_73": {
+        "type": "TEXT",
+        "dest": "field_73"
+      },
+      "field_72": {
+        "type": "TEXT",
+        "dest": "field_72"
+      },
+      "field_74": {
+        "type": "BOOLEAN",
+        "dest": "field_74"
+      },
+      "pk": "id",
+      "id_col0": {
+        "type": "TEXT"
+      },
+      "field_77": {
+        "type": "TEXT",
+        "dest": "field_77"
+      },
+      "field_75": {
+        "type": "TIMESTAMP",
+        "dest": "field_75"
+      }
+    },
+    "col2__field_149__field_80": {
+      "field_80": {
+        "type": "TEXT",
+        "dest": "field_80"
+      },
+      "pk": "id",
+      "id_col2__field_149": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_165__field_26": {
+      "field_48": {
+        "type": "TIMESTAMP",
+        "dest": "field_48"
+      },
+      "field_49": {
+        "type": "TIMESTAMP",
+        "dest": "field_49"
+      },
+      "field_47": {
+        "type": "TEXT",
+        "dest": "field_47"
+      },
+      "field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_43__field_44"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      },
+      "field_46": {
+        "type": "TEXT",
+        "dest": "field_46"
+      },
+      "pk": "id",
+      "field_50": {
+        "type": "BOOLEAN",
+        "dest": "field_50"
+      },
+      "field_51": {
+        "type": "BOOLEAN",
+        "dest": "field_51"
+      },
+      "field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_43__field_45"
+      }
+    },
+    "col2__field_141__field_26": {
+      "field_47": {
+        "type": "TEXT",
+        "dest": "field_47"
+      },
+      "field_46": {
+        "type": "TEXT",
+        "dest": "field_46"
+      },
+      "field_51": {
+        "type": "BOOLEAN",
+        "dest": "field_51"
+      },
+      "field_50": {
+        "type": "BOOLEAN",
+        "dest": "field_50"
+      },
+      "field_49": {
+        "type": "TIMESTAMP",
+        "dest": "field_49"
+      },
+      "pk": "id",
+      "id_col2": {
+        "type": "TEXT"
+      },
+      "field_48": {
+        "type": "TIMESTAMP",
+        "dest": "field_48"
+      },
+      "field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_43__field_44"
+      },
+      "field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_43__field_45"
+      }
+    },
+    "col0": {
+      "field_22": {
+        "type": "_ARRAY",
+        "fk": "id_col0",
+        "dest": "col0__field_22"
+      },
+      "field_10": {
+        "type": "TIMESTAMP",
+        "dest": "field_10"
+      },
+      "field_5": {
+        "type": "INT",
+        "dest": "field_5"
+      },
+      "field_3": {
+        "type": "TEXT",
+        "dest": "field_3"
+      },
+      "field_70": {
+        "type": "TEXT",
+        "dest": "field_70"
+      },
+      "field_53": {
+        "type": "_ARRAY",
+        "fk": "id_col0",
+        "dest": "col0__field_53"
+      },
+      "field_20": {
+        "type": "INT",
+        "dest": "field_20"
+      },
+      "field_24": {
+        "type": "TEXT",
+        "dest": "field_24"
+      },
+      "field_15": {
+        "type": "TIMESTAMP",
+        "dest": "field_15"
+      },
+      "field_1": {
+        "type": "TIMESTAMP",
+        "dest": "field_1"
+      },
+      "field_16": {
+        "type": "BOOLEAN",
+        "dest": "field_16"
+      },
+      "field_14": {
+        "type": "TEXT",
+        "dest": "field_14"
+      },
+      "field_64.field_66": {
+        "type": "TIMESTAMP",
+        "dest": "field_64__field_66"
+      },
+      "field_29.field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_29__field_34"
+      },
+      "field_18": {
+        "type": "TEXT",
+        "dest": "field_18"
+      },
+      "field_26": {
+        "type": "_ARRAY",
+        "fk": "id_col0",
+        "dest": "col0__field_26"
+      },
+      "field_78": {
+        "type": "INT",
+        "dest": "field_78"
+      },
+      "field_29.field_30": {
+        "type": "TEXT",
+        "dest": "field_29__field_30"
+      },
+      "field_27": {
+        "type": "TIMESTAMP",
+        "dest": "field_27"
+      },
+      "field_52": {
+        "type": "BOOLEAN",
+        "dest": "field_52"
+      },
+      "field_64.field_69": {
+        "type": "TIMESTAMP",
+        "dest": "field_64__field_69"
+      },
+      "field_71": {
+        "type": "BOOLEAN",
+        "dest": "field_71"
+      },
+      "field_38": {
+        "type": "TEXT",
+        "dest": "field_38"
+      },
+      "field_12": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0",
+        "dest": "col0__field_12",
+        "valueField": "field_12"
+      },
+      "field_17": {
+        "type": "TIMESTAMP",
+        "dest": "field_17"
+      },
+      "field_62": {
+        "type": "BOOLEAN",
+        "dest": "field_62"
+      },
+      "field_7": {
+        "type": "INT",
+        "dest": "field_7"
+      },
+      "field_25": {
+        "type": "INT",
+        "dest": "field_25"
+      },
+      "field_36": {
+        "type": "TIMESTAMP",
+        "dest": "field_36"
+      },
+      "field_13": {
+        "type": "BOOLEAN",
+        "dest": "field_13"
+      },
+      "pk": "_id",
+      "field_21": {
+        "type": "TEXT",
+        "dest": "field_21"
+      },
+      "field_29.field_33": {
+        "type": "TEXT",
+        "dest": "field_29__field_33"
+      },
+      "field_35": {
+        "type": "TEXT",
+        "dest": "field_35"
+      },
+      "field_19": {
+        "type": "TEXT",
+        "dest": "field_19"
+      },
+      "field_11": {
+        "type": "TIMESTAMP",
+        "dest": "field_11"
+      },
+      "field_37": {
+        "type": "TEXT",
+        "dest": "field_37"
+      },
+      "field_6": {
+        "type": "INT",
+        "dest": "field_6"
+      },
+      "field_64.field_65": {
+        "type": "TIMESTAMP",
+        "dest": "field_64__field_65"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field_9": {
+        "type": "TEXT",
+        "dest": "field_9"
+      },
+      "field_29.field_32": {
+        "type": "_ARRAY",
+        "fk": "id_col0",
+        "dest": "col0__field_29__field_32"
+      },
+      "field_54": {
+        "type": "TEXT",
+        "dest": "field_54"
+      },
+      "field_67": {
+        "type": "TEXT",
+        "dest": "field_67"
+      },
+      "field_8": {
+        "type": "TEXT",
+        "dest": "field_8"
+      },
+      "field_68": {
+        "type": "TIMESTAMP",
+        "dest": "field_68"
+      },
+      "field_63": {
+        "type": "BOOLEAN",
+        "dest": "field_63"
+      },
+      "field_4": {
+        "type": "TEXT",
+        "dest": "field_4"
+      },
+      "field_64.field_30": {
+        "type": "TEXT",
+        "dest": "field_64__field_30"
+      },
+      "field_29.field_31": {
+        "type": "TEXT",
+        "dest": "field_29__field_31"
+      },
+      "field_23": {
+        "type": "TEXT",
+        "dest": "field_23"
+      },
+      "field_0": {
+        "type": "TIMESTAMP",
+        "dest": "field_0"
+      }
+    },
+    "col1": {
+      "field_128.field_129": {
+        "type": "TIMESTAMP",
+        "dest": "field_128__field_129"
+      },
+      "field_102": {
+        "type": "TEXT",
+        "dest": "field_102"
+      },
+      "field_115": {
+        "type": "TEXT",
+        "dest": "field_115"
+      },
+      "field_107": {
+        "type": "TEXT",
+        "dest": "field_107"
+      },
+      "field_105": {
+        "type": "TEXT",
+        "dest": "field_105"
+      },
+      "field_90": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_90"
+      },
+      "field_140": {
+        "type": "TEXT",
+        "dest": "field_140"
+      },
+      "field_84": {
+        "type": "TEXT",
+        "dest": "field_84"
+      },
+      "field_81": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_81"
+      },
+      "field_101": {
+        "type": "TEXT",
+        "dest": "field_101"
+      },
+      "field_100": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_100"
+      },
+      "field_109": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col1",
+        "dest": "col1__field_109",
+        "valueField": "field_109"
+      },
+      "field_123": {
+        "type": "INT",
+        "dest": "field_123"
+      },
+      "field_124": {
+        "type": "INT",
+        "dest": "field_124"
+      },
+      "field_120": {
+        "type": "TIMESTAMP",
+        "dest": "field_120"
+      },
+      "field_104": {
+        "type": "TEXT",
+        "dest": "field_104"
+      },
+      "field_117": {
+        "type": "TEXT",
+        "dest": "field_117"
+      },
+      "field_86": {
+        "type": "TEXT",
+        "dest": "field_86"
+      },
+      "field_106": {
+        "type": "TEXT",
+        "dest": "field_106"
+      },
+      "field_128.field_130": {
+        "type": "BOOLEAN",
+        "dest": "field_128__field_130"
+      },
+      "field_108": {
+        "type": "TEXT",
+        "dest": "field_108"
+      },
+      "field_85": {
+        "type": "TEXT",
+        "dest": "field_85"
+      },
+      "field_126": {
+        "type": "BOOLEAN",
+        "dest": "field_126"
+      },
+      "field_89": {
+        "type": "BOOLEAN",
+        "dest": "field_89"
+      },
+      "field_25": {
+        "type": "INT",
+        "dest": "field_25"
+      },
+      "field_98": {
+        "type": "TEXT",
+        "dest": "field_98"
+      },
+      "field_125": {
+        "type": "INT",
+        "dest": "field_125"
+      },
+      "field_128.field_139": {
+        "type": "TIMESTAMP",
+        "dest": "field_128__field_139"
+      },
+      "pk": "_id",
+      "field_138": {
+        "type": "BOOLEAN",
+        "dest": "field_138"
+      },
+      "field_136": {
+        "type": "TEXT",
+        "dest": "field_136"
+      },
+      "field_137": {
+        "type": "TEXT",
+        "dest": "field_137"
+      },
+      "field_121": {
+        "type": "TEXT",
+        "dest": "field_121"
+      },
+      "field_128.field_134": {
+        "type": "BOOLEAN",
+        "dest": "field_128__field_134"
+      },
+      "field_122": {
+        "type": "TEXT",
+        "dest": "field_122"
+      },
+      "field_79": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_79"
+      },
+      "field_19": {
+        "type": "TEXT",
+        "dest": "field_19"
+      },
+      "field_11": {
+        "type": "TIMESTAMP",
+        "dest": "field_11"
+      },
+      "field_116": {
+        "type": "TEXT",
+        "dest": "field_116"
+      },
+      "field_96": {
+        "type": "TEXT",
+        "dest": "field_96"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field_128.field_135": {
+        "type": "BOOLEAN",
+        "dest": "field_128__field_135"
+      },
+      "field_82.field_45": {
+        "type": "TEXT",
+        "dest": "field_82__field_45"
+      },
+      "field_82.field_44": {
+        "type": "TEXT",
+        "dest": "field_82__field_44"
+      },
+      "field_80": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col1",
+        "dest": "col1__field_80",
+        "valueField": "field_80"
+      },
+      "field_88": {
+        "type": "TIMESTAMP",
+        "dest": "field_88"
+      },
+      "field_128.field_133": {
+        "type": "INT",
+        "dest": "field_128__field_133"
+      },
+      "field_27": {
+        "type": "TIMESTAMP",
+        "dest": "field_27"
+      },
+      "field_128.field_131": {
+        "type": "BOOLEAN",
+        "dest": "field_128__field_131"
+      },
+      "field_128.field_132": {
+        "type": "BOOLEAN",
+        "dest": "field_128__field_132"
+      },
+      "field_83": {
+        "type": "BOOLEAN",
+        "dest": "field_83"
+      },
+      "field_20": {
+        "type": "INT",
+        "dest": "field_20"
+      }
+    },
+    "col1__field_90": {
+      "field_92.field_93": {
+        "type": "INT",
+        "dest": "field_92__field_93"
+      },
+      "field_92.field_110": {
+        "type": "TEXT",
+        "dest": "field_92__field_110"
+      },
+      "field_92.field_114": {
+        "type": "TEXT",
+        "dest": "field_92__field_114"
+      },
+      "field_92.field_127": {
+        "type": "TEXT",
+        "dest": "field_92__field_127"
+      },
+      "field_92.field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_92__field_43__field_44"
+      },
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "field_92.field_94": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col1__field_90",
+        "dest": "col1__field_90__field_92__field_94",
+        "valueField": "field_94"
+      },
+      "field_92.field_112": {
+        "type": "TEXT",
+        "dest": "field_92__field_112"
+      },
+      "field_95": {
+        "type": "TIMESTAMP",
+        "dest": "field_95"
+      },
+      "field_92.field_111": {
+        "type": "TEXT",
+        "dest": "field_92__field_111"
+      },
+      "field_92.field_113": {
+        "type": "TEXT",
+        "dest": "field_92__field_113"
+      },
+      "field_91": {
+        "type": "TEXT",
+        "dest": "field_91"
+      },
+      "pk": "id",
+      "field_92.field_119": {
+        "type": "TEXT",
+        "dest": "field_92__field_119"
+      },
+      "field_92.field_118": {
+        "type": "TEXT",
+        "dest": "field_92__field_118"
+      },
+      "field_92.field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_92__field_43__field_45"
+      }
+    },
+    "col0__field_12": {
+      "pk": "id",
+      "field_12": {
+        "type": "INT",
+        "dest": "field_12"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_165__field_92__field_94": {
+      "pk": "id",
+      "field_94": {
+        "type": "REAL",
+        "dest": "field_94"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_146": {
+      "field_152": {
+        "type": "TEXT",
+        "dest": "field_152"
+      },
+      "field_73": {
+        "type": "TEXT",
+        "dest": "field_73"
+      },
+      "field_154": {
+        "type": "INT",
+        "dest": "field_154"
+      },
+      "field_153": {
+        "type": "BOOLEAN",
+        "dest": "field_153"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_151": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2__field_146",
+        "dest": "col2__field_146__field_151",
+        "valueField": "field_151"
+      },
+      "field_39": {
+        "type": "TIMESTAMP",
+        "dest": "field_39"
+      }
+    },
+    "col2__field_165__field_81": {
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2": {
+      "field_141.field_92.field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_43__field_44"
+      },
+      "field_165.field_92.field_93": {
+        "type": "INT",
+        "dest": "field_165__field_92__field_93"
+      },
+      "field_141.field_92.field_119": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_119"
+      },
+      "field_165.field_86": {
+        "type": "TEXT",
+        "dest": "field_165__field_86"
+      },
+      "field_165.field_137": {
+        "type": "TEXT",
+        "dest": "field_165__field_137"
+      },
+      "field_141.field_156": {
+        "type": "INT",
+        "dest": "field_141__field_156"
+      },
+      "field_165.field_156": {
+        "type": "INT",
+        "dest": "field_165__field_156"
+      },
+      "field_165.field_92.field_113": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_113"
+      },
+      "field_165.field_138": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_138"
+      },
+      "field_141.field_79": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_141__field_79"
+      },
+      "field_165.field_120": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_120"
+      },
+      "field_165.field_82.field_45": {
+        "type": "TEXT",
+        "dest": "field_165__field_82__field_45"
+      },
+      "field_141.field_84": {
+        "type": "TEXT",
+        "dest": "field_141__field_84"
+      },
+      "field_165.field_136": {
+        "type": "TEXT",
+        "dest": "field_165__field_136"
+      },
+      "field_165.field_143": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_143"
+      },
+      "field_141.field_157": {
+        "type": "INT",
+        "dest": "field_141__field_157"
+      },
+      "field_165.field_102": {
+        "type": "TEXT",
+        "dest": "field_165__field_102"
+      },
+      "field_165.field_62": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_62"
+      },
+      "field_165.field_92.field_111": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_111"
+      },
+      "field_141.field_52": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_52"
+      },
+      "field_165.field_79": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_165__field_79"
+      },
+      "field_141.field_92.field_113": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_113"
+      },
+      "field_149": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_149"
+      },
+      "field_141.field_108": {
+        "type": "TEXT",
+        "dest": "field_141__field_108"
+      },
+      "field_141.field_10": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_10"
+      },
+      "field_165.field_160": {
+        "type": "TEXT",
+        "dest": "field_165__field_160"
+      },
+      "field_141.field_140": {
+        "type": "TEXT",
+        "dest": "field_141__field_140"
+      },
+      "field_165.field_128.field_129": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_128__field_129"
+      },
+      "field_165.field_70": {
+        "type": "TEXT",
+        "dest": "field_165__field_70"
+      },
+      "field_141.field_24": {
+        "type": "TEXT",
+        "dest": "field_141__field_24"
+      },
+      "field_141.field_82.field_44": {
+        "type": "TEXT",
+        "dest": "field_141__field_82__field_44"
+      },
+      "field_165.field_10": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_10"
+      },
+      "field_141.field_116": {
+        "type": "TEXT",
+        "dest": "field_141__field_116"
+      },
+      "field_165.field_167.field_73": {
+        "type": "TEXT",
+        "dest": "field_165__field_167__field_73"
+      },
+      "field_165.field_88": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_88"
+      },
+      "field_141.field_101": {
+        "type": "TEXT",
+        "dest": "field_141__field_101"
+      },
+      "field_165.field_84": {
+        "type": "TEXT",
+        "dest": "field_165__field_84"
+      },
+      "field_141.field_92.field_110": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_110"
+      },
+      "field_141.field_80": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2",
+        "dest": "col2__field_141__field_80",
+        "valueField": "field_80"
+      },
+      "field_165.field_96": {
+        "type": "TEXT",
+        "dest": "field_165__field_96"
+      },
+      "field_141.field_71": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_71"
+      },
+      "field_141.field_155": {
+        "type": "INT",
+        "dest": "field_141__field_155"
+      },
+      "field_165.field_92.field_110": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_110"
+      },
+      "field_165.field_26": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_165__field_26"
+      },
+      "field_141.field_138": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_138"
+      },
+      "field_141.field_159": {
+        "type": "TEXT",
+        "dest": "field_141__field_159"
+      },
+      "field_141.field_92.field_93": {
+        "type": "INT",
+        "dest": "field_141__field_92__field_93"
+      },
+      "field_141.field_102": {
+        "type": "TEXT",
+        "dest": "field_141__field_102"
+      },
+      "field_141.field_17": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_17"
+      },
+      "field_141.field_88": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_88"
+      },
+      "field_147": {
+        "type": "TEXT",
+        "dest": "field_147"
+      },
+      "field_166.field_151": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2",
+        "dest": "col2__field_166__field_151",
+        "valueField": "field_151"
+      },
+      "field_165.field_128.field_132": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_128__field_132"
+      },
+      "field_165.field_80": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2",
+        "dest": "col2__field_165__field_80",
+        "valueField": "field_80"
+      },
+      "field_19": {
+        "type": "TEXT",
+        "dest": "field_19"
+      },
+      "field_165.field_126": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_126"
+      },
+      "field_141.field_92.field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_43__field_45"
+      },
+      "field_166.field_39": {
+        "type": "TIMESTAMP",
+        "dest": "field_166__field_39"
+      },
+      "field_165.field_92.field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_43__field_45"
+      },
+      "field_165.field_18": {
+        "type": "TEXT",
+        "dest": "field_165__field_18"
+      },
+      "field_141.field_85": {
+        "type": "TEXT",
+        "dest": "field_141__field_85"
+      },
+      "field_161": {
+        "type": "TEXT",
+        "dest": "field_161"
+      },
+      "field_141.field_96": {
+        "type": "TEXT",
+        "dest": "field_141__field_96"
+      },
+      "field_141.field_106": {
+        "type": "TEXT",
+        "dest": "field_141__field_106"
+      },
+      "field_9": {
+        "type": "TEXT",
+        "dest": "field_9"
+      },
+      "field_165.field_116": {
+        "type": "TEXT",
+        "dest": "field_165__field_116"
+      },
+      "field_141.field_82.field_45": {
+        "type": "TEXT",
+        "dest": "field_141__field_82__field_45"
+      },
+      "field_165.field_92.field_112": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_112"
+      },
+      "field_165.field_122": {
+        "type": "TEXT",
+        "dest": "field_165__field_122"
+      },
+      "field_141.field_115": {
+        "type": "TEXT",
+        "dest": "field_141__field_115"
+      },
+      "field_141.field_126": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_126"
+      },
+      "field_141.field_100": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_141__field_100"
+      },
+      "field_141.field_158": {
+        "type": "TEXT",
+        "dest": "field_141__field_158"
+      },
+      "field_141.field_86": {
+        "type": "TEXT",
+        "dest": "field_141__field_86"
+      },
+      "field_141.field_105": {
+        "type": "TEXT",
+        "dest": "field_141__field_105"
+      },
+      "field_141.field_160": {
+        "type": "TEXT",
+        "dest": "field_141__field_160"
+      },
+      "field_165.field_8": {
+        "type": "TEXT",
+        "dest": "field_165__field_8"
+      },
+      "field_165.field_92.field_127": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_127"
+      },
+      "field_165.field_16": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_16"
+      },
+      "field_141.field_136": {
+        "type": "TEXT",
+        "dest": "field_141__field_136"
+      },
+      "field_165.field_78": {
+        "type": "INT",
+        "dest": "field_165__field_78"
+      },
+      "field_141.field_62": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_62"
+      },
+      "field_165.field_24": {
+        "type": "TEXT",
+        "dest": "field_165__field_24"
+      },
+      "field_165.field_108": {
+        "type": "TEXT",
+        "dest": "field_165__field_108"
+      },
+      "field_141.field_121": {
+        "type": "TEXT",
+        "dest": "field_141__field_121"
+      },
+      "field_165.field_92.field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_43__field_44"
+      },
+      "field_145": {
+        "type": "TIMESTAMP",
+        "dest": "field_145"
+      },
+      "field_148": {
+        "type": "TEXT",
+        "dest": "field_148"
+      },
+      "field_165.field_144": {
+        "type": "TEXT",
+        "dest": "field_165__field_144"
+      },
+      "field_141.field_18": {
+        "type": "TEXT",
+        "dest": "field_141__field_18"
+      },
+      "field_165.field_158": {
+        "type": "TEXT",
+        "dest": "field_165__field_158"
+      },
+      "field_165.field_159": {
+        "type": "TEXT",
+        "dest": "field_165__field_159"
+      },
+      "field_162": {
+        "type": "TEXT",
+        "dest": "field_162"
+      },
+      "field_165.field_117": {
+        "type": "TEXT",
+        "dest": "field_165__field_117"
+      },
+      "field_141.field_144": {
+        "type": "TEXT",
+        "dest": "field_141__field_144"
+      },
+      "field_165.field_98": {
+        "type": "TEXT",
+        "dest": "field_165__field_98"
+      },
+      "field_141.field_143": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_143"
+      },
+      "field_141.field_92.field_112": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_112"
+      },
+      "field_165.field_121": {
+        "type": "TEXT",
+        "dest": "field_165__field_121"
+      },
+      "field_165.field_52": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_52"
+      },
+      "field_165.field_105": {
+        "type": "TEXT",
+        "dest": "field_165__field_105"
+      },
+      "field_141.field_92.field_127": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_127"
+      },
+      "field_165.field_101": {
+        "type": "TEXT",
+        "dest": "field_165__field_101"
+      },
+      "field_165.field_157": {
+        "type": "INT",
+        "dest": "field_165__field_157"
+      },
+      "field_166.field_154": {
+        "type": "INT",
+        "dest": "field_166__field_154"
+      },
+      "field_165.field_92.field_114": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_114"
+      },
+      "field_104": {
+        "type": "TEXT",
+        "dest": "field_104"
+      },
+      "field_165.field_17": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_17"
+      },
+      "field_141.field_8": {
+        "type": "TEXT",
+        "dest": "field_141__field_8"
+      },
+      "field_165.field_106": {
+        "type": "TEXT",
+        "dest": "field_165__field_106"
+      },
+      "field_166.field_152": {
+        "type": "TEXT",
+        "dest": "field_166__field_152"
+      },
+      "field_141.field_117": {
+        "type": "TEXT",
+        "dest": "field_141__field_117"
+      },
+      "field_141.field_142": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_142"
+      },
+      "field_165.field_92.field_118": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_118"
+      },
+      "field_165.field_167.field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_167__field_34"
+      },
+      "field_141.field_98": {
+        "type": "TEXT",
+        "dest": "field_141__field_98"
+      },
+      "field_141.field_137": {
+        "type": "TEXT",
+        "dest": "field_141__field_137"
+      },
+      "field_141.field_92.field_111": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_111"
+      },
+      "field_141.field_122": {
+        "type": "TEXT",
+        "dest": "field_141__field_122"
+      },
+      "field_141.field_167.field_73": {
+        "type": "TEXT",
+        "dest": "field_141__field_167__field_73"
+      },
+      "field_25": {
+        "type": "INT",
+        "dest": "field_25"
+      },
+      "field_165.field_92.field_94": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2",
+        "dest": "col2__field_165__field_92__field_94",
+        "valueField": "field_94"
+      },
+      "field_166.field_73": {
+        "type": "TEXT",
+        "dest": "field_166__field_73"
+      },
+      "field_141.field_92.field_114": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_114"
+      },
+      "pk": "_id",
+      "field_141.field_128.field_129": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_128__field_129"
+      },
+      "field_146": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_146"
+      },
+      "field_141.field_92.field_118": {
+        "type": "TEXT",
+        "dest": "field_141__field_92__field_118"
+      },
+      "field_165.field_92.field_119": {
+        "type": "TEXT",
+        "dest": "field_165__field_92__field_119"
+      },
+      "field_165.field_155": {
+        "type": "INT",
+        "dest": "field_165__field_155"
+      },
+      "field_141.field_78": {
+        "type": "INT",
+        "dest": "field_141__field_78"
+      },
+      "field_141.field_16": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_16"
+      },
+      "field_15": {
+        "type": "TIMESTAMP",
+        "dest": "field_15"
+      },
+      "field_11": {
+        "type": "TIMESTAMP",
+        "dest": "field_11"
+      },
+      "field_165.field_100": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_165__field_100"
+      },
+      "field_141.field_26": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_141__field_26"
+      },
+      "field_141.field_70": {
+        "type": "TEXT",
+        "dest": "field_141__field_70"
+      },
+      "field_141.field_120": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_120"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field_141.field_13": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_13"
+      },
+      "field_165.field_82.field_44": {
+        "type": "TEXT",
+        "dest": "field_165__field_82__field_44"
+      },
+      "field_141.field_128.field_132": {
+        "type": "BOOLEAN",
+        "dest": "field_141__field_128__field_132"
+      },
+      "field_165.field_115": {
+        "type": "TEXT",
+        "dest": "field_165__field_115"
+      },
+      "field_165.field_140": {
+        "type": "TEXT",
+        "dest": "field_165__field_140"
+      },
+      "field_4": {
+        "type": "TEXT",
+        "dest": "field_4"
+      },
+      "field_14": {
+        "type": "TEXT",
+        "dest": "field_14"
+      },
+      "field_163": {
+        "type": "TIMESTAMP",
+        "dest": "field_163"
+      },
+      "field_165.field_13": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_13"
+      },
+      "field_20": {
+        "type": "INT",
+        "dest": "field_20"
+      },
+      "field_150": {
+        "type": "TEXT",
+        "dest": "field_150"
+      },
+      "field_27": {
+        "type": "TIMESTAMP",
+        "dest": "field_27"
+      },
+      "field_141.field_1": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_1"
+      },
+      "field_165.field_142": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_142"
+      },
+      "field_141.field_81": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_141__field_81"
+      },
+      "field_141.field_92.field_94": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col2",
+        "dest": "col2__field_141__field_92__field_94",
+        "valueField": "field_94"
+      },
+      "field_165.field_71": {
+        "type": "BOOLEAN",
+        "dest": "field_165__field_71"
+      },
+      "field_141.field_167.field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_141__field_167__field_34"
+      },
+      "field_165.field_1": {
+        "type": "TIMESTAMP",
+        "dest": "field_165__field_1"
+      },
+      "field_165.field_81": {
+        "type": "_ARRAY",
+        "fk": "id_col2",
+        "dest": "col2__field_165__field_81"
+      }
+    },
+    "col1__field_100": {
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      }
+    },
+    "col1__field_79": {
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      }
+    },
+    "col0__field_26": {
+      "field_49": {
+        "type": "TIMESTAMP",
+        "dest": "field_49"
+      },
+      "field_47": {
+        "type": "TEXT",
+        "dest": "field_47"
+      },
+      "field_50": {
+        "type": "BOOLEAN",
+        "dest": "field_50"
+      },
+      "field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_43__field_44"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      },
+      "field_46": {
+        "type": "TEXT",
+        "dest": "field_46"
+      },
+      "pk": "id",
+      "field_51": {
+        "type": "BOOLEAN",
+        "dest": "field_51"
+      },
+      "field_48": {
+        "type": "TIMESTAMP",
+        "dest": "field_48"
+      },
+      "field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_43__field_45"
+      }
+    },
+    "col1__field_90__field_92__field_94": {
+      "pk": "id",
+      "id_col1__field_90": {
+        "type": "TEXT"
+      },
+      "field_94": {
+        "type": "REAL",
+        "dest": "field_94"
+      }
+    },
+    "col2__field_149__field_100": {
+      "pk": "id",
+      "id_col2__field_149": {
+        "type": "TEXT"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      }
+    },
+    "col2__field_149__field_81": {
+      "pk": "id",
+      "id_col2__field_149": {
+        "type": "TEXT"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      }
+    },
+    "col2__field_149__field_79": {
+      "pk": "id",
+      "id_col2__field_149": {
+        "type": "TEXT"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      }
+    },
+    "col1__field_81": {
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      }
+    },
+    "col0__field_29__field_32": {
+      "field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_34"
+      },
+      "field_60": {
+        "type": "TEXT",
+        "dest": "field_60"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_39": {
+        "type": "TIMESTAMP",
+        "dest": "field_39"
+      },
+      "field_61": {
+        "type": "TEXT",
+        "dest": "field_61"
+      },
+      "field_59": {
+        "type": "TEXT",
+        "dest": "field_59"
+      }
+    },
+    "col2__field_149__field_92__field_94": {
+      "pk": "id",
+      "id_col2__field_149": {
+        "type": "TEXT"
+      },
+      "field_94": {
+        "type": "REAL",
+        "dest": "field_94"
+      }
+    },
+    "col2__field_165__field_100": {
+      "pk": "id",
+      "field_44": {
+        "type": "TEXT",
+        "dest": "field_44"
+      },
+      "field_45": {
+        "type": "TEXT",
+        "dest": "field_45"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    },
+    "col2__field_141__field_92__field_94": {
+      "pk": "id",
+      "field_94": {
+        "type": "REAL",
+        "dest": "field_94"
+      },
+      "id_col2": {
+        "type": "TEXT"
+      }
+    }
+  },
+  "test_db2": {
+    "col1__field_53": {
+      "field_74": {
+        "type": "BOOLEAN",
+        "dest": "field_74"
+      },
+      "field_76": {
+        "type": "TEXT",
+        "dest": "field_76"
+      },
+      "field_73": {
+        "type": "TEXT",
+        "dest": "field_73"
+      },
+      "field_72": {
+        "type": "TEXT",
+        "dest": "field_72"
+      },
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_77": {
+        "type": "TEXT",
+        "dest": "field_77"
+      },
+      "field_75": {
+        "type": "TIMESTAMP",
+        "dest": "field_75"
+      }
+    },
+    "col0__field_list_string_copy": {
+      "pk": "id",
+      "field_list_string_copy": {
+        "type": "TEXT",
+        "dest": "field_list_string_copy"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    },
+    "col1__field_22__field_42": {
+      "pk": "id",
+      "field_42": {
+        "type": "TEXT",
+        "dest": "field_42"
+      },
+      "id_col1__field_22": {
+        "type": "TEXT"
+      }
+    },
+    "col0__field_super_nested__subfield_list__subsubfield_list": {
+      "pk": "id",
+      "subsubfield_list": {
+        "type": "INT",
+        "dest": "subsubfield_list"
+      },
+      "id_col0__field_super_nested__subfield_list": {
+        "type": "TEXT"
+      }
+    },
+    "col1__field_22": {
+      "field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_34"
+      },
+      "field_40": {
+        "type": "TEXT",
+        "dest": "field_40"
+      },
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_57": {
+        "type": "TEXT",
+        "dest": "field_57"
+      },
+      "field_41": {
+        "type": "TEXT",
+        "dest": "field_41"
+      },
+      "field_42": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col1__field_22",
+        "dest": "col1__field_22__field_42",
+        "valueField": "field_42"
+      },
+      "field_58": {
+        "type": "TIMESTAMP",
+        "dest": "field_58"
+      },
+      "field_39": {
+        "type": "TIMESTAMP",
+        "dest": "field_39"
+      }
+    },
+    "col1__field_12": {
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_12": {
+        "type": "INT",
+        "dest": "field_12"
+      }
+    },
+    "col3__accent_in_obj_list": {
+      "pk": "id",
+      "\u00ef": {
+        "type": "TEXT",
+        "dest": "\u00ef"
+      },
+      "id_col3": {
+        "type": "TEXT"
+      }
+    },
+    "col1__field_26": {
+      "field_49": {
+        "type": "TIMESTAMP",
+        "dest": "field_49"
+      },
+      "field_47": {
+        "type": "TEXT",
+        "dest": "field_47"
+      },
+      "field_43.field_44": {
+        "type": "TEXT",
+        "dest": "field_43__field_44"
+      },
+      "field_46": {
+        "type": "TEXT",
+        "dest": "field_46"
+      },
+      "field_51": {
+        "type": "BOOLEAN",
+        "dest": "field_51"
+      },
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_50": {
+        "type": "BOOLEAN",
+        "dest": "field_50"
+      },
+      "field_48": {
+        "type": "TIMESTAMP",
+        "dest": "field_48"
+      },
+      "field_43.field_45": {
+        "type": "TEXT",
+        "dest": "field_43__field_45"
+      }
+    },
+    "col1__field_29__field_32": {
+      "field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_34"
+      },
+      "field_60": {
+        "type": "TEXT",
+        "dest": "field_60"
+      },
+      "id_col1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field_39": {
+        "type": "TIMESTAMP",
+        "dest": "field_39"
+      },
+      "field_61": {
+        "type": "TEXT",
+        "dest": "field_61"
+      },
+      "field_59": {
+        "type": "TEXT",
+        "dest": "field_59"
+      }
+    },
+    "col0__field_list_number_copy": {
+      "pk": "id",
+      "field_list_number_copy": {
+        "type": "DOUBLE PRECISION",
+        "dest": "field_list_number_copy"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    },
+    "col0__field_list_obj__subfield_list": {
+      "pk": "id",
+      "subfield_list": {
+        "type": "TEXT",
+        "dest": "subfield_list"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    },
+    "col3": {
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "scalar_value_accent": {
+        "type": "TEXT",
+        "dest": "scalar_value_accent"
+      },
+      "accent_in_list": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col3",
+        "dest": "col3__accent_in_list",
+        "valueField": "accent_in_list"
+      },
+      "field_accent_\u00e9": {
+        "type": "INT",
+        "dest": "field_accent_\u00e9"
+      },
+      "accent_in_obj_list": {
+        "type": "_ARRAY",
+        "fk": "id_col3",
+        "dest": "col3__accent_in_obj_list"
+      },
+      "pk": "_id",
+      "accent_in_obj_key.\u00f9": {
+        "type": "INT",
+        "dest": "accent_in_obj_key__\u00f9"
+      },
+      "accent_in_obj_value": {
+        "type": "TEXT",
+        "dest": "accent_in_obj_value"
+      }
+    },
+    "col1": {
+      "field_22": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_22"
+      },
+      "field_10": {
+        "type": "TIMESTAMP",
+        "dest": "field_10"
+      },
+      "field_5": {
+        "type": "INT",
+        "dest": "field_5"
+      },
+      "field_3": {
+        "type": "TEXT",
+        "dest": "field_3"
+      },
+      "field_70": {
+        "type": "TEXT",
+        "dest": "field_70"
+      },
+      "field_53": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_53"
+      },
+      "field_20": {
+        "type": "INT",
+        "dest": "field_20"
+      },
+      "field_24": {
+        "type": "TEXT",
+        "dest": "field_24"
+      },
+      "field_15": {
+        "type": "TIMESTAMP",
+        "dest": "field_15"
+      },
+      "field_1": {
+        "type": "TIMESTAMP",
+        "dest": "field_1"
+      },
+      "field_16": {
+        "type": "BOOLEAN",
+        "dest": "field_16"
+      },
+      "field_14": {
+        "type": "TEXT",
+        "dest": "field_14"
+      },
+      "field_64.field_66": {
+        "type": "TIMESTAMP",
+        "dest": "field_64__field_66"
+      },
+      "field_29.field_34": {
+        "type": "TIMESTAMP",
+        "dest": "field_29__field_34"
+      },
+      "field_18": {
+        "type": "TEXT",
+        "dest": "field_18"
+      },
+      "field_26": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_26"
+      },
+      "field_78": {
+        "type": "INT",
+        "dest": "field_78"
+      },
+      "field_29.field_30": {
+        "type": "TEXT",
+        "dest": "field_29__field_30"
+      },
+      "field_27": {
+        "type": "TIMESTAMP",
+        "dest": "field_27"
+      },
+      "field_52": {
+        "type": "BOOLEAN",
+        "dest": "field_52"
+      },
+      "field_64.field_69": {
+        "type": "TIMESTAMP",
+        "dest": "field_64__field_69"
+      },
+      "field_71": {
+        "type": "BOOLEAN",
+        "dest": "field_71"
+      },
+      "field_38": {
+        "type": "TEXT",
+        "dest": "field_38"
+      },
+      "field_12": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col1",
+        "dest": "col1__field_12",
+        "valueField": "field_12"
+      },
+      "field_17": {
+        "type": "TIMESTAMP",
+        "dest": "field_17"
+      },
+      "field_62": {
+        "type": "BOOLEAN",
+        "dest": "field_62"
+      },
+      "field_7": {
+        "type": "INT",
+        "dest": "field_7"
+      },
+      "field_25": {
+        "type": "INT",
+        "dest": "field_25"
+      },
+      "field_36": {
+        "type": "TIMESTAMP",
+        "dest": "field_36"
+      },
+      "field_13": {
+        "type": "BOOLEAN",
+        "dest": "field_13"
+      },
+      "pk": "_id",
+      "field_21": {
+        "type": "TEXT",
+        "dest": "field_21"
+      },
+      "field_29.field_33": {
+        "type": "TEXT",
+        "dest": "field_29__field_33"
+      },
+      "field_35": {
+        "type": "TEXT",
+        "dest": "field_35"
+      },
+      "field_19": {
+        "type": "TEXT",
+        "dest": "field_19"
+      },
+      "field_11": {
+        "type": "TIMESTAMP",
+        "dest": "field_11"
+      },
+      "field_37": {
+        "type": "TEXT",
+        "dest": "field_37"
+      },
+      "field_6": {
+        "type": "INT",
+        "dest": "field_6"
+      },
+      "field_64.field_65": {
+        "type": "TIMESTAMP",
+        "dest": "field_64__field_65"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field_9": {
+        "type": "TEXT",
+        "dest": "field_9"
+      },
+      "field_29.field_32": {
+        "type": "_ARRAY",
+        "fk": "id_col1",
+        "dest": "col1__field_29__field_32"
+      },
+      "field_54": {
+        "type": "TEXT",
+        "dest": "field_54"
+      },
+      "field_67": {
+        "type": "TEXT",
+        "dest": "field_67"
+      },
+      "field_8": {
+        "type": "TEXT",
+        "dest": "field_8"
+      },
+      "field_68": {
+        "type": "TIMESTAMP",
+        "dest": "field_68"
+      },
+      "field_63": {
+        "type": "BOOLEAN",
+        "dest": "field_63"
+      },
+      "field_4": {
+        "type": "TEXT",
+        "dest": "field_4"
+      },
+      "field_64.field_30": {
+        "type": "TEXT",
+        "dest": "field_64__field_30"
+      },
+      "field_29.field_31": {
+        "type": "TEXT",
+        "dest": "field_29__field_31"
+      },
+      "field_23": {
+        "type": "TEXT",
+        "dest": "field_23"
+      },
+      "field_0": {
+        "type": "TIMESTAMP",
+        "dest": "field_0"
+      }
+    },
+    "col0__field_list_string": {
+      "pk": "id",
+      "field_list_string": {
+        "type": "TEXT",
+        "dest": "field_list_string"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    },
+    "col0__field_super_nested": {
+      "pk": "id",
+      "subfield_list": {
+        "type": "_ARRAY",
+        "fk": "id_col0__field_super_nested",
+        "dest": "col0__field_super_nested__subfield_list"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    },
+    "col0": {
+      "field_str_obj_copy.subfield2": {
+        "type": "TEXT",
+        "dest": "field_str_obj_copy__subfield2"
+      },
+      "field_str_obj.subfield1": {
+        "type": "TEXT",
+        "dest": "field_str_obj__subfield1"
+      },
+      "field_float": {
+        "type": "REAL",
+        "dest": "field_float"
+      },
+      "field_list_obj.subfield_list": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0",
+        "dest": "col0__field_list_obj__subfield_list",
+        "valueField": "subfield_list"
+      },
+      "pk": "_id",
+      "field_list_string_copy": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0",
+        "dest": "col0__field_list_string_copy",
+        "valueField": "field_list_string_copy"
+      },
+      "field_str_obj.subfield2": {
+        "type": "TEXT",
+        "dest": "field_str_obj__subfield2"
+      },
+      "field_number_obj.subfield2": {
+        "type": "REAL",
+        "dest": "field_number_obj__subfield2"
+      },
+      "field_int": {
+        "type": "INT",
+        "dest": "field_int"
+      },
+      "field_date": {
+        "type": "TIMESTAMP",
+        "dest": "field_date"
+      },
+      "field_list_string": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0",
+        "dest": "col0__field_list_string",
+        "valueField": "field_list_string"
+      },
+      "field_list_number_copy": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0",
+        "dest": "col0__field_list_number_copy",
+        "valueField": "field_list_number_copy"
+      },
+      "field_number_obj_copy.subfield1": {
+        "type": "INT",
+        "dest": "field_number_obj_copy__subfield1"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field_list_number": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0",
+        "dest": "col0__field_list_number",
+        "valueField": "field_list_number"
+      },
+      "field_number_obj.subfield1": {
+        "type": "INT",
+        "dest": "field_number_obj__subfield1"
+      },
+      "field_str_obj_copy.subfield1": {
+        "type": "TEXT",
+        "dest": "field_str_obj_copy__subfield1"
+      },
+      "field_super_nested": {
+        "type": "_ARRAY",
+        "fk": "id_col0",
+        "dest": "col0__field_super_nested"
+      },
+      "field_string": {
+        "type": "TEXT",
+        "dest": "field_string"
+      },
+      "field_date_obj.subfield": {
+        "type": "TIMESTAMP",
+        "dest": "field_date_obj__subfield"
+      },
+      "field_number_obj_copy.subfield2": {
+        "type": "REAL",
+        "dest": "field_number_obj_copy__subfield2"
+      },
+      "field_oid": {
+        "type": "TEXT",
+        "dest": "field_oid"
+      },
+      "field_bool": {
+        "type": "BOOLEAN",
+        "dest": "field_bool"
+      }
+    },
+    "col0__field_super_nested__subfield_list": {
+      "pk": "id",
+      "subsubfield_list": {
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_col0__field_super_nested__subfield_list",
+        "dest": "col0__field_super_nested__subfield_list__subsubfield_list",
+        "valueField": "subsubfield_list"
+      },
+      "id_col0__field_super_nested": {
+        "type": "TEXT"
+      }
+    },
+    "col3__accent_in_list": {
+      "pk": "id",
+      "accent_in_list": {
+        "type": "TEXT",
+        "dest": "accent_in_list"
+      },
+      "id_col3": {
+        "type": "TEXT"
+      }
+    },
+    "col0__field_list_number": {
+      "pk": "id",
+      "field_list_number": {
+        "type": "DOUBLE PRECISION",
+        "dest": "field_list_number"
+      },
+      "id_col0": {
+        "type": "TEXT"
+      }
+    }
+  },
+  "test_db": {
+    "test_col__address__coord": {
+      "pk": "id",
+      "id_test_col": {
+        "type": "TEXT"
+      },
+      "coord": {
+        "dest": "coord",
+        "type": "REAL"
+      }
+    },
+    "test_col__grades": {
+      "date": {
+        "dest": "date",
+        "type": "TIMESTAMP"
+      },
+      "pk": "id",
+      "id_test_col": {
+        "type": "TEXT"
+      },
+      "score": {
+        "dest": "score",
+        "type": "INT"
+      },
+      "grade": {
+        "dest": "grade",
+        "type": "TEXT"
+      }
+    },
+    "test_col": {
+      "cuisine": {
+        "dest": "cuisine",
+        "type": "TEXT"
+      },
+      "borough": {
+        "dest": "borough",
+        "type": "TEXT"
+      },
+      "name": {
+        "dest": "name",
+        "type": "TEXT"
+      },
+      "restaurant_id": {
+        "dest": "restaurant_id",
+        "type": "TEXT"
+      },
+      "address.street": {
+        "dest": "address__street",
+        "type": "TEXT"
+      },
+      "grades": {
+        "dest": "test_col__grades",
+        "fk": "id_test_col",
+        "type": "_ARRAY"
+      },
+      "address.zipcode": {
+        "dest": "address__zipcode",
+        "type": "TEXT"
+      },
+      "address.coord": {
+        "dest": "test_col__address__coord",
+        "fk": "id_test_col",
+        "type": "_ARRAY_OF_SCALARS",
+        "valueField": "coord"
+      },
+      "pk": "_id",
+      "_id": {
+        "dest": "_id",
+        "type": "TEXT"
+      },
+      "address.building": {
+        "dest": "address__building",
+        "type": "TEXT"
+      }
+    }
+  }
+}
