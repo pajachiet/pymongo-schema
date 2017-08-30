@@ -19,6 +19,9 @@ setup(name='pymongo-schema',
           'jinja2',
           'future==0.16.0'
       ],
+      dependency_links = [
+          'git@github.com:etetoolkit/ete.git'
+      ],
       entry_points={
           'console_scripts': [
               'pymongo-schema = pymongo_schema.command_line:main',
