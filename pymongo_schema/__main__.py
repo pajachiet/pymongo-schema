@@ -9,11 +9,14 @@ Usage:
     pymongo_schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
     pymongo_schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
     pymongo_schema  tosql [--input=FILENAME --output=FILENAME --quiet]
+    pymongo_schema  compare [--input=FILENAME --output=FILENAME --format=FORMAT... --expected=FILENAME --category=CATEGORY]
 
 Commands:
     extract                     Extract schema from a MongoDB instance
-    transform                   Transform a json schema to another format, eventually filtering or changing columns outputs
+    transform                   Transform a json schema to another format, potentially filtering or changing columns outputs
     tosql                       Create a mapping from mongo schema to relational schema (json input and output)
+    compare                     Compare a mongo schema to another and write differences in the desired format
+                                (only the fist difference is noted, not the entire hierarchy)
 
 Options:
     -d --database DB            Only analyze this database.
@@ -32,9 +35,13 @@ Options:
     -o , --output FILENAME      Output file for schema. Default to standard output.
                                 Extension added automatically if omitted (useful for multi-format outputs)
 
+    -e , --expected FILENAME    Expected schema file - json format expected
+
     -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'xlsx', 'yaml', 'html', 'md' or 'json'
                                 Multiple format may be specified. [default: json]
                                 Note : Output format for mongo to sql mapping is json
+
+    --category FORMAT           Category of input (schema | mapping | diff) [default: schema]
 
     --columns HEADER            String listing columns to get in 'txt', 'csv', 'html', 'md' or 'xlsx' format.
                                 Columns are to be chosen in :
@@ -70,6 +77,7 @@ from time import time
 import pymongo
 from docopt import docopt
 
+from pymongo_schema.compare import compare_schemas_bases
 from pymongo_schema.export import write_output_dict
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.filter import filter_mongo_schema_namespaces
@@ -101,6 +109,10 @@ def main(argv=None):
     if arg['tosql']:
         arg['--format'] = ['json']
         output_dict = schema_to_sql(arg)
+
+    # Compare two schemas
+    if arg['compare']:
+        output_dict = compare_schemas(arg)
 
     # Output dict
     logger.info('=== Write output')
@@ -177,12 +189,25 @@ def schema_to_sql(arg):
     return mongo_to_sql_mapping
 
 
-def load_input_schema(arg):
+def compare_schemas(arg):
+    """
+
+    :param arg:
+    :return:
+    """
+    logger.info('=== Compare schemas')
+    input_schema = load_input_schema(arg)
+    expected_schema = load_input_schema(arg, opt='--expected')
+    diff = compare_schemas_bases(input_schema, expected_schema)
+    return diff
+
+
+def load_input_schema(arg, opt='--input'):
     """Load schema from file or stdin."""
-    if arg['--input'] is None:
+    if arg[opt] is None:
         input_schema = json.load(sys.stdin)
     else:
-        with open(arg['--input'], 'r') as f:
+        with open(arg[opt], 'r') as f:
             input_schema = json.load(f)
 
     return input_schema
