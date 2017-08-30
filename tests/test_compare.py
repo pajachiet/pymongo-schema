@@ -95,3 +95,18 @@ def test03_compare_schema_nested():
                  'schema': {'type': 'integer'}, 'expected': {'type': 'boolean'}}]
     res = compare_schemas_bases(schema, exp_schema)
     assert res == exp_diff
+
+
+def test04_is_retrocompatible_true():
+    diff = [{'hierarchy': '', 'schema': 'db0', 'expected': None},
+            {'hierarchy': '', 'schema': None, 'expected': 'db1'},
+            {'hierarchy': 'db', 'schema': 'coll1', 'expected': None},
+            {'hierarchy': 'db', 'schema': None, 'expected': 'coll2'},
+            {'hierarchy': 'db.coll', 'schema': 'field2', 'expected': None},
+            {'hierarchy': 'db.coll', 'schema': None, 'expected': 'field4'},
+            {'hierarchy': 'db.coll.field', 'schema': None, 'expected': 'subfield'}]
+    assert is_retrocompatible(diff)
+
+
+def test05_is_retrocompatible_false(long_diff):
+    assert not is_retrocompatible(long_diff)
