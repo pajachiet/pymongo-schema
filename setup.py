@@ -17,9 +17,10 @@ setup(name='pymongo-schema',
           'xlsxwriter',
           'openpyxl',
           'jinja2',
-          'future==0.16.0'
+          'future==0.16.0',
+          'scipy'
       ],
-      dependency_links = [
+      dependency_links=[
           'git@github.com:etetoolkit/ete.git'
       ],
       entry_points={
