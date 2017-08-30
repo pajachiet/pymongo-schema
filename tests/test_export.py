@@ -4,7 +4,8 @@ import filecmp
 from pandas.util.testing import assert_frame_equal
 
 from pymongo_schema.export import *
-from pymongo_schema.export import _SchemaPreProcessing
+from pymongo_schema.export import _SchemaPreProcessing, _DiffPreProcessing
+from tests.test_compare import long_diff
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -67,6 +68,11 @@ def schema_ex_dict():
 def columns():
     return ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
             'Percentage', 'Types_count']
+
+
+@pytest.fixture(scope='module')
+def diff_columns():
+    return ['Database', 'Collection', 'Hierarchy', 'In Schema', 'In Expected']
 
 
 @pytest.fixture(scope='module')
@@ -196,7 +202,7 @@ def test01_write_txt(schema_ex_df):
         output_maker.write_data(out_fd)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
-    
+
 
 def test02_write_md(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.md')
@@ -207,7 +213,7 @@ def test02_write_md(schema_ex_df):
         output_maker.write_data(out_fd)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
-    
+
 
 def test03_write_html(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.html')
@@ -231,7 +237,7 @@ def test04_write_xlsx(schema_ex_df):
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
     assert res == exp
     os.remove(output)
-    
+
 
 def test05_write_output_dict_schema_txt(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.txt')
@@ -241,7 +247,7 @@ def test05_write_output_dict_schema_txt(schema_ex_dict, columns):
     write_output_dict(schema_ex_dict, arg)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
-    
+
 
 def test06_write_output_dict_schema_md(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.md')
@@ -251,7 +257,7 @@ def test06_write_output_dict_schema_md(schema_ex_dict, columns):
     write_output_dict(schema_ex_dict, arg)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
-    
+
 
 def test07_write_output_dict_schema_html(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.html')
@@ -325,3 +331,48 @@ def test12_write_output_dict_schema_non_ascii(columns):
             assert 'ÀàÂâÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûÜü' in f.read()
     for output in outputs.values():
         os.remove(output)
+
+
+def test13_schema_diff_to_df_simple(diff_columns):
+    res = _DiffPreProcessing.convert_to_dataframe(
+        [{'hierarchy': '', 'schema': 'db0', 'expected': None}])
+    exp = pd.DataFrame([['db0', '', '', 'db0', None]],
+                       columns=diff_columns)
+    assert_frame_equal(res, exp)
+
+
+def test14_schema_diff_to_df_long(long_diff, diff_columns):
+    res = _DiffPreProcessing.convert_to_dataframe(long_diff)
+    exp = pd.DataFrame([['db0', '', '', 'db0', None],
+                        ['db1', '', '', None, 'db1'],
+                        ['db', 'coll1', '', 'coll1', None],
+                        ['db', 'coll2', '', None, 'coll2'],
+                        ['db', 'coll', '', 'field2', None],
+                        ['db', 'coll', '', None, 'field4'],
+                        ['db', 'coll', 'field3', {'type': 'boolean'}, {'type': 'string'}],
+                        ['db', 'coll', 'field.array_subfield', None, 'subsubfield2'],
+                        ['db', 'coll', 'field.array_subfield.subsubfield', {'type': 'integer'},
+                         {'type': 'boolean'}],
+                        ['db', 'coll', 'field5', {'array_type': 'string'},
+                         {'array_type': 'integer'}],
+                        ['db', 'coll', 'field6', {'type': 'ARRAY'}, {'type': 'string'}]],
+                       columns=diff_columns)
+    assert_frame_equal(res, exp)
+
+
+def test15_schema_diff_to_html(long_diff):
+    output_file = os.path.join(TEST_DIR, 'output_test_diff.html')
+    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'schema_diff.html')
+    arg = {'--format': ['html'], '--output': output_file, '--category': 'diff'}
+    write_output_dict(long_diff, arg)
+    assert filecmp.cmp(output_file, expected_file)
+    os.remove(output_file)
+
+
+def test16_schema_diff_to_md(long_diff):
+    output_file = os.path.join(TEST_DIR, 'output_test_diff.md')
+    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'schema_diff.md')
+    arg = {'--format': ['md'], '--output': output_file, '--category': 'diff'}
+    write_output_dict(long_diff, arg)
+    assert filecmp.cmp(output_file, expected_file)
+    os.remove(output_file)
