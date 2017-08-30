@@ -4,6 +4,7 @@ import filecmp
 from pandas.util.testing import assert_frame_equal
 
 from pymongo_schema.export import *
+from pymongo_schema.export import _SchemaPreProcessing
 
 TEST_DIR = os.path.dirname(__file__)
 
@@ -70,42 +71,42 @@ def columns():
 
 @pytest.fixture(scope='module')
 def schema_ex_df(schema_ex_dict, columns):
-    return ListOutput.mongo_schema_as_dataframe(schema_ex_dict, columns)
+    return _SchemaPreProcessing.mongo_schema_as_dataframe(schema_ex_dict, columns)
 
 
 def test00_field_compact_name():
-    assert ListOutput._field_compact_name('baz', None, 'foo.bar:') == ' .  : baz'
-    assert ListOutput._field_compact_name('baz', None, 'foo.foo.bar:') == ' .  .  : baz'
+    assert _SchemaPreProcessing._field_compact_name('baz', None, 'foo.bar:') == ' .  : baz'
+    assert _SchemaPreProcessing._field_compact_name('baz', None, 'foo.foo.bar:') == ' .  .  : baz'
 
 
 def test01_field_depth():
-    assert ListOutput._field_depth(None, None, '') == 0
-    assert ListOutput._field_depth(None, None, 'foo') == 0
-    assert ListOutput._field_depth(None, None, 'foo.bar') == 1
-    assert ListOutput._field_depth(None, None, 'foo.bar:') == 2
-    assert ListOutput._field_depth(None, None, 'foo.foo.bar:') == 3
+    assert _SchemaPreProcessing._field_depth(None, None, '') == 0
+    assert _SchemaPreProcessing._field_depth(None, None, 'foo') == 0
+    assert _SchemaPreProcessing._field_depth(None, None, 'foo.bar') == 1
+    assert _SchemaPreProcessing._field_depth(None, None, 'foo.bar:') == 2
+    assert _SchemaPreProcessing._field_depth(None, None, 'foo.foo.bar:') == 3
 
 
 def test02_field_type():
-    assert ListOutput._field_type(None, {'type': 'string'}, None) == 'string'
-    assert ListOutput._field_type(
+    assert _SchemaPreProcessing._field_type(None, {'type': 'string'}, None) == 'string'
+    assert _SchemaPreProcessing._field_type(
         None, {'type': 'ARRAY', 'array_type': 'string'}, None) == 'ARRAY(string)'
 
 
 def test03_format_types_count():
-    res = ListOutput._format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
+    res = _SchemaPreProcessing._format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
     assert res == 'integer : 10, boolean : 5, null : 3'
-    res = ListOutput._format_types_count({'ARRAY': 10, 'null': 3, }, {'float': 4})
+    res = _SchemaPreProcessing._format_types_count({'ARRAY': 10, 'null': 3, }, {'float': 4})
     assert res == 'ARRAY(float : 4) : 10, null : 3'
 
 
 def test04_remove_counts_from_schema_simple(simple_schema):
     exp = {'object': {'field': {'type': 'string'}}}
-    assert HierarchicalOutput.remove_counts_from_schema(simple_schema) == exp
+    assert _SchemaPreProcessing.remove_counts_from_schema(simple_schema) == exp
 
 
 def test05_remove_counts_from_schema_empty():
-    assert HierarchicalOutput.remove_counts_from_schema({}) == {}
+    assert _SchemaPreProcessing.remove_counts_from_schema({}) == {}
 
 
 def test06_remove_counts_from_schema_long(long_schema):
@@ -115,18 +116,18 @@ def test06_remove_counts_from_schema_long(long_schema):
                                  'object': {'subfield1': {'type': 'string'},
                                             'subfield2': {'type': 'ARRAY',
                                                           'array_type': 'string'}}}}}
-    assert HierarchicalOutput.remove_counts_from_schema(long_schema) == exp
+    assert _SchemaPreProcessing.remove_counts_from_schema(long_schema) == exp
 
 
 def test07_field_schema_to_columns_simple(simple_schema):
-    res = ListOutput._field_schema_to_columns(
+    res = _SchemaPreProcessing._field_schema_to_columns(
         'field', simple_schema['object']['field'], '',
         ['Field_compact_name', 'Field_name', 'Count', 'Percentage', 'Types_count'])
     assert res == ('field', 'field', 25359, 100.0, 'string : 25359')
 
 
 def test08_field_schema_to_columns_long(long_schema):
-    res = ListOutput._field_schema_to_columns(
+    res = _SchemaPreProcessing._field_schema_to_columns(
         'field3', long_schema['object']['field3'], 'foo.bar:',
         ['Field_full_name', 'Field_compact_name', 'Field_name', 'Depth', 'Type', 'Count',
          'Percentage', 'Types_count'])
@@ -134,14 +135,15 @@ def test08_field_schema_to_columns_long(long_schema):
            'ARRAY(OBJECT : 25359) : 25359')
     assert res == exp
 
+
 def test09_object_schema_to_line_tuples_simple(simple_schema):
-    res = ListOutput._object_schema_to_line_tuples(
+    res = _SchemaPreProcessing._object_schema_to_line_tuples(
         simple_schema['object'], ['Field_compact_name', 'Types_count'], '')
     assert res == [('field', 'string : 25359')]
 
 
 def test10_object_schema_to_line_tuples_long(long_schema):
-    res = ListOutput._object_schema_to_line_tuples(
+    res = _SchemaPreProcessing._object_schema_to_line_tuples(
         long_schema['object'],
         ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count', 'Types_count'],
         'foo.bar:')
@@ -159,7 +161,7 @@ def test10_object_schema_to_line_tuples_long(long_schema):
 
 def test11_mongo_schema_as_dataframe_simple(simple_full_schema):
     columns = ['Field_compact_name', 'Types_count']
-    res = ListOutput.mongo_schema_as_dataframe(simple_full_schema, columns)
+    res = _SchemaPreProcessing.mongo_schema_as_dataframe(simple_full_schema, columns)
     exp = pd.DataFrame([['db', 'coll', 'field', 'string : 25359']],
                        columns=['Database', 'Collection'] + columns)
     assert_frame_equal(res, exp)
@@ -168,7 +170,7 @@ def test11_mongo_schema_as_dataframe_simple(simple_full_schema):
 def test12_mongo_schema_as_dataframe_long(long_full_schema):
     columns = ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count',
                'Types_count']
-    res = ListOutput.mongo_schema_as_dataframe(long_full_schema, columns)
+    res = _SchemaPreProcessing.mongo_schema_as_dataframe(long_full_schema, columns)
     exp = [['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
            ['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
            ['db1', 'coll', 'field3', 'field3', 'field3', 'ARRAY(OBJECT)', 25359,

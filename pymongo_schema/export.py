@@ -110,21 +110,30 @@ class BaseOutput(object):
         pass
 
 
-class HierarchicalOutput(BaseOutput):
-    """
-    Abstract base class. Preprocessing for outputs that keep the json hierarchical structure.
-    """
+class OutputPreProcessing(object):
+    __metaclass__ = abc.ABCMeta
 
-    def __init__(self, output_data, without_counts=False, **kwargs):
-        """
-        :param output_data: dict - schema
-        :param without_counts: bool - default False, remove all count fields in output if True
-        :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
-        """
-        if without_counts:
-            self.output_data = self.remove_counts_from_schema(output_data)
-        else:
-            self.output_data = output_data
+    @property
+    @abc.abstractmethod
+    def category(self):
+        """"""
+        pass
+
+    def __new__(cls, category):
+        o = object.__new__(rec_find_right_subclass(category, attribute='category', start_class=cls))
+        return o
+
+    @classmethod
+    @abc.abstractmethod
+    def mongo_schema_as_dataframe(cls, output_data, columns_to_get=None):
+        return
+
+    def remove_counts_from_schema(self, schema):
+        return schema
+
+
+class _SchemaPreProcessing(OutputPreProcessing):
+    category = 'schema'
 
     @classmethod
     def remove_counts_from_schema(cls, value):
@@ -140,24 +149,6 @@ class HierarchicalOutput(BaseOutput):
                     schema_filtered[k] = cls.remove_counts_from_schema(v)
             return schema_filtered
         return value
-
-
-class ListOutput(BaseOutput):
-    """
-    Abstract base class. Preprocessing for outputs with a table like format.
-    """
-    default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
-
-    def __init__(self, output_data, columns_to_get=None, **kwargs):
-        """
-        :param output_data: dict - schema
-        :param columns_to_get: string of column names to display in output separated by spaces
-                                default will use default_columns class attribute
-        :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
-        """
-        self.mongo_schema_df = self.mongo_schema_as_dataframe(
-            output_data,
-            columns_to_get.split(" ") if columns_to_get else self.default_columns)
 
     @classmethod
     def mongo_schema_as_dataframe(cls, output_data, columns_to_get=None):
@@ -301,6 +292,43 @@ class ListOutput(BaseOutput):
 
         types_count_string = ', '.join(type_count_list)
         return types_count_string
+
+
+class HierarchicalOutput(BaseOutput):
+    """
+    Abstract base class. Preprocessing for outputs that keep the json hierarchical structure.
+    """
+
+    def __init__(self, output_data, category='schema', without_counts=False, **kwargs):    # TODO: output_data -> data ?
+        """
+        :param output_data: dict - schema
+        :param without_counts: bool - default False, remove all count fields in output if True
+        :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
+        """
+        data_processor = OutputPreProcessing(category)
+        if without_counts:
+            self.output_data = data_processor.remove_counts_from_schema(output_data)
+        else:
+            self.output_data = output_data
+
+
+class ListOutput(BaseOutput):
+    """
+    Abstract base class. Preprocessing for outputs with a table like format.
+    """
+    default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
+
+    def __init__(self, output_data, category='schema', columns_to_get=None, **kwargs):
+        """
+        :param output_data: dict - schema
+        :param columns_to_get: string of column names to display in output separated by spaces
+                                default will use default_columns class attribute
+        :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
+        """
+        data_processor = OutputPreProcessing(category)
+        self.mongo_schema_df = data_processor.mongo_schema_as_dataframe(
+            output_data,
+            columns_to_get.split(" ") if columns_to_get else self.default_columns)
 
 
 class JsonOutput(HierarchicalOutput):
@@ -497,12 +525,12 @@ class XlsxOutput(ListOutput):
                                           float_format='%.2f')
 
 
-def rec_find_output_maker(output_format, start_class=BaseOutput):
-    """Find which subclass of BaseOutput should be used to manage output_format"""
+def rec_find_right_subclass(attribute_value, attribute='output_format', start_class=BaseOutput):
+    """Find which subclass of start_class should be used (has the right attribute value)"""
     for subclass in start_class.__subclasses__():
-        if subclass.output_format == output_format:
+        if getattr(subclass, attribute) == attribute_value:
             return subclass
-        rec_res = rec_find_output_maker(output_format, subclass)
+        rec_res = rec_find_right_subclass(attribute_value, start_class=subclass)
         if rec_res:
             return rec_res
 
@@ -537,8 +565,8 @@ def write_output_dict(output_dict, arg):
                          "{} is/are not supported".format(wrong_formats))
 
     for output_format in output_formats:
-        output_maker = rec_find_output_maker(output_format)(output_dict,
-                                                            columns_to_get=columns_to_get,
-                                                            without_counts=without_counts)
+        output_maker = rec_find_right_subclass(output_format)(output_dict,
+                                                              columns_to_get=columns_to_get,
+                                                              without_counts=without_counts)
         with output_maker.open(output_filename) as file_descr:
             output_maker.write_output_data(file_descr)
