@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 # Type of automatically generated primary keys
 # int in default mongo-connector-postgresql, string in pajachiet branch
-AUTO_GENERATED_PK_TYPE = 'TEXT'
+AUTO_GENERATED_PK_TYPE = 'SERIAL'
 
 
 def mongo_schema_to_mapping(mongo_schema):
