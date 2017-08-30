@@ -71,7 +71,7 @@ def columns():
 
 @pytest.fixture(scope='module')
 def schema_ex_df(schema_ex_dict, columns):
-    return _SchemaPreProcessing.mongo_schema_as_dataframe(schema_ex_dict, columns)
+    return _SchemaPreProcessing.convert_to_dataframe(schema_ex_dict, columns)
 
 
 def test00_field_compact_name():
@@ -102,11 +102,11 @@ def test03_format_types_count():
 
 def test04_remove_counts_from_schema_simple(simple_schema):
     exp = {'object': {'field': {'type': 'string'}}}
-    assert _SchemaPreProcessing.remove_counts_from_schema(simple_schema) == exp
+    assert _SchemaPreProcessing.filter_data(simple_schema) == exp
 
 
 def test05_remove_counts_from_schema_empty():
-    assert _SchemaPreProcessing.remove_counts_from_schema({}) == {}
+    assert _SchemaPreProcessing.filter_data({}) == {}
 
 
 def test06_remove_counts_from_schema_long(long_schema):
@@ -116,7 +116,7 @@ def test06_remove_counts_from_schema_long(long_schema):
                                  'object': {'subfield1': {'type': 'string'},
                                             'subfield2': {'type': 'ARRAY',
                                                           'array_type': 'string'}}}}}
-    assert _SchemaPreProcessing.remove_counts_from_schema(long_schema) == exp
+    assert _SchemaPreProcessing.filter_data(long_schema) == exp
 
 
 def test07_field_schema_to_columns_simple(simple_schema):
@@ -161,7 +161,7 @@ def test10_object_schema_to_line_tuples_long(long_schema):
 
 def test11_mongo_schema_as_dataframe_simple(simple_full_schema):
     columns = ['Field_compact_name', 'Types_count']
-    res = _SchemaPreProcessing.mongo_schema_as_dataframe(simple_full_schema, columns)
+    res = _SchemaPreProcessing.convert_to_dataframe(simple_full_schema, columns)
     exp = pd.DataFrame([['db', 'coll', 'field', 'string : 25359']],
                        columns=['Database', 'Collection'] + columns)
     assert_frame_equal(res, exp)
@@ -170,7 +170,7 @@ def test11_mongo_schema_as_dataframe_simple(simple_full_schema):
 def test12_mongo_schema_as_dataframe_long(long_full_schema):
     columns = ['Field_full_name', 'Field_compact_name', 'Field_name', 'Type', 'Count',
                'Types_count']
-    res = _SchemaPreProcessing.mongo_schema_as_dataframe(long_full_schema, columns)
+    res = _SchemaPreProcessing.convert_to_dataframe(long_full_schema, columns)
     exp = [['db1', 'coll', 'field', 'field', 'field', 'string', 25359, 'string : 25359'],
            ['db1', 'coll', 'field2', 'field2', 'field2', 'string', 25359, 'string : 25359'],
            ['db1', 'coll', 'field3', 'field3', 'field3', 'ARRAY(OBJECT)', 25359,
@@ -191,9 +191,9 @@ def test01_write_txt(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.txt')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
     output_maker = TxtOutput({})
-    output_maker.mongo_schema_df = schema_ex_df.copy()
+    output_maker.data_df = schema_ex_df.copy()
     with open(output, 'w') as out_fd:
-        output_maker.write_output_data(out_fd)
+        output_maker.write_data(out_fd)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
     
@@ -202,9 +202,9 @@ def test02_write_md(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.md')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.md')
     output_maker = MdOutput({})
-    output_maker.mongo_schema_df = schema_ex_df.copy()
+    output_maker.data_df = schema_ex_df.copy()
     with open(output, 'w') as out_fd:
-        output_maker.write_output_data(out_fd)
+        output_maker.write_data(out_fd)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
     
@@ -213,9 +213,9 @@ def test03_write_html(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.html')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
     output_maker = HtmlOutput({})
-    output_maker.mongo_schema_df = schema_ex_df.copy()
+    output_maker.data_df = schema_ex_df.copy()
     with open(output, 'w') as out_fd:
-        output_maker.write_output_data(out_fd)
+        output_maker.write_data(out_fd)
     with open(output) as out_fd, open(expected_file) as exp_fd:
         assert out_fd.read().replace(' ', '') == exp_fd.read().replace(' ', '')
     os.remove(output)
@@ -225,8 +225,8 @@ def test04_write_xlsx(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.xlsx')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
     output_maker = XlsxOutput({})
-    output_maker.mongo_schema_df = schema_ex_df.copy()
-    output_maker.write_output_data(output)
+    output_maker.data_df = schema_ex_df.copy()
+    output_maker.write_data(output)
     res = [cell.value for row in load_workbook(output).active for cell in row]
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
     assert res == exp
