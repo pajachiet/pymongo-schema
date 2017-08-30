@@ -20,7 +20,6 @@ They intend to preprocess data as this is common to each group of output.
 They use OutputPreProcessing class to deal with this preprocessing.
 This class is a factory that will allow to use the right preprocessing methods
 depending on the category treated (schema, mapping, ...).
-ListOutput defines a default_columns class attribute that can be overridden as well.
 
 Then those base classes are used (inherited from) to define each format:
 JsonOutput, YamlOutput, TsvOutput, HtmlOutput, MdOutput, XlsxOutput
@@ -119,6 +118,7 @@ class OutputPreProcessing(object):
 
     Abstract methods to override:
     property category: string - specifies what category the child is managing (schema, mapping, ...)
+    property default_columns: list - name of columns to display in table like outputs
     convert_to_dataframe: convert data into a dataframe - used for list outputs
 
     Public method that can be overridden:
@@ -132,9 +132,21 @@ class OutputPreProcessing(object):
         """String - category to manage (schema, mapping, ...)"""
         pass
 
+    @property
+    @abc.abstractmethod
+    def default_columns(self):
+        """List of names of columns to display."""
+        pass
+
     def __new__(cls, category):
         return object.__new__(rec_find_right_subclass(category, attribute='category',
                                                       start_class=cls))
+
+    @classmethod
+    def find_columns_to_get(cls, columns_to_get):
+        if columns_to_get:
+            return columns_to_get
+        return cls.default_columns
 
     @classmethod
     @abc.abstractmethod
@@ -151,15 +163,17 @@ class OutputPreProcessing(object):
 class MappingPreProcessing(OutputPreProcessing):
     """Preprocess 'mapping' data from to_sql module"""
     category = 'mapping'
+    default_columns = ['Field_name', 'Description', 'Type']
 
     @classmethod
-    def convert_to_dataframe(cls, data, **kwargs):  # TODO: pick columns
+    def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
+        columns_to_get = cls.find_columns_to_get(columns_to_get)
         lines = []
         for db in sorted(data):
             for table in sorted(data[db]):
                 lines += cls._table_dict_to_lines(db, table, data[db][table])
 
-        header = ['Database', 'Table', 'Field_name', 'Description', 'Type']
+        header = ['Database', 'Table'] + columns_to_get
         return pd.DataFrame(lines, columns=header)
 
     @classmethod
@@ -203,6 +217,7 @@ class _DiffPreProcessing(OutputPreProcessing):
 class _SchemaPreProcessing(OutputPreProcessing):
     """Prepocess mongo schema"""
     category = 'schema'
+    default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
 
     @classmethod
     def filter_data(cls, data):
@@ -225,6 +240,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
         Load schema (data) into dataframe, filtering on columns_to_get (column names list).
         """
         line_tuples = list()
+        columns_to_get = cls.find_columns_to_get(columns_to_get)
         for database, database_schema in sorted(list(data.items())):
             for collection, collection_schema in sorted(list(database_schema.items())):
                 collection_line_tuples = cls._object_schema_to_line_tuples(
@@ -383,8 +399,12 @@ class HierarchicalOutput(BaseOutput):
 class ListOutput(BaseOutput):
     """
     Abstract base class. Preprocessing for outputs with a table like format.
+
+    Class attribute:
+    default_columns: allow to override PreProcessing class default_columns
+                        {category: [default_columns]}
     """
-    default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
+    default_columns = {}
 
     def __init__(self, data, category='schema', columns_to_get=None, **kwargs):
         """
@@ -394,9 +414,12 @@ class ListOutput(BaseOutput):
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
-        self.data_df = data_processor.convert_to_dataframe(
-            data,
-            columns_to_get=columns_to_get.split(" ") if columns_to_get else self.default_columns)
+        if columns_to_get:
+            columns_to_get = columns_to_get.split(" ")
+        else:
+            columns_to_get = self.default_columns.get(category)
+
+        self.data_df = data_processor.convert_to_dataframe(data, columns_to_get=columns_to_get)
 
 
 class JsonOutput(HierarchicalOutput):
@@ -443,8 +466,9 @@ class HtmlOutput(ListOutput):
     Uses resources/data_dict.tmpl template.
     """
     output_format = 'html'
-    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
-                       'Percentage', 'Types_count']
+    default_columns = {
+        'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+                   'Percentage', 'Types_count']}
 
     def opener(self):
         """Use codecs module open function to support non ascii characters."""
@@ -477,8 +501,9 @@ class MdOutput(ListOutput):
     Write data from self.data_df as a table in markdown file, one table per Collection.
     """
     output_format = 'md'
-    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
-                       'Percentage', 'Types_count']
+    default_columns = {
+        'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+                   'Percentage', 'Types_count']}
 
     def opener(self):
         """Use codecs module open function to support non ascii characters."""
