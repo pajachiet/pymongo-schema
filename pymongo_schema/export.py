@@ -356,7 +356,8 @@ class TxtOutput(ListOutput):
             output_str += '\n### Database: {}\n'.format(db)
             df_db = self.mongo_schema_df.query('Database == @db').iloc[:, 1:]
             for col in df_db.Collection.unique():
-                output_str += '--- Collection: {} \n'.format(col)
+                if col:
+                    output_str += '--- Collection: {} \n'.format(col)
                 df_col = df_db.query('Collection == @col').iloc[:, 1:]
                 output_str += df_col.to_string(index=False, formatters=formatters, justify='left',
                                                float_format=lambda x: '%.2f' % x)
@@ -448,7 +449,8 @@ class MdOutput(ListOutput):
             output_str.append('\n### Database: {}\n'.format(db))
             df_db = self.mongo_schema_df.query('Database == @db').iloc[:, 1:]
             for col in df_db.Collection.unique():
-                output_str.append('#### Collection: {} \n'.format(col))
+                if col:
+                    output_str.append('#### Collection: {} \n'.format(col))
                 df_col = df_db.query('Collection == @col').iloc[:, 1:]
                 output_str.append("\n".join([str_column_names, str_sep_header] +
                                             [self._make_line([format_column(columns[i], value)
