@@ -148,6 +148,32 @@ class OutputPreProcessing(object):
         return data
 
 
+class _DiffPreProcessing(OutputPreProcessing):
+    """Preprocess 'diff' data from compare module"""
+    category = 'diff'
+
+    @classmethod
+    def convert_to_dataframe(cls, data, **kwargs):
+        """"""
+        table = []
+        for d in data:
+            if not d['hierarchy']:
+                db = d['schema'] or d['expected']
+                coll = ''
+                hierarchy = []
+            else:
+                hierarchy = d['hierarchy'].split('.')
+                db = hierarchy.pop(0)
+                if not hierarchy:
+                    coll = d['schema'] or d['expected']
+                else:
+                    coll = hierarchy.pop(0)
+            table.append([db, coll, '.'.join(hierarchy), d['schema'], d['expected']])
+
+        header = ['Database', 'Collection', 'Hierarchy', 'In Schema', 'In Expected']
+        return pd.DataFrame(table, columns=header)
+
+
 class _SchemaPreProcessing(OutputPreProcessing):
     """Prepocess mongo schema"""
     category = 'schema'
@@ -344,7 +370,7 @@ class ListOutput(BaseOutput):
         data_processor = OutputPreProcessing(category)
         self.data_df = data_processor.convert_to_dataframe(
             data,
-            columns_to_get.split(" ") if columns_to_get else self.default_columns)
+            columns_to_get=columns_to_get.split(" ") if columns_to_get else self.default_columns)
 
 
 class JsonOutput(HierarchicalOutput):
@@ -567,13 +593,15 @@ def write_output_dict(output_dict, arg):
            if output_dict is mapping
                {'--format': str in 'json', 'yaml',
                 '--output': same as for schema (path to file where output will be saved saved),
-                '__columns': unused but key must exist,
+                '--columns': unused but key must exist,
                 '--without-counts': bool to display counts in output}
+           additional field not fully managed yet --category schema | diff
     """
     output_formats = arg['--format']
     output_filename = arg['--output']
     columns_to_get = arg.get('--columns', None)
     without_counts = arg.get('--without-counts', False)
+    category = arg.get('--category', 'schema')
 
     wrong_formats = set(output_formats) - {'txt', 'csv', 'xlsx', 'json', 'yaml', 'html', 'md'}
 
@@ -584,6 +612,7 @@ def write_output_dict(output_dict, arg):
     for output_format in output_formats:
         output_maker = rec_find_right_subclass(output_format)(output_dict,
                                                               columns_to_get=columns_to_get,
-                                                              without_counts=without_counts)
+                                                              without_counts=without_counts,
+                                                              category=category)
         with output_maker.open(output_filename) as file_descr:
             output_maker.write_data(file_descr)
