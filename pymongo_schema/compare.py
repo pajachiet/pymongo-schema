@@ -70,3 +70,10 @@ def compare_schemas_bases(schema, exp_schema, hierarchy=''):
                                           exp_schema[field]['object'],
                                           hierarchy='{}.{}'.format(hierarchy, field))
     return diff
+
+
+def is_retrocompatible(diff):
+    for line in diff:
+        if line['schema'] is not None and line['expected'] is not None:
+            return False
+    return True
