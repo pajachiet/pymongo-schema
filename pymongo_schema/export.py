@@ -148,6 +148,32 @@ class OutputPreProcessing(object):
         return data
 
 
+class MappingPreProcessing(OutputPreProcessing):
+    """Preprocess 'mapping' data from to_sql module"""
+    category = 'mapping'
+
+    @classmethod
+    def convert_to_dataframe(cls, data, **kwargs):  # TODO: pick columns
+        lines = []
+        for db in sorted(data):
+            for table in sorted(data[db]):
+                lines += cls._table_dict_to_lines(db, table, data[db][table])
+
+        header = ['Database', 'Table', 'Field_name', 'Description', 'Type']
+        return pd.DataFrame(lines, columns=header)
+
+    @classmethod
+    def _table_dict_to_lines(cls, db_name, table_name, table_dict):
+        lines = []
+        for field_name, field_dict in sorted(table_dict.items(), key=lambda x: x[0]):
+            if field_name in ['_id', 'pk']:
+                continue
+            field_name = field_dict['dest'] if 'dest' in field_dict else field_name
+            field_descr = field_dict.get('description')
+            lines.append([db_name, table_name, field_name, field_descr, field_dict['type']])
+        return lines
+
+
 class _DiffPreProcessing(OutputPreProcessing):
     """Preprocess 'diff' data from compare module"""
     category = 'diff'
@@ -428,12 +454,13 @@ class HtmlOutput(ListOutput):
         """
         Format data from self.data_df, write into file_descr (opened with opener).
         """
+        columns = self.data_df.columns
         tmpl_variables = OrderedDict()
         for db in self.data_df.Database.unique():
             tmpl_variables[db] = OrderedDict()
-            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
+            df_db = self.data_df.query('{} == @db'.format(columns[0])).iloc[:, 1:]
             for col in df_db.Collection.unique():
-                df_col = df_db.query('Collection == @col').iloc[:, 1:]
+                df_col = df_db.query('{} == @col'.format(columns[1])).iloc[:, 1:]
                 tmpl_variables[db][col] = df_col.values.tolist()
 
         tmpl_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -461,7 +488,9 @@ class MdOutput(ListOutput):
         """
         Format data from self.data_df, write into file_descr (opened with opener).
         """
-        columns = list(self.data_df.columns)[2:]  # skip Database and Collection
+        columns = list(self.data_df.columns)
+        col0 = columns.pop(0)
+        col1 = columns.pop(0)
         columns_length = []
         for col in columns:
             columns_length.append(max(self.data_df[col].map(
@@ -480,12 +509,12 @@ class MdOutput(ListOutput):
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
         output_str = []
         for db in self.data_df.Database.unique():
-            output_str.append('\n### Database: {}\n'.format(db))
-            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
+            output_str.append('\n### {}: {}\n'.format(col0, db))
+            df_db = self.data_df.query('{} == @db'.format(col0)).iloc[:, 1:]
             for col in df_db.Collection.unique():
                 if col:
-                    output_str.append('#### Collection: {} \n'.format(col))
-                df_col = df_db.query('Collection == @col').iloc[:, 1:]
+                    output_str.append('#### {}: {} \n'.format(col1, col))
+                df_col = df_db.query('{} == @col'.format(col1)).iloc[:, 1:]
                 output_str.append("\n".join([str_column_names, str_sep_header] +
                                             [self._make_line([format_column(columns[i], value)
                                                               for i, value in enumerate(line)])
