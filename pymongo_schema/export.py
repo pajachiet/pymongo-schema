@@ -1,6 +1,6 @@
 # coding: utf8
 """
-This module intends to transform mongo schema or mapping to write them in different file types.
+This module intends to transform a json (schema, mapping, ...) and write it in different file types.
 
 Entry point is write_output_dict.
 
@@ -8,7 +8,7 @@ It relies on a class system that defines how to open and write into the differen
 
 The base class is BaseOutput, it defines the mechanism.
 abstract property : output_format
-abstract method: write_output_data
+abstract method: write_data
 Those must be overridden in the final subclasses.
 The opener method should be overridden as well if open method is not enough
 (to manage non ascii for example).
@@ -16,7 +16,10 @@ The opener method should be overridden as well if open method is not enough
 It is inherited by two base classes, that represent two groups of outputs:
 HierarchicalOutput for nested formats (yaml and json)
 ListOutput for table like formats (txt, csv, md, html - since this format displays a table, xlsx).
-They intend to setup prepare data as this is common to each group of output.
+They intend to preprocess data as this is common to each group of output.
+They use OutputPreProcessing class to deal with this preprocessing.
+This class is a factory that will allow to use the right preprocessing methods
+depending on the category treated (schema, mapping, ...).
 ListOutput defines a default_columns class attribute that can be overridden as well.
 
 Then those base classes are used (inherited from) to define each format:
@@ -44,7 +47,7 @@ logger = logging.getLogger(__name__)
 
 class BaseOutput(object):
     """
-    Abstract base class. Defines the mechanism allowing to write schema into various file formats.
+    Abstract base class. Defines the mechanism allowing to write data into various file formats.
 
     The principle is to be able to define how to open the file and how to write into it
     using the same interface no matter what format is asked.
@@ -52,15 +55,15 @@ class BaseOutput(object):
     Abstract methods to override:
     property output_format (can be class attribute): string representing the format expected
         ('json', 'yaml', 'txt', 'csv', 'html', 'md, 'xlsx', ... it should match file extension)
-    write_output_data: define how to write into the object given by the open method
+    write_data: define how to write into the object given by the open method
+
+    Public methods that can be overridden to specialize the output:
+    opener
+    closer
 
     Other public method (should not be overridden):
-    open: context manager that yields the file ready to be written into by write_output_data.
-        It uses private methods _opener and _closer to define how to open and close the file
-
-    Private methods that can be overridden to specialize the output:
-    _opener
-    _closer
+    open: context manager that yields the file ready to be written into by write_data.
+        It uses private methods opener and closer to define how to open and close the file
     """
     __metaclass__ = abc.ABCMeta
 
@@ -72,28 +75,28 @@ class BaseOutput(object):
 
     @contextmanager
     def open(self, filename):
-        """Yields a file descriptor as expected in self.write_output_data"""
+        """Yields a file descriptor as expected in self.write_data"""
         if not filename:  # output is stdout, opener and closer must be adapted
-            self._opener = self._stdout_opener
-            self._closer = self._stdout_closer
+            self.opener = self._stdout_opener
+            self.closer = self._stdout_closer
         else:
             if not filename.endswith('.' + self.output_format):  # Add extension
                 filename += '.' + self.output_format
-        file_descr = self._opener()(filename)
+        file_descr = self.opener()(filename)
         try:
             yield file_descr
         finally:
-            self._closer(file_descr)
+            self.closer(file_descr)
 
-    def _opener(self):
+    def opener(self):
         """Return the function used to open the file (only filename will be passed as argument)."""
         return partial(open, mode='w')
 
     def _stdout_opener(self):
-        """Mock _opener if output is stdout"""
+        """Mock opener if output is stdout"""
         return lambda x: sys.stdout
 
-    def _closer(self, file_descr):
+    def closer(self, file_descr):
         """Actions to perform to close the file."""
         try:
             file_descr.close()
@@ -101,62 +104,76 @@ class BaseOutput(object):
             pass
 
     def _stdout_closer(self, file_descr):
-        """Mock _closer if output is stdout"""
+        """Mock closer if output is stdout"""
         pass
 
     @abc.abstractmethod
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """Expected function that writes into file_descr - object yielded by the open method."""
         pass
 
 
 class OutputPreProcessing(object):
+    """
+    Abstract base class used to define how to preprocess the data depending on the category.
+
+    Abstract methods to override:
+    property category: string - specifies what category the child is managing (schema, mapping, ...)
+    convert_to_dataframe: convert data into a dataframe - used for list outputs
+
+    Public method that can be overridden:
+    filter_data: preprocess (filter) output data for hierarchical outputs
+    """
     __metaclass__ = abc.ABCMeta
 
     @property
     @abc.abstractmethod
     def category(self):
-        """"""
+        """String - category to manage (schema, mapping, ...)"""
         pass
 
     def __new__(cls, category):
-        o = object.__new__(rec_find_right_subclass(category, attribute='category', start_class=cls))
-        return o
+        return object.__new__(rec_find_right_subclass(category, attribute='category',
+                                                      start_class=cls))
 
     @classmethod
     @abc.abstractmethod
-    def mongo_schema_as_dataframe(cls, output_data, columns_to_get=None):
+    def convert_to_dataframe(cls, data, **kwargs):
+        """Create a dataframe from data"""
         return
 
-    def remove_counts_from_schema(self, schema):
-        return schema
+    @classmethod
+    def filter_data(cls, data):
+        """Basic method just return data - can be overridden to filter (return json)"""
+        return data
 
 
 class _SchemaPreProcessing(OutputPreProcessing):
+    """Prepocess mongo schema"""
     category = 'schema'
 
     @classmethod
-    def remove_counts_from_schema(cls, value):
+    def filter_data(cls, data):
         """ Recursively copy schema without count fields.
 
-        :param value: schema or subpart of schema
+        :param data: schema or subpart of schema
         :return dict (subpart of schema without count fields) or original value
         """
-        if isinstance(value, dict):
+        if isinstance(data, dict):
             schema_filtered = dict()
-            for k, v in value.items():
+            for k, v in data.items():
                 if k not in ['count', 'types_count', 'prop_in_object', 'array_types_count']:
-                    schema_filtered[k] = cls.remove_counts_from_schema(v)
+                    schema_filtered[k] = cls.filter_data(v)
             return schema_filtered
-        return value
+        return data
 
     @classmethod
-    def mongo_schema_as_dataframe(cls, output_data, columns_to_get=None):
+    def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
         """
-        Load schema (output_data) into dataframe, filtering on columns_to_get (column names list).
+        Load schema (data) into dataframe, filtering on columns_to_get (column names list).
         """
         line_tuples = list()
-        for database, database_schema in sorted(list(output_data.items())):
+        for database, database_schema in sorted(list(data.items())):
             for collection, collection_schema in sorted(list(database_schema.items())):
                 collection_line_tuples = cls._object_schema_to_line_tuples(
                     collection_schema['object'], columns_to_get, field_prefix='')
@@ -164,8 +181,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
                     line_tuples.append([database, collection] + list(line))
 
         header = tuple(['Database', 'Collection'] + columns_to_get)
-        mongo_schema_df = pd.DataFrame(line_tuples, columns=header)
-        return mongo_schema_df
+        return pd.DataFrame(line_tuples, columns=header)
 
     @classmethod
     def _object_schema_to_line_tuples(cls, object_schema, columns_to_get, field_prefix):
@@ -299,17 +315,17 @@ class HierarchicalOutput(BaseOutput):
     Abstract base class. Preprocessing for outputs that keep the json hierarchical structure.
     """
 
-    def __init__(self, output_data, category='schema', without_counts=False, **kwargs):    # TODO: output_data -> data ?
+    def __init__(self, data, category='schema', without_counts=False, **kwargs):
         """
-        :param output_data: dict - schema
+        :param data: json like structure - schema, mapping, ...
         :param without_counts: bool - default False, remove all count fields in output if True
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
         if without_counts:
-            self.output_data = data_processor.remove_counts_from_schema(output_data)
+            self.data = data_processor.filter_data(data)
         else:
-            self.output_data = output_data
+            self.data = data
 
 
 class ListOutput(BaseOutput):
@@ -318,16 +334,16 @@ class ListOutput(BaseOutput):
     """
     default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
 
-    def __init__(self, output_data, category='schema', columns_to_get=None, **kwargs):
+    def __init__(self, data, category='schema', columns_to_get=None, **kwargs):
         """
-        :param output_data: dict - schema
+        :param data: json like structure - schema, mapping, ...
         :param columns_to_get: string of column names to display in output separated by spaces
                                 default will use default_columns class attribute
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
-        self.mongo_schema_df = data_processor.mongo_schema_as_dataframe(
-            output_data,
+        self.data_df = data_processor.convert_to_dataframe(
+            data,
             columns_to_get.split(" ") if columns_to_get else self.default_columns)
 
 
@@ -337,13 +353,13 @@ class JsonOutput(HierarchicalOutput):
     """
     output_format = 'json'
 
-    def _opener(self):
+    def opener(self):
         """Use codecs module open function to support non ascii characters."""
         return partial(codecs.open, mode='w', encoding="utf-8")
 
-    def write_output_data(self, file_descr):
-        """Use json module dump function to write into file_descr (opened with _opener)."""
-        json.dump(self.output_data, file_descr, indent=4, ensure_ascii=False)
+    def write_data(self, file_descr):
+        """Use json module dump function to write into file_descr (opened with opener)."""
+        json.dump(self.data, file_descr, indent=4, ensure_ascii=False)
 
 
 class YamlOutput(HierarchicalOutput):
@@ -352,37 +368,37 @@ class YamlOutput(HierarchicalOutput):
     """
     output_format = 'yaml'
 
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """Use yaml module safe_dump function to write into file_descr."""
-        yaml.safe_dump(self.output_data, file_descr, default_flow_style=False, encoding='utf-8')
+        yaml.safe_dump(self.data, file_descr, default_flow_style=False, encoding='utf-8')
 
 
 class TxtOutput(ListOutput):
     """
-    Write data from self.mongo_schema_df as a table in text file, one table per Collection.
+    Write data from self.data_df as a table in text file, one table per Collection.
     """
     output_format = 'txt'
     default_columns = ['Field_compact_name', 'Field_name', 'Count', 'Percentage', 'Types_count']
 
-    def _opener(self):
+    def opener(self):
         """Use codecs module open function to support non ascii characters."""
         return partial(codecs.open, mode='w', encoding="utf-8")
 
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """
-        Format data from self.mongo_schema_df, write into file_descr (opened with _opener).
+        Format data from self.data_df, write into file_descr (opened with opener).
         """
         pd.options.display.max_colwidth = 1000
         formatters = dict()
-        for col in self.mongo_schema_df.columns:
-            col_len = self.mongo_schema_df[col].map(
+        for col in self.data_df.columns:
+            col_len = self.data_df[col].map(
                 lambda s: len(s) if isinstance(s, basestring) else len(str(s))).max()
             formatters[col] = u'{{:<{}}}'.format(col_len + 3).format
 
         output_str = ''
-        for db in self.mongo_schema_df.Database.unique():
+        for db in self.data_df.Database.unique():
             output_str += '\n### Database: {}\n'.format(db)
-            df_db = self.mongo_schema_df.query('Database == @db').iloc[:, 1:]
+            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
             for col in df_db.Collection.unique():
                 if col:
                     output_str += '--- Collection: {} \n'.format(col)
@@ -396,18 +412,18 @@ class TxtOutput(ListOutput):
 
 class CsvOutput(ListOutput):
     """
-    Write data from self.mongo_schema_df as a table in csv file.
+    Write data from self.data_df as a table in csv file.
     """
     output_format = 'csv'
 
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """Use dataframe to_csv method to write into file_descr."""
-        self.mongo_schema_df.to_csv(file_descr, sep='\t', index=False, encoding="utf-8")
+        self.data_df.to_csv(file_descr, sep='\t', index=False, encoding="utf-8")
 
 
 class HtmlOutput(ListOutput):
     """
-    Write data from self.mongo_schema_df as a table in html file, one table per collection.
+    Write data from self.data_df as a table in html file, one table per collection.
 
     Uses resources/data_dict.tmpl template.
     """
@@ -415,51 +431,51 @@ class HtmlOutput(ListOutput):
     default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                        'Percentage', 'Types_count']
 
-    def _opener(self):
+    def opener(self):
         """Use codecs module open function to support non ascii characters."""
         return partial(codecs.open, mode='w', encoding="utf-8")
 
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """
-        Format data from self.mongo_schema_df, write into file_descr (opened with _opener).
+        Format data from self.data_df, write into file_descr (opened with opener).
         """
-        mongo_schema_tmpl = OrderedDict()
-        for db in self.mongo_schema_df.Database.unique():
-            mongo_schema_tmpl[db] = OrderedDict()
-            df_db = self.mongo_schema_df.query('Database == @db').iloc[:, 1:]
+        tmpl_variables = OrderedDict()
+        for db in self.data_df.Database.unique():
+            tmpl_variables[db] = OrderedDict()
+            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
             for col in df_db.Collection.unique():
                 df_col = df_db.query('Collection == @col').iloc[:, 1:]
-                mongo_schema_tmpl[db][col] = df_col.values.tolist()
+                tmpl_variables[db][col] = df_col.values.tolist()
 
         tmpl_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                      'resources', 'data_dict.tmpl')
         with open(tmpl_filename) as tmpl_fd:
             tmpl = jinja2.Template(tmpl_fd.read())
 
-        file_descr.write(tmpl.render(col_titles=list(self.mongo_schema_df)[2:],
-                                     mongo_schema=mongo_schema_tmpl))
+        file_descr.write(tmpl.render(col_titles=list(self.data_df)[2:],
+                                     data=tmpl_variables))
 
 
 class MdOutput(ListOutput):
     """
-    Write data from self.mongo_schema_df as a table in markdown file, one table per Collection.
+    Write data from self.data_df as a table in markdown file, one table per Collection.
     """
     output_format = 'md'
     default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                        'Percentage', 'Types_count']
 
-    def _opener(self):
+    def opener(self):
         """Use codecs module open function to support non ascii characters."""
         return partial(codecs.open, mode='w', encoding="utf-8")
 
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """
-        Format data from self.mongo_schema_df, write into file_descr (opened with _opener).
+        Format data from self.data_df, write into file_descr (opened with opener).
         """
-        columns = list(self.mongo_schema_df.columns)[2:]  # skip Database and Collection
+        columns = list(self.data_df.columns)[2:]  # skip Database and Collection
         columns_length = []
         for col in columns:
-            columns_length.append(max(self.mongo_schema_df[col].map(
+            columns_length.append(max(self.data_df[col].map(
                 lambda s: len(s) if isinstance(s, basestring) else len(str(s))).max(),
                                       len(col)) + 5)
 
@@ -473,9 +489,9 @@ class MdOutput(ListOutput):
         str_column_names = self._make_line([format_column(col, col) for col in columns])
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
         output_str = []
-        for db in self.mongo_schema_df.Database.unique():
+        for db in self.data_df.Database.unique():
             output_str.append('\n### Database: {}\n'.format(db))
-            df_db = self.mongo_schema_df.query('Database == @db').iloc[:, 1:]
+            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
             for col in df_db.Collection.unique():
                 if col:
                     output_str.append('#### Collection: {} \n'.format(col))
@@ -494,19 +510,19 @@ class MdOutput(ListOutput):
 
 class XlsxOutput(ListOutput):
     """
-    Write data from self.mongo_schema_df as a table in csv file.
+    Write data from self.data_df as a table in csv file.
     """
     output_format = 'xlsx'
 
-    def _opener(self):
+    def opener(self):
         """
         Just return filename.
 
-        Write_output_data will manage the opening based on whether the file already exists
+        Write_data will manage the opening based on whether the file already exists
         """
         return lambda x: x
 
-    def write_output_data(self, file_descr):
+    def write_data(self, file_descr):
         """
         Use dataframe to_excel to write into file_descr (filename) - open first if file exists.
         """
@@ -517,12 +533,12 @@ class XlsxOutput(ListOutput):
             writer = pd.ExcelWriter(file_descr, engine='openpyxl')
             writer.book = book
             writer.sheets = dict((ws.title, ws) for ws in book.worksheets)
-            self.mongo_schema_df.to_excel(writer, sheet_name='Mongo_Schema', index=True,
-                                          float_format='%.2f')
+            self.data_df.to_excel(writer, sheet_name='Mongo_Schema', index=True,
+                                  float_format='%.2f')
             writer.save()
         else:
-            self.mongo_schema_df.to_excel(file_descr, sheet_name='Mongo_Schema', index=True,
-                                          float_format='%.2f')
+            self.data_df.to_excel(file_descr, sheet_name='Mongo_Schema', index=True,
+                                  float_format='%.2f')
 
 
 def rec_find_right_subclass(attribute_value, attribute='output_format', start_class=BaseOutput):
@@ -540,6 +556,7 @@ def rec_find_right_subclass(attribute_value, attribute='output_format', start_cl
 def write_output_dict(output_dict, arg):
     """
     Write output dictionary to file or standard output, with specific format described in arg
+
     :param output_dict: dict (schema or mapping)
     :param arg: dict (from docopt)
            if output_dict is schema
@@ -569,4 +586,4 @@ def write_output_dict(output_dict, arg):
                                                               columns_to_get=columns_to_get,
                                                               without_counts=without_counts)
         with output_maker.open(output_filename) as file_descr:
-            output_maker.write_output_data(file_descr)
+            output_maker.write_data(file_descr)
