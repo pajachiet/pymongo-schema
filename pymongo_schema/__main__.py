@@ -56,7 +56,7 @@ Options:
 
     --without-counts            Remove counts information from json and yaml outputs
 
-    --quiet                     Set logging level to WARN on standard output
+    --quiet                     Remove logging on standard output
 
     -h, --help                  show this usage information
 
@@ -124,13 +124,9 @@ def preprocess_arg(arg):
 
 def initialize_logger(arg):
     """ Initialize logging to standard output, if not quiet."""
-    logger.setLevel(logging.INFO)
-    logger.addHandler(logging.NullHandler())
-    steam_handler = logging.StreamHandler()
-    logger.addHandler(steam_handler)
-
-    if arg['--quiet']:
-        logger.setLevel(logging.WARN)
+    if not arg['--quiet']:
+        stream_handler = logging.StreamHandler()
+        logger.addHandler(stream_handler)
 
 
 def extract_schema(arg):
