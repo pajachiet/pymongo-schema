@@ -89,8 +89,11 @@ def extract_database_schema(pymongo_database, collection_names=None):
     if isinstance(collection_names, basestring):
         collection_names = [collection_names]
 
+    database_collections = pymongo_database.collection_names(include_system_collections=False)
     if collection_names is None:
-        collection_names = pymongo_database.collection_names(include_system_collections=False)
+        collection_names = database_collections
+    else:
+        collection_names = [col for col in collection_names if col in database_collections]
 
     database_schema = dict()
     for collection in collection_names:
