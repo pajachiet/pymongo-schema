@@ -1,29 +1,29 @@
 
 ### Database: db0
-|Hierarchy                            |In Schema                    |In Expected                   |
+|Hierarchy                            |Previous Schema              |New Schema                    |
 |-------------------------------------|-----------------------------|------------------------------|
 |                                     |db0                          |None                          |
 
 
 ### Database: db1
-|Hierarchy                            |In Schema                    |In Expected                   |
+|Hierarchy                            |Previous Schema              |New Schema                    |
 |-------------------------------------|-----------------------------|------------------------------|
 |                                     |None                         |db1                           |
 
 
 ### Database: db
 #### Collection: coll1 
-|Hierarchy                            |In Schema                    |In Expected                   |
+|Hierarchy                            |Previous Schema              |New Schema                    |
 |-------------------------------------|-----------------------------|------------------------------|
 |                                     |coll1                        |None                          |
 
 #### Collection: coll2 
-|Hierarchy                            |In Schema                    |In Expected                   |
+|Hierarchy                            |Previous Schema              |New Schema                    |
 |-------------------------------------|-----------------------------|------------------------------|
 |                                     |None                         |coll2                         |
 
 #### Collection: coll 
-|Hierarchy                            |In Schema                    |In Expected                   |
+|Hierarchy                            |Previous Schema              |New Schema                    |
 |-------------------------------------|-----------------------------|------------------------------|
 |                                     |field2                       |None                          |
 |                                     |None                         |field4                        |

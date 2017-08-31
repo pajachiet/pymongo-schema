@@ -158,19 +158,19 @@ class _DiffPreProcessing(OutputPreProcessing):
         table = []
         for d in data:
             if not d['hierarchy']:
-                db = d['schema'] or d['expected']
+                db = d['prev_schema'] or d['new_schema']
                 coll = ''
                 hierarchy = []
             else:
                 hierarchy = d['hierarchy'].split('.')
                 db = hierarchy.pop(0)
                 if not hierarchy:
-                    coll = d['schema'] or d['expected']
+                    coll = d['prev_schema'] or d['new_schema']
                 else:
                     coll = hierarchy.pop(0)
-            table.append([db, coll, '.'.join(hierarchy), d['schema'], d['expected']])
+            table.append([db, coll, '.'.join(hierarchy), d['prev_schema'], d['new_schema']])
 
-        header = ['Database', 'Collection', 'Hierarchy', 'In Schema', 'In Expected']
+        header = ['Database', 'Collection', 'Hierarchy', 'Previous Schema', 'New Schema']
         return pd.DataFrame(table, columns=header)
 
 

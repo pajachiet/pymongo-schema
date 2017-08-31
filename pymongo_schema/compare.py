@@ -4,7 +4,7 @@ This module intends to compare two mongo schemas (from extract module)
 """
 
 
-def compare_schemas_bases(schema, exp_schema, hierarchy=''):
+def compare_schemas_bases(prev_schema, new_schema, hierarchy=''):
     """
     Recursively compare the base structure of two schemas.
 
@@ -18,62 +18,62 @@ def compare_schemas_bases(schema, exp_schema, hierarchy=''):
 
     example:
     with inputs:
-    schema = {'db': {'coll': {'object': {'field1': {'type': 'string'}}}}}
-    exp_schema = {'db': {'coll': {'object': {'field1': {'type': 'integer'}}}}}
+    prev_schema = {'db': {'coll': {'object': {'field1': {'type': 'string'}}}}}
+    new_schema = {'db': {'coll': {'object': {'field1': {'type': 'integer'}}}}}
 
     result will be:
     [{'hierarchy': 'db.coll',
-      'schema': {'field1': {'type': 'string'}},
-      'exp_schema': {'field1': {'type': 'integer'}}}]
+      'prev_schema': {'field1': {'type': 'string'}},
+      'new_schema': {'field1': {'type': 'integer'}}}]
 
-    :param schema: dict - schema to be compared
-    :param exp_schema: dict - schema to compare to
+    :param prev_schema: dict - previous schema to compare to
+    :param new_schema: dict - new schema to be compared
     :param hierarchy: string - describe level of recursion (keep tracks of previous levels)
     :return: list of dicts describing differences
                 [{'hierarchy': db_name.coll_name,
-                  'schema': differing_value_in_schema,
-                  'expected': differing_value_in_exp_schema}]
+                  'prev_schema': differing_value_in_prev_schema,
+                  'new_schema': differing_value_in_new_schema}]
     """
     diff = []
 
-    additional_fields = set(schema) - set(exp_schema)
-    missing_fields = set(exp_schema) - set(schema)
+    additional_fields = set(new_schema) - set(prev_schema)
+    missing_fields = set(prev_schema) - set(new_schema)
 
     # manage additional / missing fields
-    for field in additional_fields:
-        diff.append({'hierarchy': hierarchy, 'schema': field, 'expected': None})
     for field in missing_fields:
-        diff.append({'hierarchy': hierarchy, 'schema': None, 'expected': field})
+        diff.append({'hierarchy': hierarchy, 'prev_schema': field, 'new_schema': None})
+    for field in additional_fields:
+        diff.append({'hierarchy': hierarchy, 'prev_schema': None, 'new_schema': field})
 
     # manage differences
-    for field in sorted(set(schema) & set(exp_schema)):
+    for field in sorted(set(prev_schema) & set(new_schema)):
         # manage initial case: field is db name and values are collections (not fields yet)
 
         if not hierarchy:
-            diff += compare_schemas_bases(schema[field], exp_schema[field], hierarchy=field)
+            diff += compare_schemas_bases(prev_schema[field], new_schema[field], hierarchy=field)
 
         # manage regular case (differences of fields type)
-        if schema[field].get('type') != exp_schema[field].get('type'):
+        if prev_schema[field].get('type') != new_schema[field].get('type'):
             diff.append({'hierarchy': '{}.{}'.format(hierarchy, field),
-                         'schema': {'type': schema[field]['type']},
-                         'expected': {'type': exp_schema[field]['type']}})
+                         'prev_schema': {'type': prev_schema[field]['type']},
+                         'new_schema': {'type': new_schema[field]['type']}})
 
         # manage array case (differences of fields array_type) only if both types are ARRAY
-        elif schema[field].get('array_type') != exp_schema[field].get('array_type'):
+        elif prev_schema[field].get('array_type') != new_schema[field].get('array_type'):
             diff.append({'hierarchy': '{}.{}'.format(hierarchy, field),
-                         'schema': {'array_type': schema[field]['array_type']},
-                         'expected': {'array_type': exp_schema[field]['array_type']}})
+                         'prev_schema': {'array_type': prev_schema[field]['array_type']},
+                         'new_schema': {'array_type': new_schema[field]['array_type']}})
 
         # recursion in case of nested object
-        if 'object' in schema[field] and 'object' in exp_schema[field]:
-            diff += compare_schemas_bases(schema[field]['object'],
-                                          exp_schema[field]['object'],
+        if 'object' in prev_schema[field] and 'object' in new_schema[field]:
+            diff += compare_schemas_bases(prev_schema[field]['object'],
+                                          new_schema[field]['object'],
                                           hierarchy='{}.{}'.format(hierarchy, field))
     return diff
 
 
 def is_retrocompatible(diff):
     for line in diff:
-        if line['schema'] is not None and line['expected'] is not None:
+        if line['prev_schema'] is not None and line['new_schema'] is not None:
             return False
     return True
