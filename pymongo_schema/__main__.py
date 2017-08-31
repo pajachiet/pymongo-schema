@@ -6,7 +6,7 @@ pymongo-schema extract schemas from MongoDB
 
 Usage:
     pymongo_schema  -h | --help
-    pymongo_schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
+    pymongo_schema  extract [--database=DB... --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
     pymongo_schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
     pymongo_schema  tosql [--input=FILENAME --output=FILENAME --quiet]
 
@@ -16,7 +16,7 @@ Commands:
     tosql                       Create a mapping from mongo schema to relational schema (json input and output)
 
 Options:
-    -d --database DB            Only analyze this database.
+    -d --database DB            Only analyze those databases.
                                 By default analyze all databases in Mongo instance
 
     -c --collection COL         Only analyze this collection.
