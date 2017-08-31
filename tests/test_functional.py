@@ -59,7 +59,7 @@ def test01_extract():
 def test02_transform():
     base_output = "output_fctl_data_dict"
     outputs = {}
-    extensions = ["txt", 'html', 'xlsx', 'csv', 'md']
+    extensions = ['html', 'xlsx', 'tsv', 'md']
     for ext in extensions:
         outputs[ext] = "{}.{}".format(base_output, ext)
 
@@ -69,8 +69,7 @@ def test02_transform():
     argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
     main(argv)
 
-    assert filecmp.cmp(outputs['txt'], "{}.txt".format(exp))
-    assert filecmp.cmp(outputs['csv'], "{}.csv".format(exp))
+    assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
     assert filecmp.cmp(outputs['md'], "{}.md".format(exp))
     with open(outputs['html']) as out_fd, \
             open("{}.html".format(exp)) as exp_fd:
@@ -85,7 +84,7 @@ def test02_transform():
 def test03_transform_filter():
     base_output = "output_fctl_data_dict_filtered"
     outputs = {}
-    extensions = ["txt", 'html', 'xlsx', 'csv', 'md']
+    extensions = ['html', 'xlsx', 'tsv', 'md']
     for ext in extensions:
         outputs[ext] = "{}.{}".format(base_output, ext)
 
@@ -97,8 +96,7 @@ def test03_transform_filter():
     argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
     main(argv)
 
-    assert filecmp.cmp(outputs['txt'], "{}.txt".format(exp))
-    assert filecmp.cmp(outputs['csv'], "{}.csv".format(exp))
+    assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
     assert filecmp.cmp(outputs['md'], "{}.md".format(exp))
     with open(outputs['html']) as out_fd, \
             open("{}.html".format(exp)) as exp_fd:
@@ -113,7 +111,7 @@ def test03_transform_filter():
 def test04_transform_default_cols():
     base_output = "output_fctl_data_dict_default"
     outputs = {}
-    extensions = ["txt", 'html', 'xlsx', 'csv', 'md']
+    extensions = ['html', 'xlsx', 'tsv', 'md']
     for ext in extensions:
         outputs[ext] = "{}.{}".format(base_output, ext)
 
@@ -122,8 +120,7 @@ def test04_transform_default_cols():
     argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
     main(argv)
 
-    assert filecmp.cmp(outputs['txt'], "{}.txt".format(exp))
-    assert filecmp.cmp(outputs['csv'], "{}.csv".format(exp))
+    assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
     assert filecmp.cmp(outputs['md'], "{}.md".format(exp))
     with open(outputs['html']) as out_fd, \
             open("{}.html".format(exp)) as exp_fd:

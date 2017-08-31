@@ -185,17 +185,6 @@ def test12_mongo_schema_as_dataframe_long(long_full_schema):
 
 # INTEGRATION LIKE TESTS
 
-def test01_write_txt(schema_ex_df):
-    output = os.path.join(TEST_DIR, 'output_data_dict.txt')
-    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
-    output_maker = TxtOutput({})
-    output_maker.mongo_schema_df = schema_ex_df.copy()
-    with open(output, 'w') as out_fd:
-        output_maker.write_output_data(out_fd)
-    assert filecmp.cmp(output, expected_file)
-    os.remove(output)
-    
-
 def test02_write_md(schema_ex_df):
     output = os.path.join(TEST_DIR, 'output_data_dict.md')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.md')
@@ -228,16 +217,6 @@ def test04_write_xlsx(schema_ex_df):
     res = [cell.value for row in load_workbook(output).active for cell in row]
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
     assert res == exp
-    os.remove(output)
-    
-
-def test05_write_output_dict_schema_txt(schema_ex_dict, columns):
-    output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.txt')
-    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.txt')
-    arg = {'--format': ['txt', 'txt'], '--output': output,
-           '--columns': " ".join(columns)}
-    write_output_dict(schema_ex_dict, arg)
-    assert filecmp.cmp(output, expected_file)
     os.remove(output)
     
 
@@ -307,7 +286,7 @@ def test12_write_output_dict_schema_non_ascii(columns):
     base_output = "output_fctl_data_dict"
     outputs = {}
     # WARNING: xlsx not actually tested
-    extensions = ['txt', 'json', 'html', 'csv', 'xlsx', 'md']
+    extensions = ['json', 'html', 'tsv', 'xlsx', 'md']
     for ext in extensions:
         outputs[ext] = "{}.{}".format(base_output, ext)
     input_file = os.path.join(TEST_DIR, 'resources', 'input',

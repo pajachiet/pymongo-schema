@@ -32,11 +32,11 @@ Options:
     -o , --output FILENAME      Output file for schema. Default to standard output.
                                 Extension added automatically if omitted (useful for multi-format outputs)
 
-    -f , --format FORMAT        Output format for schema : 'txt', 'csv', 'xlsx', 'yaml', 'html', 'md' or 'json'
+    -f , --format FORMAT        Output format for schema :  'tsv', 'xlsx', 'yaml', 'html', 'md' or 'json'
                                 Multiple format may be specified. [default: json]
                                 Note : Output format for mongo to sql mapping is json
 
-    --columns HEADER            String listing columns to get in 'txt', 'csv', 'html', 'md' or 'xlsx' format.
+    --columns HEADER            String listing columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
                                 Columns are to be chosen in :
                                     FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays
                                     FIELD_COMPACT_NAME      idem, without parent object names
@@ -48,9 +48,8 @@ Options:
                                     PERCENTAGE
                                     TYPES_COUNT
                                 Columns have to be separated by whitespace, and are case insensitive.
-                                Default for 'txt' output is "Field_compact_name Field_name Count Percentage Types_count"
                                 Default for 'html' and 'md' output is "Field_compact_name Field_name Full_name Description Count Percentage Types_count"
-                                Default for 'csv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
+                                Default for 'tsv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
 
     -n, --filter FILENAME       Config file to read namespace to filter. json format expected.
 
@@ -117,9 +116,9 @@ def preprocess_arg(arg):
 
     if arg['--output'] is None and 'xlsx' in arg['--format']:
         logger.warn("WARNING : xlsx format is not supported on standard output. "
-                    "Switching to csv output.")
+                    "Switching to tsv output.")
         arg['--format'].remove('xlsx')
-        arg['--format'].append('csv')
+        arg['--format'].append('tsv')
 
 
 def initialize_logger(arg):
