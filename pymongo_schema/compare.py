@@ -73,7 +73,20 @@ def compare_schemas_bases(prev_schema, new_schema, hierarchy=''):
 
 
 def is_retrocompatible(diff):
+    """
+    Determine whether diff between schema is retrocompatible (won't break the process).
+
+    It is considered retrocompatible if:
+    - a field (or collection or database) has been added
+
+    It is considered NOT retrocompatible if:
+    - a field (or collection or database) has been removed
+    - a field has been modified
+
+    :param diff: list of dicts containing differences between two schemas (compare_schemas_bases)
+    :return: boolean
+    """
     for line in diff:
-        if line['prev_schema'] is not None and line['new_schema'] is not None:
+        if line['prev_schema'] is not None:
             return False
     return True

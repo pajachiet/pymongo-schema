@@ -98,14 +98,29 @@ def test03_compare_schema_nested():
 
 
 def test04_is_retrocompatible_true():
-    diff = [{'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None},
-            {'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
-            {'hierarchy': 'db', 'prev_schema': 'coll1', 'new_schema': None},
+    diff = [{'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
             {'hierarchy': 'db', 'prev_schema': None, 'new_schema': 'coll2'},
-            {'hierarchy': 'db.coll', 'prev_schema': 'field2', 'new_schema': None},
             {'hierarchy': 'db.coll', 'prev_schema': None, 'new_schema': 'field4'},
             {'hierarchy': 'db.coll.field', 'prev_schema': None, 'new_schema': 'subfield'}]
     assert is_retrocompatible(diff)
+
+
+def test05_is_retrocompatible_false_deleted_field():
+    diff = [{'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
+            {'hierarchy': 'db', 'prev_schema': None, 'new_schema': 'coll2'},
+            {'hierarchy': 'db.coll', 'prev_schema': None, 'new_schema': 'field4'},
+            {'hierarchy': 'db.coll.field', 'prev_schema': None, 'new_schema': 'subfield'},
+            {'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None}]
+    assert not is_retrocompatible(diff)
+
+
+def test06_is_retrocompatible_false_type_modif():
+    diff = [{'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
+            {'hierarchy': 'db', 'prev_schema': None, 'new_schema': 'coll2'},
+            {'hierarchy': 'db.coll', 'prev_schema': None, 'new_schema': 'field4'},
+            {'hierarchy': 'db.coll.field', 'prev_schema': None, 'new_schema': 'subfield'},
+            {'hierarchy': '', 'prev_schema': {'type': 'integer'}, 'new_schema': {'type': 'string'}}]
+    assert not is_retrocompatible(diff)
 
 
 def test05_is_retrocompatible_false(long_diff):
