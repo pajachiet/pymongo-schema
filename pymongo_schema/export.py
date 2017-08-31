@@ -417,7 +417,7 @@ class HtmlOutput(ListOutput):
     Uses resources/data_dict.tmpl template.
     """
     output_format = 'html'
-    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+    default_columns = ['Field_compact_name', 'Field_name', 'Count',
                        'Percentage', 'Types_count']
 
     def opener(self):
@@ -450,7 +450,7 @@ class MdOutput(ListOutput):
     Write data from self.data_df as a table in markdown file, one table per Collection.
     """
     output_format = 'md'
-    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+    default_columns = ['Field_compact_name', 'Field_name', 'Count',
                        'Percentage', 'Types_count']
 
     def opener(self):

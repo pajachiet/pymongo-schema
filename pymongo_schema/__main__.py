@@ -43,7 +43,7 @@ Options:
 
     --category FORMAT           Category of input (schema | mapping | diff) [default: schema]
 
-    --columns HEADER            String listing columns to get in 'txt', 'csv', 'html', 'md' or 'xlsx' format.
+    --columns HEADER            String listing columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
                                 Columns are to be chosen in :
                                     FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays
                                     FIELD_COMPACT_NAME      idem, without parent object names
@@ -55,7 +55,7 @@ Options:
                                     PERCENTAGE
                                     TYPES_COUNT
                                 Columns have to be separated by whitespace, and are case insensitive.
-                                Default for 'html' and 'md' output is "Field_compact_name Field_name Full_name Description Count Percentage Types_count"
+                                Default for 'html' and 'md' output is "Field_compact_name Field_name Count Percentage Types_count"
                                 Default for 'tsv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
 
     -n, --filter FILENAME       Config file to read namespace to filter. json format expected.
