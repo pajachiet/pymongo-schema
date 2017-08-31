@@ -14,22 +14,22 @@ def df_columns():
 
 @pytest.fixture(scope='module')
 def long_diff():
-    return [{'hierarchy': '', 'schema': 'db0', 'expected': None},
-            {'hierarchy': '', 'schema': None, 'expected': 'db1'},
-            {'hierarchy': 'db', 'schema': 'coll1', 'expected': None},
-            {'hierarchy': 'db', 'schema': None, 'expected': 'coll2'},
-            {'hierarchy': 'db.coll', 'schema': 'field2', 'expected': None},
-            {'hierarchy': 'db.coll', 'schema': None, 'expected': 'field4'},
-            {'hierarchy': 'db.coll.field3', 'schema': {'type': 'boolean'},
-             'expected': {'type': 'string'}},
+    return [{'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None},
+            {'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
+            {'hierarchy': 'db', 'prev_schema': 'coll1', 'new_schema': None},
+            {'hierarchy': 'db', 'prev_schema': None, 'new_schema': 'coll2'},
+            {'hierarchy': 'db.coll', 'prev_schema': 'field2', 'new_schema': None},
+            {'hierarchy': 'db.coll', 'prev_schema': None, 'new_schema': 'field4'},
+            {'hierarchy': 'db.coll.field3', 'prev_schema': {'type': 'boolean'},
+             'new_schema': {'type': 'string'}},
             {'hierarchy': 'db.coll.field.array_subfield',
-             'schema': None, 'expected': 'subsubfield2'},
+             'prev_schema': None, 'new_schema': 'subsubfield2'},
             {'hierarchy': 'db.coll.field.array_subfield.subsubfield',
-             'schema': {'type': 'integer'}, 'expected': {'type': 'boolean'}},
-            {'hierarchy': 'db.coll.field5', 'schema': {'array_type': 'string'},
-             'expected': {'array_type': 'integer'}},
-            {'hierarchy': 'db.coll.field6', 'schema': {'type': 'ARRAY'},
-             'expected': {'type': 'string'}}]
+             'prev_schema': {'type': 'integer'}, 'new_schema': {'type': 'boolean'}},
+            {'hierarchy': 'db.coll.field5', 'prev_schema': {'array_type': 'string'},
+             'new_schema': {'array_type': 'integer'}},
+            {'hierarchy': 'db.coll.field6', 'prev_schema': {'type': 'ARRAY'},
+             'new_schema': {'type': 'string'}}]
 
 
 def test00_compare_schemas_bases_very_simple():
@@ -38,22 +38,22 @@ def test00_compare_schemas_bases_very_simple():
 
 
 def test01_compare_schemas_bases_diff_keys():
-    schema = {'db': {'coll': {'object': {
+    prev_schema = {'db': {'coll': {'object': {
         'field1': {'type': 'string', 'description': 'a_description'}}}}}
-    exp_schema = {'db': {'coll': {'object': {
+    new_schema = {'db': {'coll': {'object': {
         'field1': {'type': 'string', 'types_count': {'string': 1}}}}}}
-    assert compare_schemas_bases(schema, exp_schema) == []
+    assert compare_schemas_bases(prev_schema, new_schema) == []
 
 
 def test02_compare_schemas_bases_simple_diff():
-    schema = {'db': {'coll': {'object': {'field1': {'type': 'string'},
-                                         'field2': {'type': 'integer'},
-                                         'field3': {'type': 'boolean'},
-                                         'field5': {'type': 'ARRAY', 'array_type': 'string'},
-                                         'field6': {'type': 'ARRAY', 'array_type': 'string'}}},
-                     'coll1': {}},
-              'db0': {}}
-    exp_schema = {'db': {'coll': {'object': {'field1': {'type': 'string', 'count': 1},
+    prev_schema = {'db': {'coll': {'object': {'field1': {'type': 'string'},
+                                              'field2': {'type': 'integer'},
+                                              'field3': {'type': 'boolean'},
+                                              'field5': {'type': 'ARRAY', 'array_type': 'string'},
+                                              'field6': {'type': 'ARRAY', 'array_type': 'string'}}},
+                          'coll1': {}},
+                   'db0': {}}
+    new_schema = {'db': {'coll': {'object': {'field1': {'type': 'string', 'count': 1},
                                              'field3': {'type': 'string'},
                                              'field4': {'type': 'boolean'},
                                              'field5': {'type': 'ARRAY', 'array_type': 'integer'},
@@ -61,50 +61,50 @@ def test02_compare_schemas_bases_simple_diff():
                                              }},
                          'coll2': {}},
                   'db1': {}}
-    exp_diff = [{'hierarchy': '', 'schema': 'db0', 'expected': None},
-                {'hierarchy': '', 'schema': None, 'expected': 'db1'},
-                {'hierarchy': 'db', 'schema': 'coll1', 'expected': None},
-                {'hierarchy': 'db', 'schema': None, 'expected': 'coll2'},
-                {'hierarchy': 'db.coll', 'schema': 'field2', 'expected': None},
-                {'hierarchy': 'db.coll', 'schema': None, 'expected': 'field4'},
-                {'hierarchy': 'db.coll.field3', 'schema': {'type': 'boolean'},
-                 'expected': {'type': 'string'}},
-                {'hierarchy': 'db.coll.field5', 'schema': {'array_type': 'string'},
-                 'expected': {'array_type': 'integer'}},
-                {'hierarchy': 'db.coll.field6', 'schema': {'type': 'ARRAY'},
-                 'expected': {'type': 'string'}}]
-    res = compare_schemas_bases(schema, exp_schema)
+    exp_diff = [{'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None},
+                {'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
+                {'hierarchy': 'db', 'prev_schema': 'coll1', 'new_schema': None},
+                {'hierarchy': 'db', 'prev_schema': None, 'new_schema': 'coll2'},
+                {'hierarchy': 'db.coll', 'prev_schema': 'field2', 'new_schema': None},
+                {'hierarchy': 'db.coll', 'prev_schema': None, 'new_schema': 'field4'},
+                {'hierarchy': 'db.coll.field3', 'prev_schema': {'type': 'boolean'},
+                 'new_schema': {'type': 'string'}},
+                {'hierarchy': 'db.coll.field5', 'prev_schema': {'array_type': 'string'},
+                 'new_schema': {'array_type': 'integer'}},
+                {'hierarchy': 'db.coll.field6', 'prev_schema': {'type': 'ARRAY'},
+                 'new_schema': {'type': 'string'}}]
+    res = compare_schemas_bases(prev_schema, new_schema)
     assert res == exp_diff
 
 
 def test03_compare_schema_nested():
-    schema = {'db': {'coll': {'object': {
+    prev_schema = {'db': {'coll': {'object': {
         'field': {'type': 'ARRAY', 'array_type': 'OBJECT', 'object': {
             'array_subfield': {'type': 'OBJECT', 'object': {
                 'subsubfield': {'type': 'integer'}
             }}}}}}}}
-    exp_schema = {'db': {'coll': {'object': {
+    new_schema = {'db': {'coll': {'object': {
         'field': {'type': 'ARRAY', 'array_type': 'OBJECT', 'object': {
             'array_subfield': {'type': 'OBJECT', 'object': {
                 'subsubfield': {'type': 'boolean'},
                 'subsubfield2': {'type': 'boolean'}
             }}}}}}}}
     exp_diff = [{'hierarchy': 'db.coll.field.array_subfield',
-                 'schema': None, 'expected': 'subsubfield2'},
+                 'prev_schema': None, 'new_schema': 'subsubfield2'},
                 {'hierarchy': 'db.coll.field.array_subfield.subsubfield',
-                 'schema': {'type': 'integer'}, 'expected': {'type': 'boolean'}}]
-    res = compare_schemas_bases(schema, exp_schema)
+                 'prev_schema': {'type': 'integer'}, 'new_schema': {'type': 'boolean'}}]
+    res = compare_schemas_bases(prev_schema, new_schema)
     assert res == exp_diff
 
 
 def test04_is_retrocompatible_true():
-    diff = [{'hierarchy': '', 'schema': 'db0', 'expected': None},
-            {'hierarchy': '', 'schema': None, 'expected': 'db1'},
-            {'hierarchy': 'db', 'schema': 'coll1', 'expected': None},
-            {'hierarchy': 'db', 'schema': None, 'expected': 'coll2'},
-            {'hierarchy': 'db.coll', 'schema': 'field2', 'expected': None},
-            {'hierarchy': 'db.coll', 'schema': None, 'expected': 'field4'},
-            {'hierarchy': 'db.coll.field', 'schema': None, 'expected': 'subfield'}]
+    diff = [{'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None},
+            {'hierarchy': '', 'prev_schema': None, 'new_schema': 'db1'},
+            {'hierarchy': 'db', 'prev_schema': 'coll1', 'new_schema': None},
+            {'hierarchy': 'db', 'prev_schema': None, 'new_schema': 'coll2'},
+            {'hierarchy': 'db.coll', 'prev_schema': 'field2', 'new_schema': None},
+            {'hierarchy': 'db.coll', 'prev_schema': None, 'new_schema': 'field4'},
+            {'hierarchy': 'db.coll.field', 'prev_schema': None, 'new_schema': 'subfield'}]
     assert is_retrocompatible(diff)
 
 

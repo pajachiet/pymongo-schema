@@ -72,7 +72,7 @@ def columns():
 
 @pytest.fixture(scope='module')
 def diff_columns():
-    return ['Database', 'Collection', 'Hierarchy', 'In Schema', 'In Expected']
+    return ['Database', 'Collection', 'Hierarchy', 'Previous Schema', 'New Schema']
 
 
 @pytest.fixture(scope='module')
@@ -335,7 +335,7 @@ def test12_write_output_dict_schema_non_ascii(columns):
 
 def test13_schema_diff_to_df_simple(diff_columns):
     res = _DiffPreProcessing.convert_to_dataframe(
-        [{'hierarchy': '', 'schema': 'db0', 'expected': None}])
+        [{'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None}])
     exp = pd.DataFrame([['db0', '', '', 'db0', None]],
                        columns=diff_columns)
     assert_frame_equal(res, exp)
