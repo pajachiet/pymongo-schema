@@ -417,10 +417,12 @@ class TxtOutput(ListOutput):
         pd.options.display.max_colwidth = 1000
         formatters = dict()
         for col in self.data_df.columns:
+            # calculate columns length: max len of its elements
             col_len = self.data_df[col].map(
                 lambda s: len(s) if isinstance(s, basestring) else len(str(s))).max()
-            formatters[col] = u'{{:<{}}}'.format(col_len + 3).format
-
+            # prepare a method to apply on each element of the column so they have the same length
+            formatters[col] = partial(
+                lambda x, y: u'{{:<{}}}'.format(y + 3).format(u'{}'.format(x)), y=col_len)
         output_str = ''
         for db in self.data_df.Database.unique():
             output_str += '\n### Database: {}\n'.format(db)
@@ -510,7 +512,8 @@ class MdOutput(ListOutput):
             col_length = columns_length[columns.index(col_name)]
             if repeat:
                 return value * col_length
-            return u'{{:<{}}}'.format(col_length).format(value if value is not None else str(value))
+            return u'{{:<{}}}'.format(col_length).format(
+                u'{}'.format(value if value is not None else str(value)))
 
         str_column_names = self._make_line([format_column(col, col) for col in columns])
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
