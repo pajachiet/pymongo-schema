@@ -154,7 +154,7 @@ class _DiffPreProcessing(OutputPreProcessing):
 
     @classmethod
     def convert_to_dataframe(cls, data, **kwargs):
-        """"""
+        """Transform data (list of dicts) into a dataframe."""
         table = []
         for d in data:
             if not d['hierarchy']:
