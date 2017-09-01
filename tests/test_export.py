@@ -355,12 +355,3 @@ def test16_schema_diff_to_md(long_diff):
     write_output_dict(long_diff, arg)
     assert filecmp.cmp(output_file, expected_file)
     os.remove(output_file)
-
-
-def test17_schema_diff_to_txt(long_diff):
-    output_file = os.path.join(TEST_DIR, 'output_test_diff.txt')
-    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'schema_diff.txt')
-    arg = {'--format': ['txt'], '--output': output_file, '--category': 'diff'}
-    write_output_dict(long_diff, arg)
-    assert filecmp.cmp(output_file, expected_file)
-    os.remove(output_file)
