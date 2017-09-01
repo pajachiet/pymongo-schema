@@ -20,6 +20,6 @@ before_script:
 script:
   - mongo test_db --eval 'db.test_col.count() == 25359;'
   - python setup.py install
-  - py.test tests
+  - py.test --cov=pymongo_schema tests
 after_success:
   - coveralls
