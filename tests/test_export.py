@@ -355,3 +355,12 @@ def test16_schema_diff_to_md(long_diff):
     write_output_dict(long_diff, arg)
     assert filecmp.cmp(output_file, expected_file)
     os.remove(output_file)
+
+
+def test17_mapping_to_tsv(mapping_ex_dict):
+    output_file = os.path.join(TEST_DIR, 'output_mapping.tsv')
+    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.tsv')
+    arg = {'--format': ['tsv'], '--output': output_file, '--category': 'mapping'}
+    write_output_dict(mapping_ex_dict, arg)
+    assert filecmp.cmp(output_file, expected_file)
+    os.remove(output_file)

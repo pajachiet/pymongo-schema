@@ -20,7 +20,6 @@ They intend to preprocess data as this is common to each group of output.
 They use OutputPreProcessing class to deal with this preprocessing.
 This class is a factory that will allow to use the right preprocessing methods
 depending on the category treated (schema, mapping, ...).
-ListOutput defines a default_columns class attribute that can be overridden as well.
 
 Then those base classes are used (inherited from) to define each format:
 JsonOutput, YamlOutput, TsvOutput, HtmlOutput, MdOutput, XlsxOutput
@@ -119,6 +118,7 @@ class OutputPreProcessing(object):
 
     Abstract methods to override:
     property category: string - specifies what category the child is managing (schema, mapping, ...)
+    property default_columns: list - name of columns to display in table like outputs
     convert_to_dataframe: convert data into a dataframe - used for list outputs
 
     Public method that can be overridden:
@@ -132,9 +132,21 @@ class OutputPreProcessing(object):
         """String - category to manage (schema, mapping, ...)"""
         pass
 
+    @property
+    @abc.abstractmethod
+    def default_columns(self):
+        """List of names of columns to display."""
+        pass
+
     def __new__(cls, category):
         return object.__new__(rec_find_right_subclass(category, attribute='category',
                                                       start_class=cls))
+
+    @classmethod
+    def find_columns_to_get(cls, columns_to_get):
+        if columns_to_get:
+            return columns_to_get
+        return cls.default_columns
 
     @classmethod
     @abc.abstractmethod
@@ -146,6 +158,34 @@ class OutputPreProcessing(object):
     def filter_data(cls, data):
         """Basic method just return data - can be overridden to filter (return json)"""
         return data
+
+
+class MappingPreProcessing(OutputPreProcessing):
+    """Preprocess 'mapping' data from to_sql module"""
+    category = 'mapping'
+    default_columns = ['Field_name', 'Description', 'Type']
+
+    @classmethod
+    def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
+        columns_to_get = cls.find_columns_to_get(columns_to_get)
+        lines = []
+        for db in sorted(data):
+            for table in sorted(data[db]):
+                lines += cls._table_dict_to_lines(db, table, data[db][table])
+
+        header = ['Database', 'Table'] + columns_to_get
+        return pd.DataFrame(lines, columns=header)
+
+    @classmethod
+    def _table_dict_to_lines(cls, db_name, table_name, table_dict):
+        lines = []
+        for field_name, field_dict in sorted(table_dict.items(), key=lambda x: x[0]):
+            if field_name in ['_id', 'pk']:
+                continue
+            field_name = field_dict['dest'] if 'dest' in field_dict else field_name
+            field_descr = field_dict.get('description')
+            lines.append([db_name, table_name, field_name, field_descr, field_dict['type']])
+        return lines
 
 
 class _DiffPreProcessing(OutputPreProcessing):
@@ -177,6 +217,7 @@ class _DiffPreProcessing(OutputPreProcessing):
 class _SchemaPreProcessing(OutputPreProcessing):
     """Prepocess mongo schema"""
     category = 'schema'
+    default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
 
     @classmethod
     def filter_data(cls, data):
@@ -199,6 +240,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
         Load schema (data) into dataframe, filtering on columns_to_get (column names list).
         """
         line_tuples = list()
+        columns_to_get = cls.find_columns_to_get(columns_to_get)
         for database, database_schema in sorted(list(data.items())):
             for collection, collection_schema in sorted(list(database_schema.items())):
                 collection_line_tuples = cls._object_schema_to_line_tuples(
@@ -357,8 +399,12 @@ class HierarchicalOutput(BaseOutput):
 class ListOutput(BaseOutput):
     """
     Abstract base class. Preprocessing for outputs with a table like format.
+
+    Class attribute:
+    default_columns: allow to override PreProcessing class default_columns
+                        {category: [default_columns]}
     """
-    default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
+    default_columns = {}
 
     def __init__(self, data, category='schema', columns_to_get=None, **kwargs):
         """
@@ -368,9 +414,12 @@ class ListOutput(BaseOutput):
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
-        self.data_df = data_processor.convert_to_dataframe(
-            data,
-            columns_to_get=columns_to_get.split(" ") if columns_to_get else self.default_columns)
+        if columns_to_get:
+            columns_to_get = columns_to_get.split(" ")
+        else:
+            columns_to_get = self.default_columns.get(category)
+
+        self.data_df = data_processor.convert_to_dataframe(data, columns_to_get=columns_to_get)
 
 
 class JsonOutput(HierarchicalOutput):
@@ -417,8 +466,9 @@ class HtmlOutput(ListOutput):
     Uses resources/data_dict.tmpl template.
     """
     output_format = 'html'
-    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
-                       'Percentage', 'Types_count']
+    default_columns = {
+        'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+                   'Percentage', 'Types_count']}
 
     def opener(self):
         """Use codecs module open function to support non ascii characters."""
@@ -428,12 +478,13 @@ class HtmlOutput(ListOutput):
         """
         Format data from self.data_df, write into file_descr (opened with opener).
         """
+        columns = self.data_df.columns
         tmpl_variables = OrderedDict()
         for db in self.data_df.Database.unique():
             tmpl_variables[db] = OrderedDict()
-            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
+            df_db = self.data_df.query('{} == @db'.format(columns[0])).iloc[:, 1:]
             for col in df_db.Collection.unique():
-                df_col = df_db.query('Collection == @col').iloc[:, 1:]
+                df_col = df_db.query('{} == @col'.format(columns[1])).iloc[:, 1:]
                 tmpl_variables[db][col] = df_col.values.tolist()
 
         tmpl_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -450,8 +501,9 @@ class MdOutput(ListOutput):
     Write data from self.data_df as a table in markdown file, one table per Collection.
     """
     output_format = 'md'
-    default_columns = ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
-                       'Percentage', 'Types_count']
+    default_columns = {
+        'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+                   'Percentage', 'Types_count']}
 
     def opener(self):
         """Use codecs module open function to support non ascii characters."""
@@ -461,7 +513,9 @@ class MdOutput(ListOutput):
         """
         Format data from self.data_df, write into file_descr (opened with opener).
         """
-        columns = list(self.data_df.columns)[2:]  # skip Database and Collection
+        columns = list(self.data_df.columns)
+        col0 = columns.pop(0)
+        col1 = columns.pop(0)
         columns_length = []
         for col in columns:
             columns_length.append(max(self.data_df[col].map(
@@ -480,12 +534,12 @@ class MdOutput(ListOutput):
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
         output_str = []
         for db in self.data_df.Database.unique():
-            output_str.append('\n### Database: {}\n'.format(db))
-            df_db = self.data_df.query('Database == @db').iloc[:, 1:]
+            output_str.append('\n### {}: {}\n'.format(col0, db))
+            df_db = self.data_df.query('{} == @db'.format(col0)).iloc[:, 1:]
             for col in df_db.Collection.unique():
                 if col:
-                    output_str.append('#### Collection: {} \n'.format(col))
-                df_col = df_db.query('Collection == @col').iloc[:, 1:]
+                    output_str.append('#### {}: {} \n'.format(col1, col))
+                df_col = df_db.query('{} == @col'.format(col1)).iloc[:, 1:]
                 output_str.append("\n".join([str_column_names, str_sep_header] +
                                             [self._make_line([format_column(columns[i], value)
                                                               for i, value in enumerate(line)])
