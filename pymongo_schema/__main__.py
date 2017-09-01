@@ -111,6 +111,7 @@ def main(argv=None):
 
     # Compare two schemas
     if arg['compare']:
+        arg['--category'] = 'diff'
         output_dict = compare_schemas(arg)
 
     # Output dict
