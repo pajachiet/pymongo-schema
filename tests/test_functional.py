@@ -142,3 +142,28 @@ def test05_tosql():
     with open(output) as out_fd, open(exp) as exp_fd:
         assert json.load(out_fd) == json.load(exp_fd)
     os.remove(output)
+
+
+def test06_compare():
+    base_output = "output_fctl_diff"
+    outputs = {}
+    extensions = ['html', 'xlsx', 'tsv', 'md']
+    for ext in extensions:
+        outputs[ext] = "{}.{}".format(base_output, ext)
+
+    exp = os.path.join(TEST_DIR, 'resources', 'functional', 'expected', 'diff')
+    exp_schema = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema2.json')
+    argv = ['compare', '--input', SCHEMA_FILE, '--output', base_output, '--expected', exp_schema]
+    argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
+    main(argv)
+
+    assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
+    assert filecmp.cmp(outputs['md'], "{}.md".format(exp))
+    with open(outputs['html']) as out_fd, \
+            open("{}.html".format(exp)) as exp_fd:
+        assert out_fd.read().replace(' ', '') == exp_fd.read().replace(' ', '')
+    res = [cell.value for row in load_workbook(outputs['xlsx']).active for cell in row]
+    exp = [cell.value for row in load_workbook("{}.xlsx".format(exp)).active for cell in row]
+    assert res == exp
+    for output in outputs.values():
+        os.remove(output)

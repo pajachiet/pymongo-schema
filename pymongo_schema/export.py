@@ -26,6 +26,7 @@ JsonOutput, YamlOutput, TsvOutput, HtmlOutput, MdOutput, XlsxOutput
 """
 import abc
 import codecs
+import csv
 import json
 import logging
 import os
@@ -159,6 +160,16 @@ class OutputPreProcessing(object):
         """Basic method just return data - can be overridden to filter (return json)"""
         return data
 
+    @staticmethod
+    def printable_value(value):
+        """Helper to manage how to display objects (use json.dumps if possible)"""
+        if value and not isinstance(value, basestring):
+            try:
+                return json.dumps(value)
+            except ValueError:
+                return str(value)
+        return value
+
 
 class MappingPreProcessing(OutputPreProcessing):
     """Preprocess 'mapping' data from to_sql module"""
@@ -208,7 +219,10 @@ class _DiffPreProcessing(OutputPreProcessing):
                     coll = d['prev_schema'] or d['new_schema']
                 else:
                     coll = hierarchy.pop(0)
-            table.append([db, coll, '.'.join(hierarchy), d['prev_schema'], d['new_schema']])
+
+            table.append([db, coll, '.'.join(hierarchy),
+                          cls.printable_value(d['prev_schema']),
+                          cls.printable_value(d['new_schema'])])
 
         header = ['Database', 'Collection', 'Hierarchy', 'Previous Schema', 'New Schema']
         return pd.DataFrame(table, columns=header)
@@ -456,7 +470,8 @@ class TsvOutput(ListOutput):
 
     def write_data(self, file_descr):
         """Use dataframe to_csv method to write into file_descr."""
-        self.data_df.to_csv(file_descr, sep='\t', index=False, encoding="utf-8")
+        self.data_df.to_csv(file_descr, sep='\t', index=False, encoding="utf-8",
+                            quoting=csv.QUOTE_NONE)
 
 
 class HtmlOutput(ListOutput):
@@ -527,8 +542,7 @@ class MdOutput(ListOutput):
             col_length = columns_length[columns.index(col_name)]
             if repeat:
                 return value * col_length
-            return u'{{:<{}}}'.format(col_length).format(
-                u'{}'.format(value if value is not None else str(value)))
+            return u'{{:<{}}}'.format(col_length).format(u'{}'.format(value))
 
         str_column_names = self._make_line([format_column(col, col) for col in columns])
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])

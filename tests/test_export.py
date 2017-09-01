@@ -328,13 +328,13 @@ def test14_schema_diff_to_df_long(long_diff, diff_columns):
                         ['db', 'coll2', '', None, 'coll2'],
                         ['db', 'coll', '', 'field2', None],
                         ['db', 'coll', '', None, 'field4'],
-                        ['db', 'coll', 'field3', {'type': 'boolean'}, {'type': 'string'}],
+                        ['db', 'coll', 'field3', '{"type": "boolean"}', '{"type": "string"}'],
                         ['db', 'coll', 'field.array_subfield', None, 'subsubfield2'],
-                        ['db', 'coll', 'field.array_subfield.subsubfield', {'type': 'integer'},
-                         {'type': 'boolean'}],
-                        ['db', 'coll', 'field5', {'array_type': 'string'},
-                         {'array_type': 'integer'}],
-                        ['db', 'coll', 'field6', {'type': 'ARRAY'}, {'type': 'string'}]],
+                        ['db', 'coll', 'field.array_subfield.subsubfield', '{"type": "integer"}',
+                         '{"type": "boolean"}'],
+                        ['db', 'coll', 'field5', '{"array_type": "string"}',
+                         '{"array_type": "integer"}'],
+                        ['db', 'coll', 'field6', '{"type": "ARRAY"}', '{"type": "string"}']],
                        columns=diff_columns)
     assert_frame_equal(res, exp)
 

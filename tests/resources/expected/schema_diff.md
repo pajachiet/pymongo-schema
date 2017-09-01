@@ -27,9 +27,9 @@
 |-------------------------------------|-----------------------------|------------------------------|
 |                                     |field2                       |None                          |
 |                                     |None                         |field4                        |
-|field3                               |{'type': 'boolean'}          |{'type': 'string'}            |
+|field3                               |{"type": "boolean"}          |{"type": "string"}            |
 |field.array_subfield                 |None                         |subsubfield2                  |
-|field.array_subfield.subsubfield     |{'type': 'integer'}          |{'type': 'boolean'}           |
-|field5                               |{'array_type': 'string'}     |{'array_type': 'integer'}     |
-|field6                               |{'type': 'ARRAY'}            |{'type': 'string'}            |
+|field.array_subfield.subsubfield     |{"type": "integer"}          |{"type": "boolean"}           |
+|field5                               |{"array_type": "string"}     |{"array_type": "integer"}     |
+|field6                               |{"type": "ARRAY"}            |{"type": "string"}            |
 
