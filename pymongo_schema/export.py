@@ -172,23 +172,30 @@ class _MappingPreProcessing(OutputPreProcessing):
 
     @classmethod
     def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
+        columns_to_get = columns_to_get or cls.default_columns
         lines = []
         for db in sorted(data):
             for table in sorted(data[db]):
-                lines += cls._table_dict_to_lines(db, table, data[db][table])
+                lines += cls._table_dict_to_lines(db, table, data[db][table], columns_to_get)
 
         header = ['Database', 'Table'] + columns_to_get
         return pd.DataFrame(lines, columns=header)
 
     @classmethod
-    def _table_dict_to_lines(cls, db_name, table_name, table_dict):
+    def _table_dict_to_lines(cls, db_name, table_name, table_dict, columns_to_get):
+        # 'f' for field
+        column_functions = {
+            'field_name': lambda f_name, f_dict: f_dict['dest'] if 'dest' in f_dict else f_name,
+            'description': lambda f_name, f_dict: f_dict.get('description'),
+            'type': lambda f_name, f_dict: f_dict['type'],
+        }
         lines = []
         for field_name, field_dict in sorted(table_dict.items(), key=lambda x: x[0]):
             if field_name in ['_id', 'pk']:
                 continue
-            field_name = field_dict['dest'] if 'dest' in field_dict else field_name
-            field_descr = field_dict.get('description')
-            lines.append([db_name, table_name, field_name, field_descr, field_dict['type']])
+            lines.append([db_name, table_name] +
+                         [column_functions[col_name.lower()](field_name, field_dict)
+                          for col_name in columns_to_get])
         return lines
 
 
@@ -198,8 +205,14 @@ class _DiffPreProcessing(OutputPreProcessing):
     default_columns = ['Hierarchy', 'Previous Schema', 'New Schema']
 
     @classmethod
-    def convert_to_dataframe(cls, data, **kwargs):
+    def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
         """Transform data (list of dicts) into a dataframe."""
+        column_functions = {
+            'hierarchy': lambda diff, hierarchy: '.'.join(hierarchy),
+            'previous_schema': lambda diff, hierarchy: cls.printable_value(diff['prev_schema']),
+            'new_schema': lambda diff, hierarchy: cls.printable_value(diff['new_schema']),
+        }
+        columns_to_get = columns_to_get or cls.default_columns
         table = []
         for d in data:
             if not d['hierarchy']:
@@ -214,11 +227,11 @@ class _DiffPreProcessing(OutputPreProcessing):
                 else:
                     coll = hierarchy.pop(0)
 
-            table.append([db, coll, '.'.join(hierarchy),
-                          cls.printable_value(d['prev_schema']),
-                          cls.printable_value(d['new_schema'])])
+            table.append([db, coll] +
+                         [column_functions[col_name.lower().replace(" ", "_")](d, hierarchy)
+                          for col_name in columns_to_get])
 
-        header = ['Database', 'Collection'] + cls.default_columns
+        header = ['Database', 'Collection'] + columns_to_get
         return pd.DataFrame(table, columns=header)
 
 
@@ -247,6 +260,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
         """
         Load schema (data) into dataframe, filtering on columns_to_get (column names list).
         """
+        columns_to_get = columns_to_get or cls.default_columns
         line_tuples = list()
         for database, database_schema in sorted(list(data.items())):
             for collection, collection_schema in sorted(list(database_schema.items())):
