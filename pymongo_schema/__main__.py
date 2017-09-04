@@ -16,7 +16,7 @@ from time import time
 import pymongo
 
 from pymongo_schema.compare import compare_schemas_bases
-from pymongo_schema.export import write_output_dict, HtmlOutput, _SchemaPreProcessing
+from pymongo_schema.export import write_output_dict, HtmlOutput, TsvOutput
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.filter import filter_mongo_schema_namespaces
 from pymongo_schema.tosql import mongo_schema_to_mapping
@@ -64,8 +64,8 @@ def add_subparser_transform(subparsers, parent_parsers):
                            Columns have to be separated by whitespace, and are case insensitive.
                            Default for 'html' and 'md' output is {}
                            Default for 'tsv' and 'xlsx' output is {}'''.format(
-                               HtmlOutput.default_columns['schema'],
-                               _SchemaPreProcessing.default_columns))
+                               HtmlOutput.get_default_columns()['schema'],
+                               TsvOutput.get_default_columns()['schema']))
     subparser.add_argument('--without-counts', action='store_true',
                            help='Remove counts information from json and yaml outputs')
 

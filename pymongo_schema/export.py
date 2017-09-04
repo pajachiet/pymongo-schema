@@ -144,12 +144,6 @@ class OutputPreProcessing(object):
                                                       start_class=cls))
 
     @classmethod
-    def find_columns_to_get(cls, columns_to_get):
-        if columns_to_get:
-            return columns_to_get
-        return cls.default_columns
-
-    @classmethod
     @abc.abstractmethod
     def convert_to_dataframe(cls, data, **kwargs):
         """Create a dataframe from data"""
@@ -171,14 +165,13 @@ class OutputPreProcessing(object):
         return value
 
 
-class MappingPreProcessing(OutputPreProcessing):
+class _MappingPreProcessing(OutputPreProcessing):
     """Preprocess 'mapping' data from to_sql module"""
     category = 'mapping'
     default_columns = ['Field_name', 'Description', 'Type']
 
     @classmethod
     def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
-        columns_to_get = cls.find_columns_to_get(columns_to_get)
         lines = []
         for db in sorted(data):
             for table in sorted(data[db]):
@@ -202,6 +195,7 @@ class MappingPreProcessing(OutputPreProcessing):
 class _DiffPreProcessing(OutputPreProcessing):
     """Preprocess 'diff' data from compare module"""
     category = 'diff'
+    default_columns = ['Hierarchy', 'Previous Schema', 'New Schema']
 
     @classmethod
     def convert_to_dataframe(cls, data, **kwargs):
@@ -224,7 +218,7 @@ class _DiffPreProcessing(OutputPreProcessing):
                           cls.printable_value(d['prev_schema']),
                           cls.printable_value(d['new_schema'])])
 
-        header = ['Database', 'Collection', 'Hierarchy', 'Previous Schema', 'New Schema']
+        header = ['Database', 'Collection'] + cls.default_columns
         return pd.DataFrame(table, columns=header)
 
 
@@ -254,7 +248,6 @@ class _SchemaPreProcessing(OutputPreProcessing):
         Load schema (data) into dataframe, filtering on columns_to_get (column names list).
         """
         line_tuples = list()
-        columns_to_get = cls.find_columns_to_get(columns_to_get)
         for database, database_schema in sorted(list(data.items())):
             for collection, collection_schema in sorted(list(database_schema.items())):
                 collection_line_tuples = cls._object_schema_to_line_tuples(
@@ -415,21 +408,29 @@ class ListOutput(BaseOutput):
     Abstract base class. Preprocessing for outputs with a table like format.
 
     Class attribute:
-    default_columns: allow to override PreProcessing class default_columns
+    _default_columns: allow to override PreProcessing class default_columns
                         {category: [default_columns]}
     """
-    default_columns = {}
+    _default_columns = {}
+
+    @classmethod
+    def get_default_columns(cls):
+        """List default columns by category"""
+        return {
+            'schema': cls._default_columns.get('schema', _SchemaPreProcessing.default_columns),
+            'mapping': cls._default_columns.get('mapping', _MappingPreProcessing.default_columns),
+            'diff': cls._default_columns.get('diff', _DiffPreProcessing.default_columns)}
 
     def __init__(self, data, category='schema', columns_to_get=None, **kwargs):
         """
         :param data: json like structure - schema, mapping, ...
-        :param columns_to_get: string of column names to display in output separated by spaces
+        :param columns_to_get: list - column names to display in output
                                 default will use default_columns class attribute
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
         if not columns_to_get:
-            columns_to_get = self.default_columns.get(category)
+            columns_to_get = self.get_default_columns()[category]
 
         self.data_df = data_processor.convert_to_dataframe(data, columns_to_get=columns_to_get)
 
@@ -479,7 +480,7 @@ class HtmlOutput(ListOutput):
     Uses resources/data_dict.tmpl template.
     """
     output_format = 'html'
-    default_columns = {
+    _default_columns = {
         'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                    'Percentage', 'Types_count']}
 
@@ -516,7 +517,7 @@ class MdOutput(ListOutput):
     Write data from self.data_df as a table in markdown file, one table per Collection.
     """
     output_format = 'md'
-    default_columns = {
+    _default_columns = {
         'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                    'Percentage', 'Types_count']}
 
