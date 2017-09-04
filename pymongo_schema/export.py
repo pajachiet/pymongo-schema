@@ -612,40 +612,30 @@ def rec_find_right_subclass(attribute_value, attribute='output_format', start_cl
     return None
 
 
-def write_output_dict(output_dict, arg):
+def transform_data_to_file(data, formats, output=None, category='schema', **kwargs):
     """
-    Write output dictionary to file or standard output, with specific format described in arg
+    Transform data into each of output_formats and write result to output_filename or stdout.
 
-    :param output_dict: dict (schema or mapping)
-    :param arg: dict (from docopt)
-           if output_dict is schema
-               {'--format': str in 'json', 'yaml', 'tsv', 'html', 'md' or 'xlsx',
-                '--output': str full path to file where formatted output will be saved saved
-                            (default is std out),
-                '--columns': list of columns to display in the output not used for json and yaml}
-           if output_dict is mapping
-               {'--format': str in 'json', 'yaml',
-                '--output': same as for schema (path to file where output will be saved saved),
-                '--columns': unused but key must exist,
-                '--without-counts': bool to display counts in output}
-           additional field not fully managed yet --category schema | diff
+    :param data: dict (schema, mapping or diff)
+    :param formats: list of str - extensions of output desired among:
+                            'json', 'yaml' (hierarchical formats)
+                            'tsv', 'html', 'md' or 'xlsx' (list like formats)
+    :param output: str full path to file where formatted output will be saved saved
+                            (default is std out)
+    :param category: string in 'schema', 'mapping', 'diff' - describe input data
+    :param kwargs: may contain additional specific arguments
+           columns: list of columns to display in the output for list like formats
+           without_counts: bool to display count fields in output for hierarchical formats
     """
-    output_formats = arg['format']
-    output_filename = arg['output']
-    columns_to_get = arg.get('columns', None)
-    without_counts = arg.get('without-counts', False)
-    category = arg.get('category', 'schema')
-
-    wrong_formats = set(output_formats) - {'tsv', 'xlsx', 'json', 'yaml', 'html', 'md'}
+    wrong_formats = set(formats) - {'tsv', 'xlsx', 'json', 'yaml', 'html', 'md'}
 
     if wrong_formats:
         raise ValueError("Output format should be tsv, xlsx, html, md, json or yaml. "
                          "{} is/are not supported".format(wrong_formats))
 
-    for output_format in output_formats:
-        output_maker = rec_find_right_subclass(output_format)(output_dict,
-                                                              columns_to_get=columns_to_get,
-                                                              without_counts=without_counts,
-                                                              category=category)
-        with output_maker.open(output_filename) as file_descr:
+    for output_format in formats:
+        output_maker = rec_find_right_subclass(output_format)(
+            data, category=category,
+            columns_to_get=kwargs.get('columns'), without_counts=kwargs.get('without_counts'))
+        with output_maker.open(output) as file_descr:
             output_maker.write_data(file_descr)

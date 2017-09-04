@@ -16,7 +16,7 @@ from time import time
 import pymongo
 
 from pymongo_schema.compare import compare_schemas_bases
-from pymongo_schema.export import write_output_dict, HtmlOutput, TsvOutput
+from pymongo_schema.export import transform_data_to_file, HtmlOutput, TsvOutput
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.filter import filter_mongo_schema_namespaces
 from pymongo_schema.tosql import mongo_schema_to_mapping
@@ -92,8 +92,8 @@ def main(argv=None):
             Useful for usage from another python program.
     """
     parent_parser = ArgumentParser(add_help=False)
-    parent_parser.add_argument('-f', '--format', nargs='*', default=['json'],
-                               help="Output format for schema :  "
+    parent_parser.add_argument('-f', '--formats', nargs='*', default=['json'],
+                               help="List Output formats:  "
                                     "'tsv', 'xlsx', 'yaml', 'html', 'md' or 'json'"
                                     "Multiple format may be specified. [default: json]")
     parent_parser.add_argument('-o', '--output',
@@ -135,18 +135,18 @@ def main(argv=None):
     # Output dict
     logger.info('=== Write output')
     if output_dict:
-        write_output_dict(output_dict, vars(args))
+        transform_data_to_file(output_dict, **vars(args))
     else:
         logger.warn("WARNING : output is empty, we do not write any file.")
 
 
 def preprocess_arg(arg):
     """ Preprocess arguments from command line."""
-    if arg.output is None and 'xlsx' in arg.format:
+    if arg.output is None and 'xlsx' in arg.formats:
         logger.warn("WARNING : xlsx format is not supported on standard output. "
                     "Switching to tsv output.")
-        arg.format.remove('xlsx')
-        arg.format.append('tsv')
+        arg.formats.remove('xlsx')
+        arg.formats.append('tsv')
 
 
 def initialize_logger(arg):

@@ -66,7 +66,7 @@ def test02_transform():
     argv = ['transform', SCHEMA_FILE, '--output', base_output, '--columns',
             'Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count', 'Percentage',
             'Types_count',
-            '--format'] + extensions
+            '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
@@ -94,7 +94,7 @@ def test03_transform_filter():
             '--filter', namespace, '--columns',
             'Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count', 'Percentage',
             'Types_count',
-            '--format'] + extensions
+            '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
@@ -117,7 +117,7 @@ def test04_transform_default_cols():
         outputs[ext] = "{}.{}".format(base_output, ext)
 
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict_default')
-    argv = ['transform', SCHEMA_FILE, '--output', base_output, '--format'] + extensions
+    argv = ['transform', SCHEMA_FILE, '--output', base_output, '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
@@ -153,7 +153,7 @@ def test06_compare():
 
     exp = os.path.join(TEST_DIR, 'resources', 'functional', 'expected', 'diff')
     exp_schema = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema2.json')
-    argv = ['compare', SCHEMA_FILE, exp_schema, '--output', base_output, '--format'] + extensions
+    argv = ['compare', SCHEMA_FILE, exp_schema, '--output', base_output, '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
