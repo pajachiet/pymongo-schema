@@ -428,9 +428,7 @@ class ListOutput(BaseOutput):
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
-        if columns_to_get:
-            columns_to_get = columns_to_get.split(" ")
-        else:
+        if not columns_to_get:
             columns_to_get = self.default_columns.get(category)
 
         self.data_df = data_processor.convert_to_dataframe(data, columns_to_get=columns_to_get)
@@ -494,12 +492,14 @@ class HtmlOutput(ListOutput):
         Format data from self.data_df, write into file_descr (opened with opener).
         """
         columns = self.data_df.columns
+        col0 = columns[0]  # First column title (usually Database)
+        col1 = columns[1]  # Second column title (usually Collection or Table)
         tmpl_variables = OrderedDict()
-        for db in self.data_df.Database.unique():
+        for db in self.data_df[col0].unique():
             tmpl_variables[db] = OrderedDict()
-            df_db = self.data_df.query('{} == @db'.format(columns[0])).iloc[:, 1:]
-            for col in df_db.Collection.unique():
-                df_col = df_db.query('{} == @col'.format(columns[1])).iloc[:, 1:]
+            df_db = self.data_df.query('{} == @db'.format(col0)).iloc[:, 1:]
+            for col in df_db[col1].unique():
+                df_col = df_db.query('{} == @col'.format(col1)).iloc[:, 1:]
                 tmpl_variables[db][col] = df_col.values.tolist()
 
         tmpl_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -529,8 +529,8 @@ class MdOutput(ListOutput):
         Format data from self.data_df, write into file_descr (opened with opener).
         """
         columns = list(self.data_df.columns)
-        col0 = columns.pop(0)
-        col1 = columns.pop(0)
+        col0 = columns.pop(0)       # First column title (usually Database)
+        col1 = columns.pop(0)       # Second column title (usually Collection or Table)
         columns_length = []
         for col in columns:
             columns_length.append(max(self.data_df[col].map(
@@ -547,10 +547,10 @@ class MdOutput(ListOutput):
         str_column_names = self._make_line([format_column(col, col) for col in columns])
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
         output_str = []
-        for db in self.data_df.Database.unique():
+        for db in self.data_df[col0].unique():
             output_str.append('\n### {}: {}\n'.format(col0, db))
             df_db = self.data_df.query('{} == @db'.format(col0)).iloc[:, 1:]
-            for col in df_db.Collection.unique():
+            for col in df_db[col1].unique():
                 if col:
                     output_str.append('#### {}: {} \n'.format(col1, col))
                 df_col = df_db.query('{} == @col'.format(col1)).iloc[:, 1:]

@@ -231,7 +231,7 @@ def test04_write_xlsx(schema_ex_df):
 def test06_write_output_dict_schema_md(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.md')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.md')
-    arg = {'format': ['md'], 'output': output, 'columns': " ".join(columns)}
+    arg = {'format': ['md'], 'output': output, 'columns': columns}
     write_output_dict(schema_ex_dict, arg)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
@@ -240,7 +240,7 @@ def test06_write_output_dict_schema_md(schema_ex_dict, columns):
 def test07_write_output_dict_schema_html(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.html')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
-    arg = {'format': ['html'], 'output': output, 'columns': " ".join(columns)}
+    arg = {'format': ['html'], 'output': output, 'columns': columns}
     write_output_dict(schema_ex_dict, arg)
     with open(output) as out_fd, open(expected_file) as exp_fd:
         assert out_fd.read().replace(' ', '') == exp_fd.read().replace(' ', '')
@@ -250,7 +250,7 @@ def test07_write_output_dict_schema_html(schema_ex_dict, columns):
 def test08_write_output_dict_schema_xlsx(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.xlsx')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
-    arg = {'format': ['xlsx'], 'output': output, 'columns': " ".join(columns)}
+    arg = {'format': ['xlsx'], 'output': output, 'columns': columns}
     write_output_dict(schema_ex_dict, arg)
     res = [cell.value for row in load_workbook(output).active for cell in row]
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
@@ -293,7 +293,7 @@ def test12_write_output_dict_schema_non_ascii(columns):
         outputs[ext] = "{}.{}".format(base_output, ext)
     input_file = os.path.join(TEST_DIR, 'resources', 'input',
                               'test_schema_fr.json')
-    arg = {'format': extensions, 'output': base_output, 'columns': " ".join(columns),
+    arg = {'format': extensions, 'output': base_output, 'columns':columns,
            'without-counts': False}
     with open(input_file) as f:
         schema_fr = json.loads(f.read())

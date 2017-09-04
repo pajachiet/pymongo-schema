@@ -16,7 +16,7 @@ from time import time
 import pymongo
 
 from pymongo_schema.compare import compare_schemas_bases
-from pymongo_schema.export import write_output_dict
+from pymongo_schema.export import write_output_dict, HtmlOutput, _SchemaPreProcessing
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.filter import filter_mongo_schema_namespaces
 from pymongo_schema.tosql import mongo_schema_to_mapping
@@ -41,13 +41,17 @@ def add_subparser_extract(subparsers, parent_parsers):
 def add_subparser_transform(subparsers, parent_parsers):
     subparser = subparsers.add_parser('transform', parents=parent_parsers)
     subparser.add_argument('input', nargs='?',
-                           help='json formatted input file. Default to standard input')
+                           help='json formatted input file (schema, mapping, ...). '
+                                '[default standard input]')
+    subparser.add_argument('--category', default='schema',
+                           help='category of input (schema, mapping, diff) [default schema]')
     subparser.add_argument('-n', '--filter',
-                           help='Config file to read namespace to filter. json format expected.')
-    subparser.add_argument('--columns',
+                           help='Config file to read namespace to filter for schema input. '
+                                'json format expected.')
+    subparser.add_argument('--columns', nargs='+',
                            help='''
-                           String listing columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
-                           Columns are to be chosen in :
+                           Columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
+                           For schema, columns are to be chosen in :
                                FIELD_FULL_NAME ('.' for subfields, ':' for subfields in arrays)
                                FIELD_COMPACT_NAME (idem, without parent object names)
                                FIELD_NAME
@@ -58,10 +62,10 @@ def add_subparser_transform(subparsers, parent_parsers):
                                PERCENTAGE
                                TYPES_COUNT
                            Columns have to be separated by whitespace, and are case insensitive.
-                           Default for 'html' and 'md' output is "Field_compact_name Field_name 
-                           Full_name Description Count Percentage Types_count"
-                           Default for 'tsv' and 'xlsx' output is "Field_full_name Depth 
-                           Field_name Type"''')
+                           Default for 'html' and 'md' output is {}
+                           Default for 'tsv' and 'xlsx' output is {}'''.format(
+                               HtmlOutput.default_columns['schema'],
+                               _SchemaPreProcessing.default_columns))
     subparser.add_argument('--without-counts', action='store_true',
                            help='Remove counts information from json and yaml outputs')
 
@@ -121,7 +125,7 @@ def main(argv=None):
     # Map mongo schema to sql
     if args.command == 'tosql':
         output_dict = schema_to_sql(args)
-        args.format = ['json']
+        args.category = 'mapping'
 
     # Compare two schemas
     if args.command == 'compare':
@@ -178,8 +182,7 @@ def transform_schema(arg):
     """
     logger.info('=== Transform existing mongo schema (filter, new format, and/or select infos)')
     input_schema = load_input_schema(arg)
-    namespace = arg.filter
-    if namespace is not None:
+    if arg.filter is not None:
         with open(arg.filter, 'r') as f:
             config = json.load(f)
         output_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])

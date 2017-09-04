@@ -64,7 +64,8 @@ def test02_transform():
 
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict')
     argv = ['transform', SCHEMA_FILE, '--output', base_output, '--columns',
-            'Field_compact_name Field_name Full_name Description Count Percentage Types_count',
+            'Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count', 'Percentage',
+            'Types_count',
             '--format'] + extensions
     main(argv)
 
@@ -91,7 +92,8 @@ def test03_transform_filter():
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict_filtered')
     argv = ['transform', SCHEMA_FILE, '--output', base_output,
             '--filter', namespace, '--columns',
-            'Field_compact_name Field_name Full_name Description Count Percentage Types_count',
+            'Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count', 'Percentage',
+            'Types_count',
             '--format'] + extensions
     main(argv)
 
