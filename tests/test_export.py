@@ -81,8 +81,8 @@ def schema_ex_df(schema_ex_dict, columns):
 
 
 def test00_field_compact_name():
-    assert _SchemaPreProcessing._field_compact_name('baz', None, 'foo.bar:') == ' .  : baz'
-    assert _SchemaPreProcessing._field_compact_name('baz', None, 'foo.foo.bar:') == ' .  .  : baz'
+    assert _SchemaPreProcessing._field_compact_name(None, 'baz', 'foo.bar:') == ' .  : baz'
+    assert _SchemaPreProcessing._field_compact_name(None, 'baz', 'foo.foo.bar:') == ' .  .  : baz'
 
 
 def test01_field_depth():
@@ -94,9 +94,9 @@ def test01_field_depth():
 
 
 def test02_field_type():
-    assert _SchemaPreProcessing._field_type(None, {'type': 'string'}, None) == 'string'
+    assert _SchemaPreProcessing._field_type({'type': 'string'}, None, None) == 'string'
     assert _SchemaPreProcessing._field_type(
-        None, {'type': 'ARRAY', 'array_type': 'string'}, None) == 'ARRAY(string)'
+        {'type': 'ARRAY', 'array_type': 'string'}, None, None) == 'ARRAY(string)'
 
 
 def test03_format_types_count():

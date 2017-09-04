@@ -34,6 +34,7 @@ import re
 import sys
 from contextlib import contextmanager
 from functools import partial
+from numbers import Number
 
 import yaml
 import jinja2
@@ -122,8 +123,15 @@ class OutputPreProcessing(object):
     property default_columns: list - name of columns to display in table like outputs
     convert_to_dataframe: convert data into a dataframe - used for list outputs
 
+    Public method that should be overridden:
+    columns_values_makers: dict - indicate how to extract data for each columns
+
     Public method that can be overridden:
     filter_data: preprocess (filter) output data for hierarchical outputs
+
+    Public methods that should not be overridden:
+    regularize_column_name: reformat column name to fill columns_values_makers format
+    make_column_value: use columns_values_makers to extract column data
     """
     __metaclass__ = abc.ABCMeta
 
@@ -144,6 +152,24 @@ class OutputPreProcessing(object):
                                                       start_class=cls))
 
     @classmethod
+    def columns_values_makers(cls):
+        """{column snake case name: function to extract columns data}"""
+        return {}
+
+    @classmethod
+    def regularize_column_name(cls, column_name):
+        """Column names are stored snake case."""
+        return column_name.lower().replace(" ", "_")
+
+    @classmethod
+    def make_column_value(cls, column, data, *infos):
+        """Call the right function in columns_values_makers to make column value based on infos."""
+        column = cls.regularize_column_name(column)
+        if column in cls.columns_values_makers():
+            return cls.printable_value(cls.columns_values_makers()[column](data, *infos))
+        return cls.printable_value(data.get(column))
+
+    @classmethod
     @abc.abstractmethod
     def convert_to_dataframe(cls, data, **kwargs):
         """Create a dataframe from data"""
@@ -157,12 +183,12 @@ class OutputPreProcessing(object):
     @staticmethod
     def printable_value(value):
         """Helper to manage how to display objects (use json.dumps if possible)"""
-        if value and not isinstance(value, basestring):
-            try:
-                return json.dumps(value)
-            except ValueError:
-                return str(value)
-        return value
+        if isinstance(value, (Number, basestring, type(None))):
+            return value
+        try:
+            return json.dumps(value)
+        except ValueError:
+            return str(value)
 
 
 class _MappingPreProcessing(OutputPreProcessing):
@@ -171,7 +197,17 @@ class _MappingPreProcessing(OutputPreProcessing):
     default_columns = ['Field_name', 'Description', 'Type']
 
     @classmethod
+    def columns_values_makers(cls):
+        """How to extract columns data based on field mapping and field name"""
+        return {
+            # f for field
+            'field_name': lambda f_dict, f_name: f_dict['dest'] if 'dest' in f_dict else f_name,
+            'type': lambda f_dict, f_name: f_dict['type'],
+        }
+
+    @classmethod
     def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
+        """Transform data (mapping dict) into a dataframe."""
         columns_to_get = columns_to_get or cls.default_columns
         lines = []
         for db in sorted(data):
@@ -183,18 +219,13 @@ class _MappingPreProcessing(OutputPreProcessing):
 
     @classmethod
     def _table_dict_to_lines(cls, db_name, table_name, table_dict, columns_to_get):
-        # 'f' for field
-        column_functions = {
-            'field_name': lambda f_name, f_dict: f_dict['dest'] if 'dest' in f_dict else f_name,
-            'description': lambda f_name, f_dict: f_dict.get('description'),
-            'type': lambda f_name, f_dict: f_dict['type'],
-        }
+        """Transform mapping table dict into a list, filtering on columns_to_get."""
         lines = []
         for field_name, field_dict in sorted(table_dict.items(), key=lambda x: x[0]):
             if field_name in ['_id', 'pk']:
                 continue
             lines.append([db_name, table_name] +
-                         [column_functions[col_name.lower()](field_name, field_dict)
+                         [cls.make_column_value(col_name, field_dict, field_name)
                           for col_name in columns_to_get])
         return lines
 
@@ -205,14 +236,18 @@ class _DiffPreProcessing(OutputPreProcessing):
     default_columns = ['Hierarchy', 'Previous Schema', 'New Schema']
 
     @classmethod
+    def columns_values_makers(cls):
+        """How to extract columns data based on diff dict and hierarchy"""
+        return {
+            'hierarchy': lambda diff, hierarchy: '.'.join(hierarchy),
+            'previous_schema': lambda diff, hierarchy: diff['prev_schema']
+        }
+
+    @classmethod
     def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
         """Transform data (list of dicts) into a dataframe."""
-        column_functions = {
-            'hierarchy': lambda diff, hierarchy: '.'.join(hierarchy),
-            'previous_schema': lambda diff, hierarchy: cls.printable_value(diff['prev_schema']),
-            'new_schema': lambda diff, hierarchy: cls.printable_value(diff['new_schema']),
-        }
         columns_to_get = columns_to_get or cls.default_columns
+
         table = []
         for d in data:
             if not d['hierarchy']:
@@ -228,7 +263,7 @@ class _DiffPreProcessing(OutputPreProcessing):
                     coll = hierarchy.pop(0)
 
             table.append([db, coll] +
-                         [column_functions[col_name.lower().replace(" ", "_")](d, hierarchy)
+                         [cls.make_column_value(col_name, d, hierarchy)
                           for col_name in columns_to_get])
 
         header = ['Database', 'Collection'] + columns_to_get
@@ -239,6 +274,20 @@ class _SchemaPreProcessing(OutputPreProcessing):
     """Prepocess mongo schema"""
     category = 'schema'
     default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
+
+    @classmethod
+    def columns_values_makers(cls):
+        """How to extract columns data based on field schema, name and prefix."""
+        return {  # 'f' for field
+            'field_full_name': lambda f_schema, f, f_prefix: f_prefix + f,
+            'field_compact_name': cls._field_compact_name,
+            'field_name': lambda f_schema, f, f_prefix: f,
+            'depth': cls._field_depth,
+            'type': cls._field_type,
+            'percentage': lambda f_schema, f, f_prefix: 100 * f_schema['prop_in_object'],
+            'types_count': lambda f_schema, f, f_prefix: cls._format_types_count(
+                f_schema['types_count'], f_schema.get('array_types_count', None)),
+        }
 
     @classmethod
     def filter_data(cls, data):
@@ -310,67 +359,50 @@ class _SchemaPreProcessing(OutputPreProcessing):
         return line_tuples
 
     @classmethod
-    def _field_schema_to_columns(cls, field, field_schema, field_prefix, columns_to_get):
+    def _field_schema_to_columns(cls, field_name, field_schema, field_prefix, columns_to_get):
         """ Given fields information, returns a tuple representing columns_to_get.
 
-        :param field:
+        :param field_name:
         :param field_schema:
         :param field_prefix: str, default ''
         :param columns_to_get: iterable
             columns to create for each field
         :return field_columns: tuple
         """
-        # 'f' for field
-        column_functions = {
-            'field_full_name': lambda f, f_schema, f_prefix: f_prefix + f,
-            'field_compact_name': cls._field_compact_name,
-            'field_name': lambda f, f_schema, f_prefix: f,
-            'depth': cls._field_depth,
-            'type': cls._field_type,
-            'percentage': lambda f, f_schema, f_prefix: 100 * f_schema['prop_in_object'],
-            'types_count': lambda f, f_schema, f_prefix: cls._format_types_count(
-                f_schema['types_count'], f_schema.get('array_types_count', None)),
-        }
-
         field_columns = list()
         for column in columns_to_get:
-            column = column.lower()
-            if column not in column_functions:
-                column_str = field_schema.get(column, None)
-            else:
-                column_str = column_functions[column](field, field_schema, field_prefix)
-            field_columns.append(column_str)
+            field_columns.append(cls.make_column_value(column, field_schema, field_name, field_prefix))
 
         return tuple(field_columns)
 
-    @classmethod
-    def _field_compact_name(cls, field, field_schema, field_prefix):
+    @staticmethod
+    def _field_compact_name(field_schema, field_name, field_prefix):
         """ Return a compact version of field name, without parent object names.
 
-        >>> field_compact_name('baz', None, 'foo.bar:')
+        >>> field_compact_name(None, 'baz', 'foo.bar:')
         " .  : baz"
         """
         separators = re.sub('[^.:]', '', field_prefix)
         separators = re.sub('\.', ' . ', separators)
         separators = re.sub(':', ' : ', separators)
-        return separators + field
+        return separators + field_name
 
-    @classmethod
-    def _field_depth(cls, field, field_schema, field_prefix):
+    @staticmethod
+    def _field_depth(field_schema, field_name, field_prefix):
         """ Return the level of imbrication of a field."""
         separators = re.sub('[^.:]', '', field_prefix)
         return len(separators)
 
-    @classmethod
-    def _field_type(cls, field, field_schema, field_prefix):
+    @staticmethod
+    def _field_type(field_schema, field_name, field_prefix):
         """ Return a string describing the type of a field."""
         f_type = field_schema['type']
         if f_type == 'ARRAY':
             f_type = 'ARRAY(' + field_schema['array_type'] + ')'
         return f_type
 
-    @classmethod
-    def _format_types_count(cls, types_count, array_types_count=None):
+    @staticmethod
+    def _format_types_count(types_count, array_types_count=None):
         """ Format types_count to a readable sting.
 
         >>> format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
@@ -390,7 +422,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
         type_count_list = list()
         for type_name, count in types_count:
             if type_name == 'ARRAY':
-                array_type_name = cls._format_types_count(array_types_count)
+                array_type_name = _SchemaPreProcessing._format_types_count(array_types_count)
                 type_count_list.append('ARRAY(' + array_type_name + ') : ' + str(count))
             else:
                 type_count_list.append(str(type_name) + ' : ' + str(count))
