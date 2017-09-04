@@ -255,6 +255,11 @@ def test08_write_output_dict_schema_xlsx(schema_ex_dict, columns):
     res = [cell.value for row in load_workbook(output).active for cell in row]
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
     assert res == exp
+    # test on existing file
+    transform_data_to_file(schema_ex_dict, **arg)
+    res = [cell.value for row in load_workbook(output).active for cell in row]
+    exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
+    assert res == exp
     os.remove(output)
 
 
