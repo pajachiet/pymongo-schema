@@ -25,6 +25,7 @@ logger = logging.getLogger()
 
 
 def add_subparser_extract(subparsers, parent_parsers):
+    """CLI argument parser for extract module"""
     subparser = subparsers.add_parser('extract', parents=parent_parsers)
     subparser.add_argument('-d', '--databases', nargs='*',
                            help='Only analyze those databases. By default analyze all databases '
@@ -39,6 +40,7 @@ def add_subparser_extract(subparsers, parent_parsers):
 
 
 def add_subparser_transform(subparsers, parent_parsers):
+    """CLI argument parser for transform module"""
     subparser = subparsers.add_parser('transform', parents=parent_parsers)
     subparser.add_argument('input', nargs='?',
                            help='json formatted input file (schema, mapping, ...). '
@@ -71,6 +73,7 @@ def add_subparser_transform(subparsers, parent_parsers):
 
 
 def add_subparser_tosql(subparsers, parent_parsers):
+    """CLI argument parser for tosql module"""
     subparser = subparsers.add_parser('tosql', parents=parent_parsers)
     subparser.add_argument('input', nargs='?',
                            help='Input schema file to map to sql (json format). '
@@ -78,6 +81,7 @@ def add_subparser_tosql(subparsers, parent_parsers):
 
 
 def add_subparser_compare(subparsers, parent_parsers):
+    """CLI argument parser for compare module"""
     subparser = subparsers.add_parser('compare', parents=parent_parsers)
     subparser.add_argument('input',
                            help='Input schema')
@@ -88,7 +92,7 @@ def add_subparser_compare(subparsers, parent_parsers):
 def main(argv=None):
     """ Launch pymongo_schema (assuming CLI).
 
-    :param argv: command line arguments to pass directly to docopt.
+    :param argv: command line arguments to pass directly to argparse.
             Useful for usage from another python program.
     """
     parent_parser = ArgumentParser(add_help=False)
