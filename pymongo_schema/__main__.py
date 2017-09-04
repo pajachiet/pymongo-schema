@@ -26,7 +26,8 @@ logger = logging.getLogger()
 
 def add_subparser_extract(subparsers, parent_parsers):
     """CLI argument parser for extract module"""
-    subparser = subparsers.add_parser('extract', parents=parent_parsers)
+    subparser = subparsers.add_parser('extract', parents=parent_parsers,
+                                      help='Extract schema from a MongoDB instance')
     subparser.add_argument('-d', '--databases', nargs='*',
                            help='Only analyze those databases. By default analyze all databases '
                                 'in MongoDB instance')
@@ -41,7 +42,9 @@ def add_subparser_extract(subparsers, parent_parsers):
 
 def add_subparser_transform(subparsers, parent_parsers):
     """CLI argument parser for transform module"""
-    subparser = subparsers.add_parser('transform', parents=parent_parsers)
+    subparser = subparsers.add_parser('transform', parents=parent_parsers,
+                                      help='Transform a json schema to another format, potentially '
+                                           'filtering or changing columns outputs')
     subparser.add_argument('input', nargs='?',
                            help='json formatted input file (schema, mapping, ...). '
                                 '[default standard input]')
@@ -74,7 +77,9 @@ def add_subparser_transform(subparsers, parent_parsers):
 
 def add_subparser_tosql(subparsers, parent_parsers):
     """CLI argument parser for tosql module"""
-    subparser = subparsers.add_parser('tosql', parents=parent_parsers)
+    subparser = subparsers.add_parser('tosql', parents=parent_parsers,
+                                      help='Create a mapping from mongo schema to relational '
+                                           'schema (json input and output)')
     subparser.add_argument('input', nargs='?',
                            help='Input schema file to map to sql (json format). '
                                 'Default to standard input')
@@ -82,10 +87,11 @@ def add_subparser_tosql(subparsers, parent_parsers):
 
 def add_subparser_compare(subparsers, parent_parsers):
     """CLI argument parser for compare module"""
-    subparser = subparsers.add_parser('compare', parents=parent_parsers)
-    subparser.add_argument('input',
+    subparser = subparsers.add_parser('compare', parents=parent_parsers,
+                                      help='Compare two schemas')
+    subparser.add_argument('prev_schema',
                            help='Input schema')
-    subparser.add_argument('expected', nargs='?',
+    subparser.add_argument('new_schema', nargs='?',
                            help='Expected schema')
 
 
@@ -208,15 +214,15 @@ def schema_to_sql(arg):
 
 
 def compare_schemas(arg):
-    """
+    """ Main entry point function to compare two schemas.
 
-    :param arg:
-    :return:
+    :param arg: dict
+    :return: diff: list of dicts
     """
     logger.info('=== Compare schemas')
-    input_schema = load_input_schema(arg)
-    expected_schema = load_input_schema(arg, opt='expected')
-    diff = compare_schemas_bases(input_schema, expected_schema)
+    prev_schema = load_input_schema(arg, opt='prev_schema')
+    new_schema = load_input_schema(arg, opt='new_schema')
+    diff = compare_schemas_bases(prev_schema, new_schema)
     return diff
 
 
