@@ -122,7 +122,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     # Parse command line argument
-    preprocess_arg(args)
+    preprocess_args(args)
 
     # Extract mongo schema
     if args.command == 'extract':
@@ -150,50 +150,42 @@ def main(argv=None):
         logger.warn("WARNING : output is empty, we do not write any file.")
 
 
-def preprocess_arg(arg):
+def preprocess_args(args):
     """ Preprocess arguments from command line."""
-    if arg.output is None and 'xlsx' in arg.formats:
+    if args.output is None and 'xlsx' in args.formats:
         logger.warn("WARNING : xlsx format is not supported on standard output. "
                     "Switching to tsv output.")
-        arg.formats.remove('xlsx')
-        arg.formats.append('tsv')
+        args.formats.remove('xlsx')
+        args.formats.append('tsv')
 
 
-def initialize_logger(arg):
+def initialize_logger(args):
     """ Initialize logging to standard output, if not quiet."""
-    if not arg.quiet:
+    if not args.quiet:
         stream_handler = logging.StreamHandler()
         logger.addHandler(stream_handler)
 
 
-def extract_schema(arg):
-    """ Main entry point function to extract schema.
-
-    :param arg:
-    :return mongo_schema: dict
-    """
+def extract_schema(args):
+    """ Main entry point function to extract schema."""
     start_time = time()
     logger.info('=== Start MongoDB schema analysis')
-    client = pymongo.MongoClient(host=arg.host, port=arg.port)
+    client = pymongo.MongoClient(host=args.host, port=args.port)
 
     mongo_schema = extract_pymongo_client_schema(client,
-                                                 database_names=arg.databases,
-                                                 collection_names=arg.collections)
+                                                 database_names=args.databases,
+                                                 collection_names=args.collections)
 
     logger.info('--- MongoDB schema analysis took %.2f s', time() - start_time)
     return mongo_schema
 
 
-def transform_schema(arg):
-    """ Main entry point function to transform a schema.
-
-    :param arg: dict
-    :return filtered_mongo_schema: dict
-    """
+def transform_schema(args):
+    """ Main entry point function to transform a schema."""
     logger.info('=== Transform existing mongo schema (filter, new format, and/or select infos)')
-    input_schema = load_input_schema(arg)
-    if arg.filter is not None:
-        with open(arg.filter, 'r') as f:
+    input_schema = load_input_schema(args)
+    if args.filter is not None:
+        with open(args.filter, 'r') as f:
             config = json.load(f)
         output_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])
     else:
@@ -201,35 +193,27 @@ def transform_schema(arg):
     return output_schema
 
 
-def schema_to_sql(arg):
-    """ Main entry point function to generate a mapping from mongo to sql.
-
-    :param arg: dict
-    :return mongo_to_sql_mapping: dict
-    """
+def schema_to_sql(args):
+    """ Main entry point function to generate a mapping from mongo to sql."""
     logger.info('=== Generate mapping from mongo to sql')
-    input_schema = load_input_schema(arg)
+    input_schema = load_input_schema(args)
     mongo_to_sql_mapping = mongo_schema_to_mapping(input_schema)
     return mongo_to_sql_mapping
 
 
-def compare_schemas(arg):
-    """ Main entry point function to compare two schemas.
-
-    :param arg: dict
-    :return: diff: list of dicts
-    """
+def compare_schemas(args):
+    """ Main entry point function to compare two schemas."""
     logger.info('=== Compare schemas')
-    prev_schema = load_input_schema(arg, opt='prev_schema')
-    new_schema = load_input_schema(arg, opt='new_schema')
+    prev_schema = load_input_schema(args, opt='prev_schema')
+    new_schema = load_input_schema(args, opt='new_schema')
     diff = compare_schemas_bases(prev_schema, new_schema)
     return diff
 
 
-def load_input_schema(arg, opt='input'):
+def load_input_schema(args, opt='input'):
     """Load schema from file or stdin."""
     try:
-        filename = getattr(arg, opt)
+        filename = getattr(args, opt)
     except AttributeError:
         input_schema = json.load(sys.stdin)
     else:
