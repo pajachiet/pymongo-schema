@@ -43,6 +43,7 @@ Usage:
     python -m pymongo_schema extract -h
     usage:  [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--port PORT] [--host HOST]
                  [-d [DATABASES [DATABASES ...]]] [-c [COLLECTIONS [COLLECTIONS ...]]]
+                 [--columns COLUMNS [COLUMNS ...]] [--without-counts]
                  
     python -m pymongo_schema transform -h
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--category CATEGORY] [-n FILTER]
@@ -50,9 +51,11 @@ Usage:
                 
     python -m pymongo_schema transform -h
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
     
     python -m pymongo_schema compare -h
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
                          
 
 ```

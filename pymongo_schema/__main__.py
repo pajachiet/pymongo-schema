@@ -53,26 +53,6 @@ def add_subparser_transform(subparsers, parent_parsers):
     subparser.add_argument('-n', '--filter',
                            help='Config file to read namespace to filter for schema input. '
                                 'json format expected.')
-    subparser.add_argument('--columns', nargs='+',
-                           help='''
-                           Columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
-                           For schema, columns are to be chosen in :
-                               FIELD_FULL_NAME ('.' for subfields, ':' for subfields in arrays)
-                               FIELD_COMPACT_NAME (idem, without parent object names)
-                               FIELD_NAME
-                               DEPTH
-                               TYPE
-                               COUNT
-                               PROP_IN_OBJECT
-                               PERCENTAGE
-                               TYPES_COUNT
-                           Columns have to be separated by whitespace, and are case insensitive.
-                           Default for 'html' and 'md' output is {}
-                           Default for 'tsv' and 'xlsx' output is {}'''.format(
-                               HtmlOutput.get_default_columns()['schema'],
-                               TsvOutput.get_default_columns()['schema']))
-    subparser.add_argument('--without-counts', action='store_true',
-                           help='Remove counts information from json and yaml outputs')
 
 
 def add_subparser_tosql(subparsers, parent_parsers):
@@ -106,6 +86,26 @@ def main(argv=None):
                                help="List Output formats:  "
                                     "'tsv', 'xlsx', 'yaml', 'html', 'md' or 'json'"
                                     "Multiple format may be specified. [default: json]")
+    parent_parser.add_argument('--columns', nargs='+',
+                               help='''
+                               Columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
+                               For schema, columns are to be chosen in :
+                                   FIELD_FULL_NAME ('.' for subfields, ':' for subfields in arrays)
+                                   FIELD_COMPACT_NAME (idem, without parent object names)
+                                   FIELD_NAME
+                                   DEPTH
+                                   TYPE
+                                   COUNT
+                                   PROP_IN_OBJECT
+                                   PERCENTAGE
+                                   TYPES_COUNT
+                               Columns have to be separated by whitespace, and are case insensitive.
+                               Default for 'html' and 'md' output is {}
+                               Default for 'tsv' and 'xlsx' output is {}'''.format(
+                                   HtmlOutput.get_default_columns()['schema'],
+                                   TsvOutput.get_default_columns()['schema']))
+    parent_parser.add_argument('--without-counts', action='store_true',
+                               help='Remove counts information from json and yaml outputs')
     parent_parser.add_argument('-o', '--output',
                                help='Output file. Default to standard output. Extension added '
                                     'automatically if omitted (useful for multi-format outputs)')
