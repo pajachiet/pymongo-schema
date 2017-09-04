@@ -629,11 +629,11 @@ def write_output_dict(output_dict, arg):
                 '--without-counts': bool to display counts in output}
            additional field not fully managed yet --category schema | diff
     """
-    output_formats = arg['--format']
-    output_filename = arg['--output']
-    columns_to_get = arg.get('--columns', None)
-    without_counts = arg.get('--without-counts', False)
-    category = arg.get('--category', 'schema')
+    output_formats = arg['format']
+    output_filename = arg['output']
+    columns_to_get = arg.get('columns', None)
+    without_counts = arg.get('without-counts', False)
+    category = arg.get('category', 'schema')
 
     wrong_formats = set(output_formats) - {'tsv', 'xlsx', 'json', 'yaml', 'html', 'md'}
 

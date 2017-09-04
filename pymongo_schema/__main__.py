@@ -2,79 +2,18 @@
 # coding: utf8
 
 """
-pymongo-schema extract schemas from MongoDB
+CLI tool to use pymongo_schema modules.
 
-Usage:
-    pymongo_schema  -h | --help
-    pymongo_schema  extract [--database=DB... --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
-    pymongo_schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
-    pymongo_schema  tosql [--input=FILENAME --output=FILENAME --quiet]
-    pymongo_schema  compare [--input=FILENAME --output=FILENAME --format=FORMAT... --expected=FILENAME --category=CATEGORY]
-
-Commands:
-    extract                     Extract schema from a MongoDB instance
-    transform                   Transform a json schema to another format, potentially filtering or changing columns outputs
-    tosql                       Create a mapping from mongo schema to relational schema (json input and output)
-    compare                     Compare a mongo schema to another and write differences in the desired format
-                                (only the fist difference is noted, not the entire hierarchy)
-
-Options:
-    -d --database DB            Only analyze those databases.
-                                By default analyze all databases in Mongo instance
-
-    -c --collection COL         Only analyze this collection.
-                                Multiple collections may be specified this way.
-
-    --port PORT                 Port to connect to [default: 27017]
-
-    --host HOST                 Server to connect to [default: localhost]
-
-    -i , --input FILENAME       Input schema file, to transform or to map to sql. json format expected.
-                                Default to standard input
-
-    -o , --output FILENAME      Output file for schema. Default to standard output.
-                                Extension added automatically if omitted (useful for multi-format outputs)
-
-    -e , --expected FILENAME    Expected schema file - json format expected
-
-    -f , --format FORMAT        Output format for schema :  'tsv', 'xlsx', 'yaml', 'html', 'md' or 'json'
-                                Multiple format may be specified. [default: json]
-                                Note : Output format for mongo to sql mapping is json
-
-    --category FORMAT           Category of input (schema | mapping | diff) [default: schema]
-
-    --columns HEADER            String listing columns to get in 'txt', 'csv', 'html', 'md' or 'xlsx' format.
-                                Columns are to be chosen in :
-                                    FIELD_FULL_NAME         '.' for subfields, ':' for subfields in arrays
-                                    FIELD_COMPACT_NAME      idem, without parent object names
-                                    FIELD_NAME
-                                    DEPTH
-                                    TYPE
-                                    COUNT
-                                    PROP_IN_OBJECT
-                                    PERCENTAGE
-                                    TYPES_COUNT
-                                Columns have to be separated by whitespace, and are case insensitive.
-                                Default for 'html' and 'md' output is "Field_compact_name Field_name Full_name Description Count Percentage Types_count"
-                                Default for 'tsv' and 'xlsx' output is "Field_full_name Depth Field_name Type"
-
-    -n, --filter FILENAME       Config file to read namespace to filter. json format expected.
-
-    --without-counts            Remove counts information from json and yaml outputs
-
-    --quiet                     Remove logging on standard output
-
-    -h, --help                  show this usage information
-
+python -m pymongo_schema --help
 """
 
 import json
 import logging
 import sys
+from argparse import ArgumentParser
 from time import time
 
 import pymongo
-from docopt import docopt
 
 from pymongo_schema.compare import compare_schemas_bases
 from pymongo_schema.export import write_output_dict
@@ -85,58 +24,130 @@ from pymongo_schema.tosql import mongo_schema_to_mapping
 logger = logging.getLogger()
 
 
+def add_subparser_extract(subparsers, parent_parsers):
+    subparser = subparsers.add_parser('extract', parents=parent_parsers)
+    subparser.add_argument('-d', '--databases', nargs='*',
+                           help='Only analyze those databases. By default analyze all databases '
+                                'in MongoDB instance')
+    subparser.add_argument('-c', '--collections', nargs='*',
+                           help='Only analyze those collections. By default analyze all '
+                                'collections in each database')
+    subparser.add_argument('--port', default=27017, type=int,
+                           help='Port to connect to MongoDB [default: 27017]')
+    subparser.add_argument('--host', default='localhost',
+                           help='Server to connect to MongoDB [default: localhost]')
+
+
+def add_subparser_transform(subparsers, parent_parsers):
+    subparser = subparsers.add_parser('transform', parents=parent_parsers)
+    subparser.add_argument('input', nargs='?',
+                           help='json formatted input file. Default to standard input')
+    subparser.add_argument('-n', '--filter',
+                           help='Config file to read namespace to filter. json format expected.')
+    subparser.add_argument('--columns',
+                           help='''
+                           String listing columns to get in 'tsv', 'html', 'md' or 'xlsx' format.
+                           Columns are to be chosen in :
+                               FIELD_FULL_NAME ('.' for subfields, ':' for subfields in arrays)
+                               FIELD_COMPACT_NAME (idem, without parent object names)
+                               FIELD_NAME
+                               DEPTH
+                               TYPE
+                               COUNT
+                               PROP_IN_OBJECT
+                               PERCENTAGE
+                               TYPES_COUNT
+                           Columns have to be separated by whitespace, and are case insensitive.
+                           Default for 'html' and 'md' output is "Field_compact_name Field_name 
+                           Full_name Description Count Percentage Types_count"
+                           Default for 'tsv' and 'xlsx' output is "Field_full_name Depth 
+                           Field_name Type"''')
+    subparser.add_argument('--without-counts', action='store_true',
+                           help='Remove counts information from json and yaml outputs')
+
+
+def add_subparser_tosql(subparsers, parent_parsers):
+    subparser = subparsers.add_parser('tosql', parents=parent_parsers)
+    subparser.add_argument('input', nargs='?',
+                           help='Input schema file to map to sql (json format). '
+                                'Default to standard input')
+
+
+def add_subparser_compare(subparsers, parent_parsers):
+    subparser = subparsers.add_parser('compare', parents=parent_parsers)
+    subparser.add_argument('input',
+                           help='Input schema')
+    subparser.add_argument('expected', nargs='?',
+                           help='Expected schema')
+
+
 def main(argv=None):
     """ Launch pymongo_schema (assuming CLI).
 
     :param argv: command line arguments to pass directly to docopt.
             Useful for usage from another python program.
     """
+    parent_parser = ArgumentParser(add_help=False)
+    parent_parser.add_argument('-f', '--format', nargs='*', default=['json'],
+                               help="Output format for schema :  "
+                                    "'tsv', 'xlsx', 'yaml', 'html', 'md' or 'json'"
+                                    "Multiple format may be specified. [default: json]")
+    parent_parser.add_argument('-o', '--output',
+                               help='Output file. Default to standard output. Extension added '
+                                    'automatically if omitted (useful for multi-format outputs)')
+    parser = ArgumentParser("extract schemas from MongoDB")
+    parser.add_argument('--quiet', action='store_true',
+                        help='Remove logging on standard output')
+    subparsers = parser.add_subparsers(dest='command')
+
+    add_subparser_extract(subparsers, [parent_parser])
+    add_subparser_transform(subparsers, [parent_parser])
+    add_subparser_tosql(subparsers, [parent_parser])
+    add_subparser_compare(subparsers, [parent_parser])
+
+    args = parser.parse_args(argv)
+
     # Parse command line argument
-    arg = docopt(__doc__, argv=argv, help=True)
-    initialize_logger(arg)
-    preprocess_arg(arg)
+    preprocess_arg(args)
 
     # Extract mongo schema
-    if arg['extract']:
-        output_dict = extract_schema(arg)
+    if args.command == 'extract':
+        output_dict = extract_schema(args)
 
     # Transform mongo schema
-    if arg['transform']:
-        output_dict = transform_schema(arg)
+    if args.command == 'transform':
+        output_dict = transform_schema(args)
 
     # Map mongo schema to sql
-    if arg['tosql']:
-        arg['--format'] = ['json']
-        output_dict = schema_to_sql(arg)
+    if args.command == 'tosql':
+        output_dict = schema_to_sql(args)
+        args.format = ['json']
 
     # Compare two schemas
-    if arg['compare']:
-        arg['--category'] = 'diff'
-        output_dict = compare_schemas(arg)
+    if args.command == 'compare':
+        output_dict = compare_schemas(args)
+        args.category = 'diff'
 
     # Output dict
     logger.info('=== Write output')
     if output_dict:
-        write_output_dict(output_dict, arg)
+        write_output_dict(output_dict, vars(args))
     else:
         logger.warn("WARNING : output is empty, we do not write any file.")
 
 
 def preprocess_arg(arg):
     """ Preprocess arguments from command line."""
-    if not arg['--collection']:
-        arg['--collection'] = None
-
-    if arg['--output'] is None and 'xlsx' in arg['--format']:
+    if arg.output is None and 'xlsx' in arg.format:
         logger.warn("WARNING : xlsx format is not supported on standard output. "
                     "Switching to tsv output.")
-        arg['--format'].remove('xlsx')
-        arg['--format'].append('tsv')
+        arg.format.remove('xlsx')
+        arg.format.append('tsv')
 
 
 def initialize_logger(arg):
     """ Initialize logging to standard output, if not quiet."""
-    if not arg['--quiet']:
+    if not arg.quiet:
         stream_handler = logging.StreamHandler()
         logger.addHandler(stream_handler)
 
@@ -149,11 +160,11 @@ def extract_schema(arg):
     """
     start_time = time()
     logger.info('=== Start MongoDB schema analysis')
-    client = pymongo.MongoClient(host=arg['--host'], port=int(arg['--port']))
+    client = pymongo.MongoClient(host=arg.host, port=arg.port)
 
     mongo_schema = extract_pymongo_client_schema(client,
-                                                 database_names=arg['--database'],
-                                                 collection_names=arg['--collection'])
+                                                 database_names=arg.databases,
+                                                 collection_names=arg.collections)
 
     logger.info('--- MongoDB schema analysis took %.2f s', time() - start_time)
     return mongo_schema
@@ -167,9 +178,9 @@ def transform_schema(arg):
     """
     logger.info('=== Transform existing mongo schema (filter, new format, and/or select infos)')
     input_schema = load_input_schema(arg)
-    namespace = arg['--filter']
+    namespace = arg.filter
     if namespace is not None:
-        with open(arg['--filter'], 'r') as f:
+        with open(arg.filter, 'r') as f:
             config = json.load(f)
         output_schema = filter_mongo_schema_namespaces(input_schema, config['namespaces'])
     else:
@@ -197,17 +208,19 @@ def compare_schemas(arg):
     """
     logger.info('=== Compare schemas')
     input_schema = load_input_schema(arg)
-    expected_schema = load_input_schema(arg, opt='--expected')
+    expected_schema = load_input_schema(arg, opt='expected')
     diff = compare_schemas_bases(input_schema, expected_schema)
     return diff
 
 
-def load_input_schema(arg, opt='--input'):
+def load_input_schema(arg, opt='input'):
     """Load schema from file or stdin."""
-    if arg[opt] is None:
+    try:
+        filename = getattr(arg, opt)
+    except AttributeError:
         input_schema = json.load(sys.stdin)
     else:
-        with open(arg[opt], 'r') as f:
+        with open(filename, 'r') as f:
             input_schema = json.load(f)
 
     return input_schema
