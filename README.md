@@ -1,14 +1,22 @@
 # pymongo-schema
 A schema analyser for MongoDB, written in Python. 
 
-This tools is inspired by [variety](https://github.com/variety/variety), with the following enhancements :
+This tool allows you to **extract your application's schema, directly from your MongoDB data**. It comes with **powerful schema manipulation and export functionalities**.
+
+It will be particularly useful when you inherit a data dump, and want to quickly learn how the data is structured. 
+
+pymongo-schema allows to map your MongoDB data model to a relational (SQL) data model. This greatly helps to configure [mongo-connector-postgresql](https://github.com/Hopwork/mongo-connector-postgresql), a tool to synchronize data from MongoDB to a target PostgreSQL database.
+
+It also helps you to **compare different versions of your data model**.
+
+This tools is inspired by [variety](https://github.com/variety/variety), with the following enhancement
 
 - extract the **hierarchical structure** of the schema 
-- Several output options : python dictionnary, json, yaml or text
+- versatile output options : json, yaml, tsv, markdown or htlm
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
-- ways to **filter** and **transform** the output schema
-- translate the mongo schema extracted into a 'mapping' to a relational schema 
-(as defined in [mongo-connector-postgresql](https://github.com/Hopwork/mongo-connector-postgresql))
+- **filtering** of the output schema
+- **mapping to a relational schema**
+- **comparison** of successive schema
 
 [![Build Status](https://travis-ci.org/pajachiet/pymongo-schema.svg?branch=master)](https://travis-ci.org/pajachiet/pymongo-schema)
 [![Coverage Status](https://coveralls.io/repos/github/pajachiet/pymongo-schema/badge.svg?branch=master)](https://coveralls.io/github/pajachiet/pymongo-schema?branch=master)
@@ -18,7 +26,7 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 
 Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
 ```shell
-pip install --upgrade git+https://github.com/pajachiet/pymongo-schema.git
+pip install --upgrade https://github.com/pajachiet/pymongo-schema/archive/master.zip
 ```
 # Usage
 
@@ -64,6 +72,46 @@ To display full usage, with options description, run:
 ```shell 
 pymongo-schema <command> -h
 ```
+
+# Easy examples
+
+First, lets populate a collection in test database from mongo shell
+
+
+    db.users.insert({name: "Tom", bio: "A nice guy.", pets: ["monkey", "fish"], someWeirdLegacyKey: "I like Ike!"});
+    db.users.insert({name: "Dick", bio: "I swordfight.", birthday: new Date("1974/03/14")});
+    db.users.insert({name: "Harry", pets: "egret", birthday: new Date("1984/03/14"), location:{country:"France", city: "Lyon"}});
+    db.users.insert({name: "Geneviève", bio: "Ça va?", location:{country:"France", city: "Nantes"}});
+    db.users.insert({name: "MadJacques", location:{country:"France", city: "Paris"}});
+
+
+Extract the schema from this database, with a markdown format on standard output
+
+    $ python -m pymongo_schema extract --database test --format md
+    Extract schema of database test
+    ...collection users
+       scanned 5 documents out of 5 (100.00 %)
+    
+    ### Database: test
+    #### Collection: users 
+    |Field_compact_name     |Field_name             |Count     |Percentage     |Types_count                           |
+    |-----------------------|-----------------------|----------|---------------|--------------------------------------|
+    |_id                    |_id                    |5         |100.0          |oid : 5                               |
+    |name                   |name                   |5         |100.0          |string : 5                            |
+    |bio                    |bio                    |3         |60.0           |string : 3                            |
+    |location               |location               |3         |60.0           |OBJECT : 3                            |
+    | . city                |city                   |3         |100.0          |string : 3                            |
+    | . country             |country                |3         |100.0          |string : 3                            |
+    |birthday               |birthday               |2         |40.0           |date : 2                              |
+    |pets                   |pets                   |2         |40.0           |ARRAY(string : 2) : 1, string : 1     |
+    |someWeirdLegacyKey     |someWeirdLegacyKey     |1         |20.0           |string : 1                            |
+
+Extract the same schema to a file in json format.
+
+
+Filter this schema
+
+Map this schema to a relational mapping
 
 # Examples
 
