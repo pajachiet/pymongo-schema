@@ -2,7 +2,6 @@ import filecmp
 import json
 import os
 import pytest
-from itertools import chain
 
 from openpyxl import load_workbook
 from pymongo import MongoClient
@@ -22,7 +21,7 @@ def pymongo_client():
         yield conn
     finally:
         conn.close()
-        
+
 
 def test00_from_mongo_to_mapping(pymongo_client):
     with open(os.path.join(TEST_DIR, "resources", "input", "mapping.json")) as f:
@@ -64,9 +63,10 @@ def test02_transform():
         outputs[ext] = "{}.{}".format(base_output, ext)
 
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict')
-    argv = ['transform', '--input', SCHEMA_FILE, '--output', base_output, '--columns',
-            'Field_compact_name Field_name Full_name Description Count Percentage Types_count']
-    argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
+    argv = ['transform', SCHEMA_FILE, '--output', base_output, '--columns',
+            'Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count', 'Percentage',
+            'Types_count',
+            '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
@@ -90,10 +90,11 @@ def test03_transform_filter():
 
     namespace = os.path.join(TEST_DIR, 'resources', 'input', 'namespace.json')
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict_filtered')
-    argv = ['transform', '--input', SCHEMA_FILE, '--output', base_output,
+    argv = ['transform', SCHEMA_FILE, '--output', base_output,
             '--filter', namespace, '--columns',
-            'Field_compact_name Field_name Full_name Description Count Percentage Types_count']
-    argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
+            'Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count', 'Percentage',
+            'Types_count',
+            '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
@@ -116,8 +117,7 @@ def test04_transform_default_cols():
         outputs[ext] = "{}.{}".format(base_output, ext)
 
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict_default')
-    argv = ['transform', '--input', SCHEMA_FILE, '--output', base_output]
-    argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
+    argv = ['transform', SCHEMA_FILE, '--output', base_output, '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
@@ -136,7 +136,7 @@ def test05_tosql():
     output = os.path.join(TEST_DIR, "output_fctl_mapping.json")
     exp = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.json')
 
-    argv = ['tosql', '--input', SCHEMA_FILE, '--output', output]
+    argv = ['tosql', SCHEMA_FILE, '--output', output]
     main(argv)
 
     with open(output) as out_fd, open(exp) as exp_fd:
@@ -153,8 +153,7 @@ def test06_compare():
 
     exp = os.path.join(TEST_DIR, 'resources', 'functional', 'expected', 'diff')
     exp_schema = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema2.json')
-    argv = ['compare', '--input', SCHEMA_FILE, '--output', base_output, '--expected', exp_schema]
-    argv += chain.from_iterable([['--format', fmt] for fmt in extensions])
+    argv = ['compare', SCHEMA_FILE, exp_schema, '--output', base_output, '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))

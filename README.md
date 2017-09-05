@@ -23,21 +23,46 @@ pip install --upgrade git+https://github.com/pajachiet/pymongo-schema.git
 # Usage
 
 ```shell
-Usage:
-    pymongo_schema  -h | --help
-    pymongo_schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
-    pymongo_schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
-    pymongo_schema  tosql [--input=FILENAME --output=FILENAME --quiet]
+python -m pymongo_schema -h
+usage: [-h] [--quiet] {extract,transform,tosql,compare} ...
 
-Commands:
-    extract                     Extract schema from a MongoDB instance
-    transform                   Transform a json schema to another format, eventually filtering or changing columns outputs
-    tosql                       Create a mapping from mongo schema to relational schema (json input and output)
+commands:
+  {extract,transform,tosql,compare}
+    extract             Extract schema from a MongoDB instance
+    transform           Transform a json schema to another format, potentially
+                        filtering or changing columns outputs
+    tosql               Create a mapping from mongo schema to relational
+                        schema (json input and output)
+    compare             Compare two schemas
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --quiet               Remove logging on standard output
+
+Usage:
+    python -m pymongo_schema extract -h
+    usage:  [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--port PORT] [--host HOST]
+                 [-d [DATABASES [DATABASES ...]]] [-c [COLLECTIONS [COLLECTIONS ...]]]
+                 [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+                 
+    python -m pymongo_schema transform -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--category CATEGORY] [-n FILTER]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts] [input]
+                
+    python -m pymongo_schema transform -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+    
+    python -m pymongo_schema compare -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+                         
+
 ```
 
 To display full usage, with options description, run:
 ```shell 
-pymongo-schema -h
+pymongo-schema <command> -h
 ```
 
 # Examples

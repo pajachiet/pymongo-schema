@@ -81,8 +81,8 @@ def schema_ex_df(schema_ex_dict, columns):
 
 
 def test00_field_compact_name():
-    assert _SchemaPreProcessing._field_compact_name('baz', None, 'foo.bar:') == ' .  : baz'
-    assert _SchemaPreProcessing._field_compact_name('baz', None, 'foo.foo.bar:') == ' .  .  : baz'
+    assert _SchemaPreProcessing._field_compact_name(None, 'baz', 'foo.bar:') == ' .  : baz'
+    assert _SchemaPreProcessing._field_compact_name(None, 'baz', 'foo.foo.bar:') == ' .  .  : baz'
 
 
 def test01_field_depth():
@@ -94,9 +94,9 @@ def test01_field_depth():
 
 
 def test02_field_type():
-    assert _SchemaPreProcessing._field_type(None, {'type': 'string'}, None) == 'string'
+    assert _SchemaPreProcessing._field_type({'type': 'string'}, None, None) == 'string'
     assert _SchemaPreProcessing._field_type(
-        None, {'type': 'ARRAY', 'array_type': 'string'}, None) == 'ARRAY(string)'
+        {'type': 'ARRAY', 'array_type': 'string'}, None, None) == 'ARRAY(string)'
 
 
 def test03_format_types_count():
@@ -231,9 +231,8 @@ def test04_write_xlsx(schema_ex_df):
 def test06_write_output_dict_schema_md(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.md')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.md')
-    arg = {'--format': ['md'], '--output': output,
-           '--columns': " ".join(columns)}
-    write_output_dict(schema_ex_dict, arg)
+    arg = {'formats': ['md'], 'output': output, 'columns': columns}
+    transform_data_to_file(schema_ex_dict, **arg)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
 
@@ -241,9 +240,8 @@ def test06_write_output_dict_schema_md(schema_ex_dict, columns):
 def test07_write_output_dict_schema_html(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.html')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.html')
-    arg = {'--format': ['html'], '--output': output,
-           '--columns': " ".join(columns)}
-    write_output_dict(schema_ex_dict, arg)
+    arg = {'formats': ['html'], 'output': output, 'columns': columns}
+    transform_data_to_file(schema_ex_dict, **arg)
     with open(output) as out_fd, open(expected_file) as exp_fd:
         assert out_fd.read().replace(' ', '') == exp_fd.read().replace(' ', '')
     os.remove(output)
@@ -252,9 +250,13 @@ def test07_write_output_dict_schema_html(schema_ex_dict, columns):
 def test08_write_output_dict_schema_xlsx(schema_ex_dict, columns):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.xlsx')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict.xlsx')
-    arg = {'--format': ['xlsx'], '--output': output,
-           '--columns': " ".join(columns)}
-    write_output_dict(schema_ex_dict, arg)
+    arg = {'formats': ['xlsx'], 'output': output, 'columns': columns}
+    transform_data_to_file(schema_ex_dict, **arg)
+    res = [cell.value for row in load_workbook(output).active for cell in row]
+    exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
+    assert res == exp
+    # test on existing file
+    transform_data_to_file(schema_ex_dict, **arg)
     res = [cell.value for row in load_workbook(output).active for cell in row]
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
     assert res == exp
@@ -265,9 +267,8 @@ def test09_write_output_dict_schema_json_without_count(schema_ex_dict):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_schema.json')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected',
                                  'data_dict_without_counts.json')
-    arg = {'--format': ['json'], '--output': output,
-           '--without-counts': True}
-    write_output_dict(schema_ex_dict, arg)
+    arg = {'formats': ['json'], 'output': output, 'without_counts': True}
+    transform_data_to_file(schema_ex_dict, **arg)
     with open(output) as out_fd, open(expected_file) as exp_fd:
         assert json.load(out_fd) == json.load(exp_fd)
     os.remove(output)
@@ -276,18 +277,16 @@ def test09_write_output_dict_schema_json_without_count(schema_ex_dict):
 def test10_write_output_dict_mapping_yaml(mapping_ex_dict):
     output = os.path.join(TEST_DIR, 'output_data_dict_from_mapping.yaml')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.yaml')
-    arg = {'--format': ['yaml'], '--output': output,
-           '--columns': None, '--without-counts': True}
-    write_output_dict(mapping_ex_dict, arg)
+    arg = {'formats': ['yaml'], 'output': output, 'columns': None, 'without_counts': True}
+    transform_data_to_file(mapping_ex_dict, **arg)
     assert filecmp.cmp(output, expected_file)
     os.remove(output)
 
 
 def test11_write_output_dict_wrong_format(mapping_ex_dict):
-    arg = {'--format': ['fake'], '--output': None,
-           '--columns': None, '--without-counts': True}
+    arg = {'formats': ['fake'], 'output': None, 'columns': None, 'without_counts': True}
     with pytest.raises(ValueError):
-        write_output_dict(mapping_ex_dict, arg)
+        transform_data_to_file(mapping_ex_dict, **arg)
 
 
 def test12_write_output_dict_schema_non_ascii(columns):
@@ -299,11 +298,11 @@ def test12_write_output_dict_schema_non_ascii(columns):
         outputs[ext] = "{}.{}".format(base_output, ext)
     input_file = os.path.join(TEST_DIR, 'resources', 'input',
                               'test_schema_fr.json')
-    arg = {'--format': extensions, '--output': base_output, '--columns': " ".join(columns),
-           '--without-counts': False}
+    arg = {'formats': extensions, 'output': base_output, 'columns':columns,
+           'without_counts': False}
     with open(input_file) as f:
         schema_fr = json.loads(f.read())
-    write_output_dict(schema_fr, arg)
+    transform_data_to_file(schema_fr, **arg)
     extensions.remove('xlsx')
     for ext in extensions:
         with open(outputs[ext]) as f:
@@ -342,8 +341,8 @@ def test14_schema_diff_to_df_long(long_diff, diff_columns):
 def test15_schema_diff_to_html(long_diff):
     output_file = os.path.join(TEST_DIR, 'output_test_diff.html')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'schema_diff.html')
-    arg = {'--format': ['html'], '--output': output_file, '--category': 'diff'}
-    write_output_dict(long_diff, arg)
+    arg = {'formats': ['html'], 'output': output_file, 'category': 'diff'}
+    transform_data_to_file(long_diff, **arg)
     assert filecmp.cmp(output_file, expected_file)
     os.remove(output_file)
 
@@ -351,8 +350,8 @@ def test15_schema_diff_to_html(long_diff):
 def test16_schema_diff_to_md(long_diff):
     output_file = os.path.join(TEST_DIR, 'output_test_diff.md')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'schema_diff.md')
-    arg = {'--format': ['md'], '--output': output_file, '--category': 'diff'}
-    write_output_dict(long_diff, arg)
+    arg = {'formats': ['md'], 'output': output_file, 'category': 'diff'}
+    transform_data_to_file(long_diff, **arg)
     assert filecmp.cmp(output_file, expected_file)
     os.remove(output_file)
 
@@ -360,7 +359,7 @@ def test16_schema_diff_to_md(long_diff):
 def test17_mapping_to_tsv(mapping_ex_dict):
     output_file = os.path.join(TEST_DIR, 'output_mapping.tsv')
     expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'mapping.tsv')
-    arg = {'--format': ['tsv'], '--output': output_file, '--category': 'mapping'}
-    write_output_dict(mapping_ex_dict, arg)
+    arg = {'formats': ['tsv'], 'output': output_file, 'category': 'mapping'}
+    transform_data_to_file(mapping_ex_dict, **arg)
     assert filecmp.cmp(output_file, expected_file)
     os.remove(output_file)

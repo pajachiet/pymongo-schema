@@ -34,6 +34,7 @@ import re
 import sys
 from contextlib import contextmanager
 from functools import partial
+from numbers import Number
 
 import yaml
 import jinja2
@@ -122,8 +123,15 @@ class OutputPreProcessing(object):
     property default_columns: list - name of columns to display in table like outputs
     convert_to_dataframe: convert data into a dataframe - used for list outputs
 
+    Public method that should be overridden:
+    columns_values_makers: dict - indicate how to extract data for each columns
+
     Public method that can be overridden:
     filter_data: preprocess (filter) output data for hierarchical outputs
+
+    Public methods that should not be overridden:
+    regularize_column_name: reformat column name to fill columns_values_makers format
+    make_column_value: use columns_values_makers to extract column data
     """
     __metaclass__ = abc.ABCMeta
 
@@ -144,10 +152,22 @@ class OutputPreProcessing(object):
                                                       start_class=cls))
 
     @classmethod
-    def find_columns_to_get(cls, columns_to_get):
-        if columns_to_get:
-            return columns_to_get
-        return cls.default_columns
+    def columns_values_makers(cls):
+        """{column snake case name: function to extract columns data}"""
+        return {}
+
+    @classmethod
+    def regularize_column_name(cls, column_name):
+        """Column names are stored snake case."""
+        return column_name.lower().replace(" ", "_")
+
+    @classmethod
+    def make_column_value(cls, column, data, *infos):
+        """Call the right function in columns_values_makers to make column value based on infos."""
+        column = cls.regularize_column_name(column)
+        if column in cls.columns_values_makers():
+            return cls.printable_value(cls.columns_values_makers()[column](data, *infos))
+        return cls.printable_value(data.get(column))
 
     @classmethod
     @abc.abstractmethod
@@ -163,49 +183,71 @@ class OutputPreProcessing(object):
     @staticmethod
     def printable_value(value):
         """Helper to manage how to display objects (use json.dumps if possible)"""
-        if value and not isinstance(value, basestring):
-            try:
-                return json.dumps(value)
-            except ValueError:
-                return str(value)
-        return value
+        if isinstance(value, (Number, basestring, type(None))):
+            return value
+        try:
+            return json.dumps(value)
+        except ValueError:
+            return str(value)
 
 
-class MappingPreProcessing(OutputPreProcessing):
+class _MappingPreProcessing(OutputPreProcessing):
     """Preprocess 'mapping' data from to_sql module"""
     category = 'mapping'
     default_columns = ['Field_name', 'Description', 'Type']
 
     @classmethod
+    def columns_values_makers(cls):
+        """How to extract columns data based on field mapping and field name"""
+        return {
+            # f for field
+            'field_name': lambda f_dict, f_name: f_dict['dest'] if 'dest' in f_dict else f_name,
+            'type': lambda f_dict, f_name: f_dict['type'],
+        }
+
+    @classmethod
     def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
-        columns_to_get = cls.find_columns_to_get(columns_to_get)
+        """Transform data (mapping dict) into a dataframe."""
+        columns_to_get = columns_to_get or cls.default_columns
         lines = []
         for db in sorted(data):
             for table in sorted(data[db]):
-                lines += cls._table_dict_to_lines(db, table, data[db][table])
+                lines += cls._table_dict_to_lines(db, table, data[db][table], columns_to_get)
 
         header = ['Database', 'Table'] + columns_to_get
         return pd.DataFrame(lines, columns=header)
 
     @classmethod
-    def _table_dict_to_lines(cls, db_name, table_name, table_dict):
+    def _table_dict_to_lines(cls, db_name, table_name, table_dict, columns_to_get):
+        """Transform mapping table dict into a list, filtering on columns_to_get."""
         lines = []
         for field_name, field_dict in sorted(table_dict.items(), key=lambda x: x[0]):
             if field_name in ['_id', 'pk']:
                 continue
-            field_name = field_dict['dest'] if 'dest' in field_dict else field_name
-            field_descr = field_dict.get('description')
-            lines.append([db_name, table_name, field_name, field_descr, field_dict['type']])
+            lines.append([db_name, table_name] +
+                         [cls.make_column_value(col_name, field_dict, field_name)
+                          for col_name in columns_to_get])
         return lines
 
 
 class _DiffPreProcessing(OutputPreProcessing):
     """Preprocess 'diff' data from compare module"""
     category = 'diff'
+    default_columns = ['Hierarchy', 'Previous Schema', 'New Schema']
 
     @classmethod
-    def convert_to_dataframe(cls, data, **kwargs):
+    def columns_values_makers(cls):
+        """How to extract columns data based on diff dict and hierarchy"""
+        return {
+            'hierarchy': lambda diff, hierarchy: '.'.join(hierarchy),
+            'previous_schema': lambda diff, hierarchy: diff['prev_schema']
+        }
+
+    @classmethod
+    def convert_to_dataframe(cls, data, columns_to_get=None, **kwargs):
         """Transform data (list of dicts) into a dataframe."""
+        columns_to_get = columns_to_get or cls.default_columns
+
         table = []
         for d in data:
             if not d['hierarchy']:
@@ -220,11 +262,11 @@ class _DiffPreProcessing(OutputPreProcessing):
                 else:
                     coll = hierarchy.pop(0)
 
-            table.append([db, coll, '.'.join(hierarchy),
-                          cls.printable_value(d['prev_schema']),
-                          cls.printable_value(d['new_schema'])])
+            table.append([db, coll] +
+                         [cls.make_column_value(col_name, d, hierarchy)
+                          for col_name in columns_to_get])
 
-        header = ['Database', 'Collection', 'Hierarchy', 'Previous Schema', 'New Schema']
+        header = ['Database', 'Collection'] + columns_to_get
         return pd.DataFrame(table, columns=header)
 
 
@@ -232,6 +274,20 @@ class _SchemaPreProcessing(OutputPreProcessing):
     """Prepocess mongo schema"""
     category = 'schema'
     default_columns = ['Field_full_name', 'Depth', 'Field_name', 'Type']
+
+    @classmethod
+    def columns_values_makers(cls):
+        """How to extract columns data based on field schema, name and prefix."""
+        return {  # 'f' for field
+            'field_full_name': lambda f_schema, f, f_prefix: f_prefix + f,
+            'field_compact_name': cls._field_compact_name,
+            'field_name': lambda f_schema, f, f_prefix: f,
+            'depth': cls._field_depth,
+            'type': cls._field_type,
+            'percentage': lambda f_schema, f, f_prefix: 100 * f_schema['prop_in_object'],
+            'types_count': lambda f_schema, f, f_prefix: cls._format_types_count(
+                f_schema['types_count'], f_schema.get('array_types_count', None)),
+        }
 
     @classmethod
     def filter_data(cls, data):
@@ -253,8 +309,8 @@ class _SchemaPreProcessing(OutputPreProcessing):
         """
         Load schema (data) into dataframe, filtering on columns_to_get (column names list).
         """
+        columns_to_get = columns_to_get or cls.default_columns
         line_tuples = list()
-        columns_to_get = cls.find_columns_to_get(columns_to_get)
         for database, database_schema in sorted(list(data.items())):
             for collection, collection_schema in sorted(list(database_schema.items())):
                 collection_line_tuples = cls._object_schema_to_line_tuples(
@@ -303,67 +359,50 @@ class _SchemaPreProcessing(OutputPreProcessing):
         return line_tuples
 
     @classmethod
-    def _field_schema_to_columns(cls, field, field_schema, field_prefix, columns_to_get):
+    def _field_schema_to_columns(cls, field_name, field_schema, field_prefix, columns_to_get):
         """ Given fields information, returns a tuple representing columns_to_get.
 
-        :param field:
+        :param field_name:
         :param field_schema:
         :param field_prefix: str, default ''
         :param columns_to_get: iterable
             columns to create for each field
         :return field_columns: tuple
         """
-        # 'f' for field
-        column_functions = {
-            'field_full_name': lambda f, f_schema, f_prefix: f_prefix + f,
-            'field_compact_name': cls._field_compact_name,
-            'field_name': lambda f, f_schema, f_prefix: f,
-            'depth': cls._field_depth,
-            'type': cls._field_type,
-            'percentage': lambda f, f_schema, f_prefix: 100 * f_schema['prop_in_object'],
-            'types_count': lambda f, f_schema, f_prefix: cls._format_types_count(
-                f_schema['types_count'], f_schema.get('array_types_count', None)),
-        }
-
         field_columns = list()
         for column in columns_to_get:
-            column = column.lower()
-            if column not in column_functions:
-                column_str = field_schema.get(column, None)
-            else:
-                column_str = column_functions[column](field, field_schema, field_prefix)
-            field_columns.append(column_str)
+            field_columns.append(cls.make_column_value(column, field_schema, field_name, field_prefix))
 
         return tuple(field_columns)
 
-    @classmethod
-    def _field_compact_name(cls, field, field_schema, field_prefix):
+    @staticmethod
+    def _field_compact_name(field_schema, field_name, field_prefix):
         """ Return a compact version of field name, without parent object names.
 
-        >>> field_compact_name('baz', None, 'foo.bar:')
+        >>> field_compact_name(None, 'baz', 'foo.bar:')
         " .  : baz"
         """
         separators = re.sub('[^.:]', '', field_prefix)
         separators = re.sub('\.', ' . ', separators)
         separators = re.sub(':', ' : ', separators)
-        return separators + field
+        return separators + field_name
 
-    @classmethod
-    def _field_depth(cls, field, field_schema, field_prefix):
+    @staticmethod
+    def _field_depth(field_schema, field_name, field_prefix):
         """ Return the level of imbrication of a field."""
         separators = re.sub('[^.:]', '', field_prefix)
         return len(separators)
 
-    @classmethod
-    def _field_type(cls, field, field_schema, field_prefix):
+    @staticmethod
+    def _field_type(field_schema, field_name, field_prefix):
         """ Return a string describing the type of a field."""
         f_type = field_schema['type']
         if f_type == 'ARRAY':
             f_type = 'ARRAY(' + field_schema['array_type'] + ')'
         return f_type
 
-    @classmethod
-    def _format_types_count(cls, types_count, array_types_count=None):
+    @staticmethod
+    def _format_types_count(types_count, array_types_count=None):
         """ Format types_count to a readable sting.
 
         >>> format_types_count({'integer': 10, 'boolean': 5, 'null': 3, })
@@ -383,7 +422,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
         type_count_list = list()
         for type_name, count in types_count:
             if type_name == 'ARRAY':
-                array_type_name = cls._format_types_count(array_types_count)
+                array_type_name = _SchemaPreProcessing._format_types_count(array_types_count)
                 type_count_list.append('ARRAY(' + array_type_name + ') : ' + str(count))
             else:
                 type_count_list.append(str(type_name) + ' : ' + str(count))
@@ -415,23 +454,29 @@ class ListOutput(BaseOutput):
     Abstract base class. Preprocessing for outputs with a table like format.
 
     Class attribute:
-    default_columns: allow to override PreProcessing class default_columns
+    _default_columns: allow to override PreProcessing class default_columns
                         {category: [default_columns]}
     """
-    default_columns = {}
+    _default_columns = {}
+
+    @classmethod
+    def get_default_columns(cls):
+        """List default columns by category"""
+        return {
+            'schema': cls._default_columns.get('schema', _SchemaPreProcessing.default_columns),
+            'mapping': cls._default_columns.get('mapping', _MappingPreProcessing.default_columns),
+            'diff': cls._default_columns.get('diff', _DiffPreProcessing.default_columns)}
 
     def __init__(self, data, category='schema', columns_to_get=None, **kwargs):
         """
         :param data: json like structure - schema, mapping, ...
-        :param columns_to_get: string of column names to display in output separated by spaces
+        :param columns_to_get: list - column names to display in output
                                 default will use default_columns class attribute
         :param kwargs: unused - exists for a unified interface with other subclasses of BaseOutput
         """
         data_processor = OutputPreProcessing(category)
-        if columns_to_get:
-            columns_to_get = columns_to_get.split(" ")
-        else:
-            columns_to_get = self.default_columns.get(category)
+        if not columns_to_get:
+            columns_to_get = self.get_default_columns()[category]
 
         self.data_df = data_processor.convert_to_dataframe(data, columns_to_get=columns_to_get)
 
@@ -481,7 +526,7 @@ class HtmlOutput(ListOutput):
     Uses resources/data_dict.tmpl template.
     """
     output_format = 'html'
-    default_columns = {
+    _default_columns = {
         'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                    'Percentage', 'Types_count']}
 
@@ -494,12 +539,14 @@ class HtmlOutput(ListOutput):
         Format data from self.data_df, write into file_descr (opened with opener).
         """
         columns = self.data_df.columns
+        col0 = columns[0]  # First column title (usually Database)
+        col1 = columns[1]  # Second column title (usually Collection or Table)
         tmpl_variables = OrderedDict()
-        for db in self.data_df.Database.unique():
+        for db in self.data_df[col0].unique():
             tmpl_variables[db] = OrderedDict()
-            df_db = self.data_df.query('{} == @db'.format(columns[0])).iloc[:, 1:]
-            for col in df_db.Collection.unique():
-                df_col = df_db.query('{} == @col'.format(columns[1])).iloc[:, 1:]
+            df_db = self.data_df.query('{} == @db'.format(col0)).iloc[:, 1:]
+            for col in df_db[col1].unique():
+                df_col = df_db.query('{} == @col'.format(col1)).iloc[:, 1:]
                 tmpl_variables[db][col] = df_col.values.tolist()
 
         tmpl_filename = os.path.join(os.path.dirname(os.path.dirname(__file__)),
@@ -516,7 +563,7 @@ class MdOutput(ListOutput):
     Write data from self.data_df as a table in markdown file, one table per Collection.
     """
     output_format = 'md'
-    default_columns = {
+    _default_columns = {
         'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
                    'Percentage', 'Types_count']}
 
@@ -529,8 +576,8 @@ class MdOutput(ListOutput):
         Format data from self.data_df, write into file_descr (opened with opener).
         """
         columns = list(self.data_df.columns)
-        col0 = columns.pop(0)
-        col1 = columns.pop(0)
+        col0 = columns.pop(0)       # First column title (usually Database)
+        col1 = columns.pop(0)       # Second column title (usually Collection or Table)
         columns_length = []
         for col in columns:
             columns_length.append(max(self.data_df[col].map(
@@ -547,10 +594,10 @@ class MdOutput(ListOutput):
         str_column_names = self._make_line([format_column(col, col) for col in columns])
         str_sep_header = self._make_line([format_column(col, '-', repeat=True) for col in columns])
         output_str = []
-        for db in self.data_df.Database.unique():
+        for db in self.data_df[col0].unique():
             output_str.append('\n### {}: {}\n'.format(col0, db))
             df_db = self.data_df.query('{} == @db'.format(col0)).iloc[:, 1:]
-            for col in df_db.Collection.unique():
+            for col in df_db[col1].unique():
                 if col:
                     output_str.append('#### {}: {} \n'.format(col1, col))
                 df_col = df_db.query('{} == @col'.format(col1)).iloc[:, 1:]
@@ -611,40 +658,30 @@ def rec_find_right_subclass(attribute_value, attribute='output_format', start_cl
     return None
 
 
-def write_output_dict(output_dict, arg):
+def transform_data_to_file(data, formats, output=None, category='schema', **kwargs):
     """
-    Write output dictionary to file or standard output, with specific format described in arg
+    Transform data into each of output_formats and write result to output_filename or stdout.
 
-    :param output_dict: dict (schema or mapping)
-    :param arg: dict (from docopt)
-           if output_dict is schema
-               {'--format': str in 'json', 'yaml', 'tsv', 'html', 'md' or 'xlsx',
-                '--output': str full path to file where formatted output will be saved saved
-                            (default is std out),
-                '--columns': list of columns to display in the output not used for json and yaml}
-           if output_dict is mapping
-               {'--format': str in 'json', 'yaml',
-                '--output': same as for schema (path to file where output will be saved saved),
-                '--columns': unused but key must exist,
-                '--without-counts': bool to display counts in output}
-           additional field not fully managed yet --category schema | diff
+    :param data: dict (schema, mapping or diff)
+    :param formats: list of str - extensions of output desired among:
+                            'json', 'yaml' (hierarchical formats)
+                            'tsv', 'html', 'md' or 'xlsx' (list like formats)
+    :param output: str full path to file where formatted output will be saved saved
+                            (default is std out)
+    :param category: string in 'schema', 'mapping', 'diff' - describe input data
+    :param kwargs: may contain additional specific arguments
+           columns: list of columns to display in the output for list like formats
+           without_counts: bool to display count fields in output for hierarchical formats
     """
-    output_formats = arg['--format']
-    output_filename = arg['--output']
-    columns_to_get = arg.get('--columns', None)
-    without_counts = arg.get('--without-counts', False)
-    category = arg.get('--category', 'schema')
-
-    wrong_formats = set(output_formats) - {'tsv', 'xlsx', 'json', 'yaml', 'html', 'md'}
+    wrong_formats = set(formats) - {'tsv', 'xlsx', 'json', 'yaml', 'html', 'md'}
 
     if wrong_formats:
         raise ValueError("Output format should be tsv, xlsx, html, md, json or yaml. "
                          "{} is/are not supported".format(wrong_formats))
 
-    for output_format in output_formats:
-        output_maker = rec_find_right_subclass(output_format)(output_dict,
-                                                              columns_to_get=columns_to_get,
-                                                              without_counts=without_counts,
-                                                              category=category)
-        with output_maker.open(output_filename) as file_descr:
+    for output_format in formats:
+        output_maker = rec_find_right_subclass(output_format)(
+            data, category=category,
+            columns_to_get=kwargs.get('columns'), without_counts=kwargs.get('without_counts'))
+        with output_maker.open(output) as file_descr:
             output_maker.write_data(file_descr)
