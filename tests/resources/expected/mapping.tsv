@@ -1,0 +1,16 @@
+Database	Table	Field_name	Description	Type
+test_db	test_col	address__building		TEXT
+test_db	test_col	test_col__address__coord		_ARRAY_OF_SCALARS
+test_db	test_col	address__street		TEXT
+test_db	test_col	address__zipcode		TEXT
+test_db	test_col	borough		TEXT
+test_db	test_col	cuisine		TEXT
+test_db	test_col	test_col__grades		_ARRAY
+test_db	test_col	name		TEXT
+test_db	test_col	restaurant_id		TEXT
+test_db	test_col__address__coord	coord		REAL
+test_db	test_col__address__coord	id_test_col		TEXT
+test_db	test_col__grades	date		TIMESTAMP
+test_db	test_col__grades	grade		TEXT
+test_db	test_col__grades	id_test_col		TEXT
+test_db	test_col__grades	score		INT

@@ -1,12 +1,13 @@
 # coding: utf8
-""" 
-Functions in this library which take a 'schema' as argument, modify this schema as a side-effect and have no value.
+"""
+Functions in this library which take a 'schema' as argument,
+modify this schema as a side-effect and have no return value.
 
 Schema are hierarchically nested : (see also README.md)
 - A MongoDB instance contains databases
     {
         "database_name_1": database_schema_1,
-        "database_name_2": database_schema_2            
+        "database_name_2": database_schema_2
     }
 - A database contains collections
     {
@@ -15,38 +16,43 @@ Schema are hierarchically nested : (see also README.md)
     }
 
 - A collection maintains a 'count' and contains 1 object
-    { 
-        "count" : int, 
-        "object": object_schema 
+    {
+        "count" : int,
+        "object": object_schema
     }
 
 - An object contains fields.
-Objects are initialized as defaultdict(empty_field_schema) to simplify the code 
-    { 
-        "field_name_1" : field_schema_1, 
-        "field_name_2": field_schema_2 
+Objects are initialized as defaultdict(empty_field_schema) to simplify the code
+    {
+        "field_name_1" : field_schema_1,
+        "field_name_2": field_schema_2
     }
 
-- A field maintains 'count' and 'types_count' information, and has optional 'array_types_count' and 'object'
+- A field maintains 'count' and 'types_count' information,
+  and has optional 'array_types_count' and 'object'
     {
         'count': int,
         'type', 'type_str',
-        'types_count': defaultdict(int) # count for each encountered type  
-        'array_type', 'type_str', # (optional if array)
-        'array_types_count': defaultdict(int), # (optional if array) count for each type encountered  in arrays
-        'object': {}, # (optional if object) object_schema 
-    } 
+        'types_count': defaultdict(int) # count for each encountered type
+        'array_type', 'type_str', # (optional: if array)
+        'array_types_count': defaultdict(int), # (optional: if array) count for each type  in array
+        'object': {}, # (optional if object) object_schema
+    }
 """
 
-from collections import defaultdict
-from mongo_sql_types import get_type_string, common_parent_type
 import logging
+from collections import defaultdict
+
+from past.builtins import basestring
+
+from pymongo_schema.mongo_sql_types import get_type_string, common_parent_type
+
 logger = logging.getLogger(__name__)
 
 
 def extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None):
     """ Extract the schema for every database in database_names
-    
+
     :param pymongo_client: pymongo.mongo_client.MongoClient
     :param database_names: str, list of str, default None
     :param collection_names: str, list of str, default None
@@ -64,7 +70,7 @@ def extract_pymongo_client_schema(pymongo_client, database_names=None, collectio
 
     mongo_schema = dict()
     for database in database_names:
-        logger.info('Extract schema of database ' + database)
+        logger.info('Extract schema of database %s', database)
         pymongo_database = pymongo_client[database]
         database_schema = extract_database_schema(pymongo_database, collection_names)
         if database_schema:  # Do not add a schema if it is empty
@@ -83,12 +89,15 @@ def extract_database_schema(pymongo_database, collection_names=None):
     if isinstance(collection_names, basestring):
         collection_names = [collection_names]
 
+    database_collections = pymongo_database.collection_names(include_system_collections=False)
     if collection_names is None:
-        collection_names = pymongo_database.collection_names()
+        collection_names = database_collections
+    else:
+        collection_names = [col for col in collection_names if col in database_collections]
 
     database_schema = dict()
     for collection in collection_names:
-        logger.info('...collection ' + collection)
+        logger.info('...collection %s', collection)
         pymongo_collection = pymongo_database[collection]
         database_schema[collection] = extract_collection_schema(pymongo_collection)
 
@@ -116,8 +125,8 @@ def extract_collection_schema(pymongo_collection):
         collection_schema['count'] += 1
         add_document_to_object_schema(document, collection_schema['object'])
         i += 1
-        if i % 10**5 == 0 or i == n:
-            logger.info('   scanned {} documents out of {} ({:.2f} %)'.format(i, n, (100. * i)/n))
+        if i % 10 ** 5 == 0 or i == n:
+            logger.info('   scanned %s documents out of %s (%.2f %%)', i, n, (100. * i) / n)
 
     post_process_schema(collection_schema)
     collection_schema = recursive_default_to_regular_dict(collection_schema)
@@ -125,15 +134,15 @@ def extract_collection_schema(pymongo_collection):
 
 
 def recursive_default_to_regular_dict(value):
-    """ If value is a dictionnary, recursively replace defaultdict to regular dict 
-    
+    """ If value is a dictionary, recursively replace defaultdict to regular dict
+
     Note : defaultdict are instances of dict
-    
-    :param value: 
+
+    :param value:
     :return d: dict or original value
     """
     if isinstance(value, dict):
-        d = {k: recursive_default_to_regular_dict(v) for k, v in value.iteritems()}
+        d = {k: recursive_default_to_regular_dict(v) for k, v in value.items()}
         return d
     else:
         return value
@@ -142,9 +151,9 @@ def recursive_default_to_regular_dict(value):
 def post_process_schema(object_count_schema):
     """ Clean and add information to schema once it has been built
 
-    - compute the main type for each field 
+    - compute the main type for each field
     - compute the proportion of non null values in the parent object
-    - recursively postprocess imbricated object schemas
+    - recursively postprocess nested object schemas
 
     :param object_count_schema: dict
     This schema can either be a field_schema or a collection_schema
@@ -154,28 +163,29 @@ def post_process_schema(object_count_schema):
     for field_schema in object_schema.values():
 
         summarize_types(field_schema)
-        field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 5)
-
+        field_schema['prop_in_object'] = round((field_schema['count']) / float(object_count), 4)
         if 'object' in field_schema:
             post_process_schema(field_schema)
 
 
 def summarize_types(field_schema):
-    """ Summarize types information to one 'type' field 
-    
-    Add a 'type' field, compatible with all encountered types in 'types_count'. 
+    """ Summarize types information to one 'type' field
+
+    Add a 'type' field, compatible with all encountered types in 'types_count'.
     This is done by taking the least common parent type between types.
-    
-    If 'ARRAY' type count is not null, the main type is 'ARRAY'. 
+
+    If 'ARRAY' type count is not null, the main type is 'ARRAY'.
     An 'array_type' is defined, as the least common parent type between 'types' and 'array_types'
-    
-    :param field_schema:    
+
+    :param field_schema:
     """
 
-    type_list = field_schema['types_count'].keys()
-    type_list += field_schema.get('array_types_count', {}).keys()  # Only exists if 'ARRAY' in 'types_count'
+    type_list = list(field_schema['types_count'])
+    # Only if 'ARRAY' in 'types_count':
+    type_list += list(field_schema.get('array_types_count', {}))
 
-    cleaned_type_list = [type_name for type_name in type_list if type_name != 'ARRAY' and type_name != 'null']
+    cleaned_type_list = [type_name for type_name in type_list
+                         if type_name != 'ARRAY' and type_name != 'null']
     common_type = common_parent_type(cleaned_type_list)
 
     if 'ARRAY' in field_schema['types_count']:
@@ -210,7 +220,7 @@ def add_document_to_object_schema(document, object_schema):
     contains a MongoDB Object
     :param object_schema: dict
     """
-    for field, value in document.iteritems():
+    for field, value in document.items():
         add_value_to_field_schema(value, object_schema[field])
 
 
@@ -224,7 +234,7 @@ def add_value_to_field_schema(value, field_schema):
     :param value:
     value corresponding to a field in a MongoDB Object
     :param field_schema: dict
-    subdictionnary of the global schema dict corresponding to a field
+    subdictionary of the global schema dict corresponding to a field
     """
     field_schema['count'] += 1
     add_value_type(value, field_schema)
@@ -234,11 +244,11 @@ def add_value_to_field_schema(value, field_schema):
 
 def add_potential_document_to_field_schema(document, field_schema):
     """ Add a document to a field_schema
-    
+
     - Exit if document is not a dict
-    
+
     :param document: dict (or skipped)
-    :param field_schema: 
+    :param field_schema:
     """
     if isinstance(document, dict):
         if 'object' not in field_schema:
@@ -251,9 +261,9 @@ def add_potential_list_to_field_schema(value_list, field_schema):
 
     - Exit if value_list is not a list
     - Define or check the type of each value of the list.
-    - Recursively add 'dict' values to the schema.   
+    - Recursively add 'dict' values to the schema.
 
-    :param value_list: list (or skipped) 
+    :param value_list: list (or skipped)
     :param field_schema: dict
     """
     if isinstance(value_list, list):
@@ -269,12 +279,12 @@ def add_potential_list_to_field_schema(value_list, field_schema):
 
 
 def add_value_type(value, field_schema, type_str='types_count'):
-    """ Define the type_str in field_schema, or check it is equal to the one previously defined. 
+    """ Define the type_str in field_schema, or check it is equal to the one previously defined.
 
-    :param value: 
+    :param value:
     :param field_schema: dict
     :param type_str: str, either 'types_count' or 'array_types_count'
-    
+
     """
     value_type_str = get_type_string(value)
     field_schema[type_str][value_type_str] += 1

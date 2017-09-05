@@ -7,6 +7,8 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 - Several output options : python dictionnary, json, yaml or text
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
 - ways to **filter** and **transform** the output schema
+- translate the mongo schema extracted into a 'mapping' to a relational schema 
+(as defined in [mongo-connector-postgresql](https://github.com/Hopwork/mongo-connector-postgresql))
 
 [![Build Status](https://travis-ci.org/pajachiet/pymongo-schema.svg?branch=master)](https://travis-ci.org/pajachiet/pymongo-schema)
 [![Coverage Status](https://coveralls.io/repos/github/pajachiet/pymongo-schema/badge.svg?branch=master)](https://coveralls.io/github/pajachiet/pymongo-schema?branch=master)
@@ -21,28 +23,66 @@ pip install --upgrade git+https://github.com/pajachiet/pymongo-schema.git
 # Usage
 
 ```shell
-Usage:
-    pymongo-schema  -h | --help
-    pymongo-schema  extract [--database=DB --collection=COLLECTION... --port=PORT --host=HOST --output=FILENAME --format=FORMAT... --quiet]
-    pymongo-schema  transform [--input=FILENAME --filter=FILENAME --output=FILENAME --format=FORMAT... --columns=COLUMNS  --without-counts --quiet]
-    pymongo-schema  tosql [--input=FILENAME --output=FILENAME --quiet]
+python -m pymongo_schema -h
+usage: [-h] [--quiet] {extract,transform,tosql,compare} ...
 
-Commands:
-    extract                     Extract schema from a MongoDB instance
-    transform                   Transform a json schema to another format, eventually filtering or changing columns outputs
-    tosql                       Create a mapping from mongo schema to relational schema (json input and output)
+commands:
+  {extract,transform,tosql,compare}
+    extract             Extract schema from a MongoDB instance
+    transform           Transform a json schema to another format, potentially
+                        filtering or changing columns outputs
+    tosql               Create a mapping from mongo schema to relational
+                        schema (json input and output)
+    compare             Compare two schemas
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --quiet               Remove logging on standard output
+
+Usage:
+    python -m pymongo_schema extract -h
+    usage:  [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--port PORT] [--host HOST]
+                 [-d [DATABASES [DATABASES ...]]] [-c [COLLECTIONS [COLLECTIONS ...]]]
+                 [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+                 
+    python -m pymongo_schema transform -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--category CATEGORY] [-n FILTER]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts] [input]
+                
+    python -m pymongo_schema transform -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+    
+    python -m pymongo_schema compare -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
+                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+                         
+
 ```
 
 To display full usage, with options description, run:
 ```shell 
-pymongo-schema -h
+pymongo-schema <command> -h
 ```
 
-TODO : add examples
+# Examples
+
+extract:
+```shell
+    python -m pymongo_schema extract --database test_db --collection test_collection_1 test_collection_2 --output mongo_schema --format html --format json
+```
+transform:
+```shell
+    python -m pymongo_schema transform --input mongo_schema.json --filter namespace.json --output mongo_schema_filtered --format html --format csv --format json
+```
+tosql:
+```shell
+    python -m pymongo_schema tosql --input mongo_schema_filtered.json --output mapping.json
+```
 
 # Schema
 
-We define 'schema' as a dictionnary describing the structure of MongoDB component, being either a MongoDB instances, a database, a collection, an objects or a field. 
+We define 'schema' as a dictionary describing the structure of MongoDB component, being either a MongoDB instances, a database, a collection, an objects or a field. 
  
 Schema are hierarchically nested, with the following structure :  
 
@@ -105,7 +145,6 @@ TODO
 ## Support Python 3 version
 
 - fix encoding issues when exporting manually added non-ascii characters
-- test for support of multiple Python versions
 
 ## Diff between schemas
 
@@ -128,7 +167,7 @@ A way to compare the schema dictionaries and highlights the differences.
 
 ## Other option to sort text outputs
 
-- It is currently based on counts
+- It is currently based on counts and then alphabetically.
 
 
 
@@ -140,11 +179,11 @@ To tackle bigger databases, it certainly would be usefull to implement the follo
 - Analyze subsets of documents, most recent documents, or documents to a maximum depth.
 
 ## Tests
-The codebase is not tested. It should not be trusted blindly.
+The codebase is still under development. It should not be trusted blindly.
 
 ## Distribution
 
-Distribute in PyPi
+Will be distributed in PyPi
 
 
 

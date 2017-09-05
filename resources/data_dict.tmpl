@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DataDict</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #F0F8FF;
+    }
+
+    .level1 {
+        background-color: lightblue !important;
+    }
+    </style>
+</head>
+<body>
+
+<div class="panel-group">
+    {% for db, subdict in data.items() %}
+    <div class="panel level1">
+        <div class="panel-heading">
+            <h4>
+                <a data-toggle="collapse" href="#collapse_{{ db }}" style="color: #333333 !important;">{{ db }}</a>
+            </h4>
+        </div>
+        <div id="collapse_{{ db }}" class="panel-collapse collapse">
+            <div class="panel-group" >
+                {% for coll, table in subdict.items() %}
+                <div class="panel panel-default">
+                    {% if coll != '' %}
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse_{{ db }}_{{ coll }}">{{ coll }}</a>
+                        </h4>
+                    </div>
+                    <div id="collapse_{{ db }}_{{ coll }}" class="panel-collapse collapse">
+                    {% else %}
+                    <div id="collapse_{{ db }}_{{ coll }}" class="panel-collapse">
+                    {% endif %}
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    {% for cell in col_titles %}
+                                    <th style="text-align: left">{{ cell }}</th>
+                                    {% endfor %}
+                                </tr>
+                                {% for line in table %}
+                                <tr>
+                                    {% for cell in line %}
+                                    <td>{{ cell }}</td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DataDict</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style>
+    table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #F0F8FF;
+    }
+
+    .level1 {
+        background-color: lightblue !important;
+    }
+    </style>
+</head>
+<body>
+
+<div class="panel-group">
+    
+    <div class="panel level1">
+        <div class="panel-heading">
+            <h4>
+                <a data-toggle="collapse" href="#collapse_test_db2" style="color: #333333 !important;">test_db2</a>
+            </h4>
+        </div>
+        <div id="collapse_test_db2" class="panel-collapse collapse">
+            <div class="panel-group" >
+                
+                <div class="panel panel-default">
+                    
+                    <div id="collapse_test_db2_" class="panel-collapse">
+                    
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    
+                                    <th style="text-align: left">Hierarchy</th>
+                                    
+                                    <th style="text-align: left">Previous Schema</th>
+                                    
+                                    <th style="text-align: left">New Schema</th>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td></td>
+                                    
+                                    <td>test_db2</td>
+                                    
+                                    <td>None</td>
+                                    
+                                </tr>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <div class="panel level1">
+        <div class="panel-heading">
+            <h4>
+                <a data-toggle="collapse" href="#collapse_test_db1" style="color: #333333 !important;">test_db1</a>
+            </h4>
+        </div>
+        <div id="collapse_test_db1" class="panel-collapse collapse">
+            <div class="panel-group" >
+                
+                <div class="panel panel-default">
+                    
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse_test_db1_test_col2">test_col2</a>
+                        </h4>
+                    </div>
+                    <div id="collapse_test_db1_test_col2" class="panel-collapse collapse">
+                    
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    
+                                    <th style="text-align: left">Hierarchy</th>
+                                    
+                                    <th style="text-align: left">Previous Schema</th>
+                                    
+                                    <th style="text-align: left">New Schema</th>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td></td>
+                                    
+                                    <td>test_col2</td>
+                                    
+                                    <td>None</td>
+                                    
+                                </tr>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel panel-default">
+                    
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse_test_db1_test_col3">test_col3</a>
+                        </h4>
+                    </div>
+                    <div id="collapse_test_db1_test_col3" class="panel-collapse collapse">
+                    
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    
+                                    <th style="text-align: left">Hierarchy</th>
+                                    
+                                    <th style="text-align: left">Previous Schema</th>
+                                    
+                                    <th style="text-align: left">New Schema</th>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td></td>
+                                    
+                                    <td>None</td>
+                                    
+                                    <td>test_col3</td>
+                                    
+                                </tr>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel panel-default">
+                    
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" href="#collapse_test_db1_test_col1">test_col1</a>
+                        </h4>
+                    </div>
+                    <div id="collapse_test_db1_test_col1" class="panel-collapse collapse">
+                    
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    
+                                    <th style="text-align: left">Hierarchy</th>
+                                    
+                                    <th style="text-align: left">Previous Schema</th>
+                                    
+                                    <th style="text-align: left">New Schema</th>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td></td>
+                                    
+                                    <td>borough</td>
+                                    
+                                    <td>None</td>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td></td>
+                                    
+                                    <td>None</td>
+                                    
+                                    <td>_borough</td>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td>cuisine</td>
+                                    
+                                    <td>{"type": "string"}</td>
+                                    
+                                    <td>{"type": "ARRAY"}</td>
+                                    
+                                </tr>
+                                
+                                <tr>
+                                    
+                                    <td>grades</td>
+                                    
+                                    <td>grade</td>
+                                    
+                                    <td>None</td>
+                                    
+                                </tr>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+</body>
+</html>

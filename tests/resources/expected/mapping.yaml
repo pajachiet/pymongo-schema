@@ -1,0 +1,56 @@
+test_db:
+  test_col:
+    _id:
+      dest: _id
+      type: TEXT
+    address.building:
+      dest: address__building
+      type: TEXT
+    address.coord:
+      dest: test_col__address__coord
+      fk: id_test_col
+      type: _ARRAY_OF_SCALARS
+      valueField: coord
+    address.street:
+      dest: address__street
+      type: TEXT
+    address.zipcode:
+      dest: address__zipcode
+      type: TEXT
+    borough:
+      dest: borough
+      type: TEXT
+    cuisine:
+      dest: cuisine
+      type: TEXT
+    grades:
+      dest: test_col__grades
+      fk: id_test_col
+      type: _ARRAY
+    name:
+      dest: name
+      type: TEXT
+    pk: _id
+    restaurant_id:
+      dest: restaurant_id
+      type: TEXT
+  test_col__address__coord:
+    coord:
+      dest: coord
+      type: REAL
+    id_test_col:
+      type: TEXT
+    pk: id
+  test_col__grades:
+    date:
+      dest: date
+      type: TIMESTAMP
+    grade:
+      dest: grade
+      type: TEXT
+    id_test_col:
+      type: TEXT
+    pk: id
+    score:
+      dest: score
+      type: INT

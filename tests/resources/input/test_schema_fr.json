@@ -1,0 +1,17 @@
+{
+    "test_db1": {
+        "test_col1": {
+            "count": 25359, 
+            "object": {
+                "ÀàÂâÇçÈèÉéÊêËëÎîÏïÔôŒœÙùÛûÜü": {
+                    "types_count": {
+                        "string": 25359
+                    }, 
+                    "count": 25359, 
+                    "type": "string", 
+                    "prop_in_object": 1.0
+                }
+            }
+        }
+    }
+}
