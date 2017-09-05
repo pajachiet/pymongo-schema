@@ -1,0 +1,162 @@
+{
+    "test_db2": {
+        "test_col": {
+            "object": {
+                "name": {
+                    "type": "string"
+                },
+                "_id": {
+                    "type": "oid"
+                },
+                "cuisine": {
+                    "type": "string"
+                },
+                "borough": {
+                    "type": "string"
+                },
+                "address": {
+                    "object": {
+                        "street": {
+                            "type": "string"
+                        },
+                        "building": {
+                            "type": "string"
+                        },
+                        "zipcode": {
+                            "type": "string"
+                        },
+                        "coord": {
+                            "array_type": "float",
+                            "type": "ARRAY"
+                        }
+                    },
+                    "type": "OBJECT"
+                },
+                "grades": {
+                    "object": {
+                        "grade": {
+                            "type": "string"
+                        },
+                        "date": {
+                            "type": "date"
+                        },
+                        "score": {
+                            "type": "integer"
+                        }
+                    },
+                    "array_type": "OBJECT",
+                    "type": "ARRAY"
+                },
+                "restaurant_id": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "test_db1": {
+        "test_col2": {
+            "object": {
+                "name": {
+                    "type": "string"
+                },
+                "_id": {
+                    "type": "oid"
+                },
+                "cuisine": {
+                    "type": "string"
+                },
+                "borough": {
+                    "type": "string"
+                },
+                "address": {
+                    "object": {
+                        "street": {
+                            "type": "string"
+                        },
+                        "building": {
+                            "type": "string"
+                        },
+                        "zipcode": {
+                            "type": "string"
+                        },
+                        "coord": {
+                            "array_type": "float",
+                            "type": "ARRAY"
+                        }
+                    },
+                    "type": "OBJECT"
+                },
+                "grades": {
+                    "object": {
+                        "grade": {
+                            "type": "string"
+                        },
+                        "date": {
+                            "type": "date"
+                        },
+                        "score": {
+                            "type": "integer"
+                        }
+                    },
+                    "array_type": "OBJECT",
+                    "type": "ARRAY"
+                },
+                "restaurant_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "test_col1": {
+            "object": {
+                "name": {
+                    "type": "string"
+                },
+                "_id": {
+                    "type": "oid"
+                },
+                "cuisine": {
+                    "type": "string"
+                },
+                "borough": {
+                    "type": "string"
+                },
+                "address": {
+                    "object": {
+                        "street": {
+                            "type": "string"
+                        },
+                        "building": {
+                            "type": "string"
+                        },
+                        "zipcode": {
+                            "type": "string"
+                        },
+                        "coord": {
+                            "array_type": "float",
+                            "type": "ARRAY"
+                        }
+                    },
+                    "type": "OBJECT"
+                },
+                "grades": {
+                    "object": {
+                        "grade": {
+                            "type": "string"
+                        },
+                        "date": {
+                            "type": "date"
+                        },
+                        "score": {
+                            "type": "integer"
+                        }
+                    },
+                    "array_type": "OBJECT",
+                    "type": "ARRAY"
+                },
+                "restaurant_id": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
