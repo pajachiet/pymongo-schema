@@ -93,8 +93,14 @@ def add_object_to_mapping(object_schema, mapping, table_name, field_prefix=''):
                                                   mapping, table_name)
 
         elif mongo_type == 'OBJECT':
-            add_object_to_mapping(field_info['object'], mapping, table_name,
-                                  field_prefix=mongo_field_name + '.')
+            if 'object' in field_info:
+                add_object_to_mapping(field_info['object'], mapping, table_name,
+                                      field_prefix=mongo_field_name + '.')
+            else:   # can happen in extract from code (DictField)
+                logger.warning(
+                    "WARNING : 'JSON' SQL type is not managed yet. Field '%s' from table "
+                    "'%s' is skipped from the mapping.",
+                    mongo_field_name, table_name)
 
         else:
             comment = field_info.get('comment', '')

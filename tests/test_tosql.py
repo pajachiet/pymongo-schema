@@ -1,6 +1,10 @@
+import json
+import os
 import pytest
 
 from pymongo_schema.tosql import *
+
+TEST_DIR = os.path.dirname(__file__)
 
 
 @pytest.fixture(scope='module')
@@ -36,7 +40,6 @@ def long_schema():
                                                        'array_type': 'string',
                                                        'array_types_count': {'string': 93463,
                                                                              'null': 738}}}}}}
-
 
 
 def test00_init_collection_mapping_simple(simple_schema):
@@ -163,3 +166,11 @@ def test10_mongo_schema_to_mapping_long(simple_schema, long_schema):
                    'coll1': {'pk': '_id', '_id': {'dest': '_id', 'type': 'TEXT'},
                              'field': {'dest': 'field', 'type': 'TEXT'}}}}
     assert res == exp
+
+
+def test11_schema_from_code_to_mapping():
+    with open(os.path.join(TEST_DIR, 'resources', 'input', 'schema_from_code.json')) as f:
+        schema = json.load(f)
+    with open(os.path.join(TEST_DIR, 'resources', 'expected', 'mapping_from_code.json')) as f:
+        exp_mapping = json.load(f)
+    assert mongo_schema_to_mapping(schema) == exp_mapping

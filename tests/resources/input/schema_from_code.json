@@ -1,0 +1,446 @@
+{
+  "db1": {
+    "coll1": {
+      "object": {
+        "field1": {
+          "array_type": "oid",
+          "default": "",
+          "type": "ARRAY",
+          "sensitive": false,
+          "required": true,
+          "field": "ListField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field2": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": true,
+          "field": "ReferenceField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field3": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field4": {
+          "array_type": "OBJECT",
+          "object": {
+            "subfield1": {
+              "default": "",
+              "type": "string",
+              "sensitive": false,
+              "required": true,
+              "field": "StringField",
+              "description": null,
+              "usage name": null,
+              "is_num": false
+            },
+            "subfield2": {
+              "array_type": "OBJECT",
+              "object": {
+                "subsubfield1": {
+                  "default": "",
+                  "type": "integer",
+                  "sensitive": false,
+                  "required": false,
+                  "field": "IntField",
+                  "description": null,
+                  "usage name": null,
+                  "is_num": true
+                },
+                "subsubfield2": {
+                  "default": "",
+                  "type": "boolean",
+                  "sensitive": false,
+                  "required": true,
+                  "field": "BooleanField",
+                  "description": null,
+                  "usage name": null,
+                  "is_num": true
+                },
+                "subsubfield3": {
+                  "default": "",
+                  "type": "integer",
+                  "sensitive": false,
+                  "required": false,
+                  "field": "IntField",
+                  "description": null,
+                  "usage name": null,
+                  "is_num": true
+                },
+                "subsubfield4": {
+                  "default": "",
+                  "type": "date",
+                  "sensitive": false,
+                  "required": true,
+                  "field": "DateTimeField",
+                  "description": null,
+                  "usage name": null,
+                  "is_num": false
+                }
+              },
+              "default": "",
+              "type": "ARRAY",
+              "sensitive": false,
+              "required": false,
+              "field": "ListField",
+              "description": null,
+              "usage name": null,
+              "is_num": false
+            }
+          },
+          "default": "",
+          "type": "ARRAY",
+          "sensitive": false,
+          "required": false,
+          "field": "ListField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field5": {
+          "object": {
+            "subfield1": {
+              "default": "",
+              "type": "string",
+              "sensitive": false,
+              "required": false,
+              "field": "StringField",
+              "description": null,
+              "usage name": null,
+              "is_num": false
+            },
+            "subfield2": {
+              "default": "",
+              "type": "string",
+              "sensitive": false,
+              "required": false,
+              "field": "StringField",
+              "description": null,
+              "usage name": null,
+              "is_num": false
+            },
+            "subfield3": {
+              "array_type": "float",
+              "default": "",
+              "type": "ARRAY",
+              "sensitive": false,
+              "required": false,
+              "field": "ListField",
+              "description": null,
+              "usage name": null,
+              "is_num": false
+            },
+            "subfield4": {
+              "object": {
+                "subsubfield1": {
+                  "default": "",
+                  "type": "string",
+                  "sensitive": false,
+                  "required": true,
+                  "field": "StringField",
+                  "description": null,
+                  "usage name": null,
+                  "is_num": false
+                },
+                "subsubfield2": {
+                  "default": "",
+                  "type": "string",
+                  "sensitive": false,
+                  "required": false,
+                  "field": "StringField",
+                  "description": null,
+                  "usage name": null,
+                  "is_num": false
+                }
+              },
+              "default": "",
+              "type": "OBJECT",
+              "sensitive": false,
+              "required": false,
+              "field": "ReferentialField",
+              "description": null,
+              "usage name": null,
+              "is_num": false
+            },
+            "subfield5": {
+              "default": "",
+              "type": "boolean",
+              "sensitive": false,
+              "required": false,
+              "field": "BooleanField",
+              "description": null,
+              "usage name": null,
+              "is_num": true
+            }
+          },
+          "default": "",
+          "type": "OBJECT",
+          "sensitive": false,
+          "required": true,
+          "field": "AddressField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field6": {
+          "default": 3,
+          "type": "integer",
+          "sensitive": false,
+          "required": true,
+          "field": "IntField",
+          "description": null,
+          "usage name": null,
+          "is_num": true
+        },
+        "field7": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": "Date de creation",
+          "is_num": false
+        },
+        "field8": {
+          "default": "",
+          "type": "string",
+          "sensitive": false,
+          "required": false,
+          "field": "EmailField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "_id": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": false,
+          "field": "ObjectIdField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field9": {
+          "default": 1,
+          "type": "integer",
+          "sensitive": false,
+          "required": true,
+          "field": "IntField",
+          "description": null,
+          "usage name": "Some usage name",
+          "is_num": true
+        }
+      }
+    },
+    "coll2": {
+      "object": {
+        "field1": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field2": {
+          "default": "",
+          "type": "OBJECT",
+          "sensitive": false,
+          "required": false,
+          "field": "DictField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field3": {
+          "default": "",
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "field": "StringField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "_id": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": false,
+          "field": "ObjectIdField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field4": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": true,
+          "field": "ReferenceField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field5": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": "A simple description",
+          "is_num": false
+        }
+      }
+    },
+    "coll3": {
+      "object": {
+        "field1": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": "Date de creation",
+          "is_num": false
+        },
+        "field2": {
+          "object": {
+            "_cls": {
+              "type": "string"
+            },
+            "_ref": {
+              "type": "dbref"
+            }
+          },
+          "default": "",
+          "type": "OBJECT",
+          "sensitive": false,
+          "required": false,
+          "field": "GenericReferenceField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "_id": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": false,
+          "field": "ObjectIdField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        }
+      }
+    }
+  },
+  "db2": {
+    "coll1": {
+      "object": {
+        "field1": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field2": {
+          "default": "",
+          "type": "OBJECT",
+          "sensitive": false,
+          "required": false,
+          "field": "DictField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field3": {
+          "default": "",
+          "type": "string",
+          "sensitive": false,
+          "required": true,
+          "field": "StringField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "_id": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": false,
+          "field": "ObjectIdField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field4": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": true,
+          "field": "ReferenceField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "field5": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": "A simple description",
+          "is_num": false
+        }
+      }
+    },
+    "coll2": {
+      "object": {
+        "field1": {
+          "default": "",
+          "type": "date",
+          "sensitive": false,
+          "required": false,
+          "field": "DateTimeField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        },
+        "_id": {
+          "default": "",
+          "type": "oid",
+          "sensitive": false,
+          "required": false,
+          "field": "ObjectIdField",
+          "description": null,
+          "usage name": null,
+          "is_num": false
+        }
+      }
+    }
+  }
+}

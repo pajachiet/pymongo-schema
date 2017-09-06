@@ -1,6 +1,10 @@
+import json
+import os
 import pytest
 
 from pymongo_schema.filter import *
+
+TEST_DIR = os.path.dirname(__file__)
 
 
 @pytest.fixture(scope='module')
@@ -143,3 +147,30 @@ def test16_filter_mongo_schema_namespaces(schema):    # functional test
     expected["db2"]["coll2"]["object"]["field3"]["object"].pop("subfield1")
     expected["db2"].pop("coll1")
     assert filter_mongo_schema_namespaces(schema, namespaces) == expected
+
+
+def test17_filter_schema_from_code():    # functional test
+    with open(os.path.join(TEST_DIR, 'resources', 'input', 'schema_from_code.json')) as f:
+        schema = json.load(f)
+
+    namespaces = {"db1.coll2": True,
+                  "db1.coll1": {"includeFields": ["field1", "field4.subfield1"]},
+                  "db2.coll1": {"excludeFields": ["field1"]},
+                  "db2.coll2": False}
+
+    expected = deepcopy(schema)
+    for f in schema['db1']['coll1']['object']:
+        if f == 'field1':
+            continue
+        if f == 'field4':
+            for sf in schema['db1']['coll1']['object'][f]['object']:
+                if sf != 'subfield1':
+                    expected['db1']['coll1']['object'][f]['object'].pop(sf)
+        else:
+            expected['db1']['coll1']['object'].pop(f)
+    expected['db2']['coll1']['object'].pop('field1')
+    expected['db2'].pop('coll2')
+    expected['db1'].pop('coll3')
+
+    res = filter_mongo_schema_namespaces(deepcopy(schema), namespaces)
+    assert res == expected
