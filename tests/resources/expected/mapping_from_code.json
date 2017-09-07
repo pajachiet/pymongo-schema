@@ -1,0 +1,207 @@
+{
+  "db2": {
+    "coll1": {
+      "field1": {
+        "type": "TIMESTAMP",
+        "dest": "field1"
+      },
+      "pk": "_id",
+      "field5": {
+        "type": "TIMESTAMP",
+        "dest": "field5"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field3": {
+        "type": "TEXT",
+        "dest": "field3"
+      },
+      "field4": {
+        "type": "TEXT",
+        "dest": "field4"
+      }
+    },
+    "coll2": {
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field1": {
+        "type": "TIMESTAMP",
+        "dest": "field1"
+      },
+      "pk": "_id"
+    }
+  },
+  "db1": {
+    "coll1": {
+      "field1": {
+        "valueField": "field1",
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_coll1",
+        "dest": "coll1__field1"
+      },
+      "pk": "_id",
+      "field5.subfield4.subsubfield1": {
+        "type": "TEXT",
+        "dest": "field5__subfield4__subsubfield1"
+      },
+      "field5.subfield2": {
+        "type": "TEXT",
+        "dest": "field5__subfield2"
+      },
+      "field3": {
+        "type": "TIMESTAMP",
+        "dest": "field3"
+      },
+      "field2": {
+        "type": "TEXT",
+        "dest": "field2"
+      },
+      "field6": {
+        "type": "INT",
+        "dest": "field6"
+      },
+      "field5.subfield5": {
+        "type": "BOOLEAN",
+        "dest": "field5__subfield5"
+      },
+      "field9": {
+        "type": "INT",
+        "dest": "field9"
+      },
+      "field7": {
+        "type": "TIMESTAMP",
+        "dest": "field7"
+      },
+      "field5.subfield3": {
+        "valueField": "subfield3",
+        "type": "_ARRAY_OF_SCALARS",
+        "fk": "id_coll1",
+        "dest": "coll1__field5__subfield3"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field5.subfield1": {
+        "type": "TEXT",
+        "dest": "field5__subfield1"
+      },
+      "field4": {
+        "type": "_ARRAY",
+        "fk": "id_coll1",
+        "dest": "coll1__field4"
+      },
+      "field5.subfield4.subsubfield2": {
+        "type": "TEXT",
+        "dest": "field5__subfield4__subsubfield2"
+      },
+      "field8": {
+        "type": "TEXT",
+        "dest": "field8"
+      }
+    },
+    "coll2": {
+      "field1": {
+        "type": "TIMESTAMP",
+        "dest": "field1"
+      },
+      "pk": "_id",
+      "field5": {
+        "type": "TIMESTAMP",
+        "dest": "field5"
+      },
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field3": {
+        "type": "TEXT",
+        "dest": "field3"
+      },
+      "field4": {
+        "type": "TEXT",
+        "dest": "field4"
+      }
+    },
+    "coll1__field4__subfield2": {
+      "subsubfield4": {
+        "type": "TIMESTAMP",
+        "dest": "subsubfield4"
+      },
+      "subsubfield2": {
+        "type": "BOOLEAN",
+        "dest": "subsubfield2"
+      },
+      "pk": "id",
+      "id_coll1__field4": {
+        "type": "SERIAL"
+      },
+      "subsubfield1": {
+        "type": "INT",
+        "dest": "subsubfield1"
+      },
+      "subsubfield3": {
+        "type": "INT",
+        "dest": "subsubfield3"
+      }
+    },
+    "coll1__field4": {
+      "subfield1": {
+        "type": "TEXT",
+        "dest": "subfield1"
+      },
+      "subfield2": {
+        "type": "_ARRAY",
+        "fk": "id_coll1__field4",
+        "dest": "coll1__field4__subfield2"
+      },
+      "id_coll1": {
+        "type": "TEXT"
+      },
+      "pk": "id"
+    },
+    "coll3": {
+      "_id": {
+        "type": "TEXT",
+        "dest": "_id"
+      },
+      "field2._ref": {
+        "type": "TEXT",
+        "dest": "field2___ref"
+      },
+      "field1": {
+        "type": "TIMESTAMP",
+        "dest": "field1"
+      },
+      "pk": "_id",
+      "field2._cls": {
+        "type": "TEXT",
+        "dest": "field2___cls"
+      }
+    },
+    "coll1__field1": {
+      "id_coll1": {
+        "type": "TEXT"
+      },
+      "pk": "id",
+      "field1": {
+        "type": "TEXT",
+        "dest": "field1"
+      }
+    },
+    "coll1__field5__subfield3": {
+      "subfield3": {
+        "type": "REAL",
+        "dest": "subfield3"
+      },
+      "id_coll1": {
+        "type": "TEXT"
+      },
+      "pk": "id"
+    }
+  }
+}

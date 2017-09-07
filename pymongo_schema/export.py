@@ -284,9 +284,10 @@ class _SchemaPreProcessing(OutputPreProcessing):
             'field_name': lambda f_schema, f, f_prefix: f,
             'depth': cls._field_depth,
             'type': cls._field_type,
-            'percentage': lambda f_schema, f, f_prefix: 100 * f_schema['prop_in_object'],
+            'percentage': lambda f_schema, f, f_prefix: (100 * f_schema['prop_in_object']
+                                                         if 'prop_in_object' in f_schema else None),
             'types_count': lambda f_schema, f, f_prefix: cls._format_types_count(
-                f_schema['types_count'], f_schema.get('array_types_count', None)),
+                f_schema.get('types_count', None), f_schema.get('array_types_count', None)),
         }
 
     @classmethod
@@ -339,22 +340,27 @@ class _SchemaPreProcessing(OutputPreProcessing):
         :return line_tuples: list of tuples describing lines
         """
         line_tuples = []
-        sorted_fields = sorted(list(object_schema.items()), key=lambda x: (-x[1]['count'], x[0]))
+        sorted_fields = sorted(list(object_schema.items()),
+                               key=lambda x: (-x[1]['count'], x[0]) if 'count' in x[1] else x[0])
 
         for field, field_schema in sorted_fields:
             line_columns = cls._field_schema_to_columns(
                 field, field_schema, field_prefix, columns_to_get)
             line_tuples.append(line_columns)
 
-            if 'ARRAY' in field_schema['types_count'] \
-                    and 'OBJECT' in field_schema['array_types_count']:
-                line_tuples += cls._object_schema_to_line_tuples(
-                    field_schema['object'], columns_to_get, field_prefix=field_prefix + field + ':')
+            types = field_schema.get('types_count', [field_schema['type']])
 
-            elif 'OBJECT' in field_schema['types_count']:
-                # 'elif' rather than 'if' in case of both OBJECT and ARRAY(OBJECT)
+            if 'object' in field_schema:
+                if 'ARRAY' in types:
+                    current_prefix = field_prefix + field + ':'
+                elif 'OBJECT' in types:
+                    current_prefix = field_prefix + field + '.'
+                else:
+                    logger.warning('Field {} has key "object" but has types {} while should have '
+                                   '"OBJECT" or "ARRAY"'.format(field, types))
+                    continue
                 line_tuples += cls._object_schema_to_line_tuples(
-                    field_schema['object'], columns_to_get, field_prefix=field_prefix + field + '.')
+                    field_schema['object'], columns_to_get, field_prefix=current_prefix)
 
         return line_tuples
 
@@ -415,9 +421,10 @@ class _SchemaPreProcessing(OutputPreProcessing):
         :param array_types_count: dict, default None
         :return types_count_string : str
         """
-        types_count = sorted(types_count.items(),
-                             key=lambda x: x[1],
-                             reverse=True)
+        if types_count is None:
+            return None
+
+        types_count = sorted(types_count.items(), key=lambda x: x[1], reverse=True)
 
         type_count_list = list()
         for type_name, count in types_count:

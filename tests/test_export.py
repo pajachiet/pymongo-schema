@@ -363,3 +363,15 @@ def test17_mapping_to_tsv(mapping_ex_dict):
     transform_data_to_file(mapping_ex_dict, **arg)
     assert filecmp.cmp(output_file, expected_file)
     os.remove(output_file)
+
+
+def test18_schema_from_code():
+    with open(os.path.join(TEST_DIR, 'resources', 'input', 'schema_from_code.json')) as f:
+        schema = json.load(f)
+    output_file = os.path.join(TEST_DIR, 'output_data_dict_from_code.md')
+    expected_file = os.path.join(TEST_DIR, 'resources', 'expected', 'data_dict_from_code.md')
+    arg = {'formats': ['md'], 'output': output_file,
+           'columns': ['Field_compact_name', 'Field_name', 'Default', 'Field', 'Count']}
+    transform_data_to_file(schema, **arg)
+    assert filecmp.cmp(output_file, expected_file)
+    os.remove(output_file)
