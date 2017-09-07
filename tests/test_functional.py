@@ -41,6 +41,8 @@ def test00_from_mongo_to_mapping_long(pymongo_client):
                                                  database_names=['test_db', 'test_db1', 'test_db2'])
 
     mapping = mongo_schema_to_mapping(mongo_schema)
+    print(mapping)
+    print(exp_mapping)
     assert mapping == exp_mapping
 
 

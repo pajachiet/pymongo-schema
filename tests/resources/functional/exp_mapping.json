@@ -23,7 +23,7 @@
     "col2__field_146__field_151": {
       "pk": "id",
       "id_col2__field_146": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_151": {
         "type": "TEXT",
@@ -104,7 +104,7 @@
         "dest": "field_47"
       },
       "id_col2__field_149": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_51": {
         "type": "BOOLEAN",
@@ -475,7 +475,7 @@
     "col0__field_22__field_42": {
       "pk": "id",
       "id_col0__field_22": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_42": {
         "type": "TEXT",
@@ -519,7 +519,7 @@
       },
       "pk": "id",
       "id_col2__field_149": {
-        "type": "TEXT"
+        "type": "SERIAL"
       }
     },
     "col2__field_165__field_26": {
@@ -1880,7 +1880,7 @@
     "col1__field_90__field_92__field_94": {
       "pk": "id",
       "id_col1__field_90": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_94": {
         "type": "REAL",
@@ -1890,7 +1890,7 @@
     "col2__field_149__field_100": {
       "pk": "id",
       "id_col2__field_149": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_45": {
         "type": "TEXT",
@@ -1904,7 +1904,7 @@
     "col2__field_149__field_81": {
       "pk": "id",
       "id_col2__field_149": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_45": {
         "type": "TEXT",
@@ -1918,7 +1918,7 @@
     "col2__field_149__field_79": {
       "pk": "id",
       "id_col2__field_149": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_45": {
         "type": "TEXT",
@@ -1972,7 +1972,7 @@
     "col2__field_149__field_92__field_94": {
       "pk": "id",
       "id_col2__field_149": {
-        "type": "TEXT"
+        "type": "SERIAL"
       },
       "field_94": {
         "type": "REAL",
@@ -2052,7 +2052,7 @@
         "dest": "field_42"
       },
       "id_col1__field_22": {
-        "type": "TEXT"
+        "type": "SERIAL"
       }
     },
     "col0__field_super_nested__subfield_list__subsubfield_list": {
@@ -2062,7 +2062,7 @@
         "dest": "subsubfield_list"
       },
       "id_col0__field_super_nested__subfield_list": {
-        "type": "TEXT"
+        "type": "SERIAL"
       }
     },
     "col1__field_22": {
@@ -2584,7 +2584,7 @@
         "valueField": "subsubfield_list"
       },
       "id_col0__field_super_nested": {
-        "type": "TEXT"
+        "type": "SERIAL"
       }
     },
     "col3__accent_in_list": {

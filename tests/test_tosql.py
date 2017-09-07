@@ -141,7 +141,7 @@ def test10_mongo_schema_to_mapping_long(simple_schema, long_schema):
                                            'coll2': simple_schema}})
     exp = {'db1':
                {'coll1__field3__subfield2':
-                    {'id_coll1__field3': {'type': 'TEXT'},
+                    {'id_coll1__field3': {'type': 'SERIAL'},
                      'pk': 'id',
                      'subfield2': {'dest': 'subfield2', 'type': 'TEXT'}},
                 'coll1': {'field2': {'dest': 'field2', 'type': 'TEXT'},
