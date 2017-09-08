@@ -1,10 +1,6 @@
-import os
-
 import pytest
 
 from pymongo_schema.compare import *
-
-TEST_DIR = os.path.dirname(__file__)
 
 
 @pytest.fixture(scope='module')

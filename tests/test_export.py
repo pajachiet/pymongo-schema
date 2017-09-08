@@ -6,8 +6,7 @@ from pandas.util.testing import assert_frame_equal
 from pymongo_schema.export import *
 from pymongo_schema.export import _SchemaPreProcessing, _DiffPreProcessing
 from tests.test_compare import long_diff
-
-TEST_DIR = os.path.dirname(__file__)
+from tests import TEST_DIR
 
 
 @pytest.fixture(scope='module')

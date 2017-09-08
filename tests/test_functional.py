@@ -9,8 +9,8 @@ from pymongo import MongoClient
 from pymongo_schema.extract import extract_pymongo_client_schema
 from pymongo_schema.tosql import mongo_schema_to_mapping
 from pymongo_schema.__main__ import main
+from tests import TEST_DIR
 
-TEST_DIR = os.path.dirname(__file__)
 SCHEMA_FILE = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema.json')
 
 

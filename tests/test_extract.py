@@ -5,8 +5,7 @@ import pytest
 from pymongo import MongoClient
 
 from pymongo_schema.extract import *
-
-TEST_DIR = os.path.dirname(__file__)
+from tests import TEST_DIR
 
 
 @pytest.yield_fixture(scope='module')

@@ -3,8 +3,7 @@ import os
 import pytest
 
 from pymongo_schema.filter import *
-
-TEST_DIR = os.path.dirname(__file__)
+from tests import TEST_DIR
 
 
 @pytest.fixture(scope='module')
