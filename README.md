@@ -56,7 +56,7 @@ Usage:
     python -m pymongo_schema compare -h
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
                 [--columns COLUMNS [COLUMNS ...]] [--without-counts]
-                         
+                [--detailed_diff] prev_schema [new_schema]
 
 ```
 

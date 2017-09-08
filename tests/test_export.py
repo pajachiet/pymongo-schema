@@ -312,7 +312,7 @@ def test12_write_output_dict_schema_non_ascii(columns):
 
 def test13_schema_diff_to_df_simple(diff_columns):
     res = _DiffPreProcessing.convert_to_dataframe(
-        [{'hierarchy': '', 'prev_schema': 'db0', 'new_schema': None}])
+        [{'hierarchy': 'db0', 'prev_schema': 'db0', 'new_schema': None}])
     exp = pd.DataFrame([['db0', '', '', 'db0', None]],
                        columns=diff_columns)
     assert_frame_equal(res, exp)
@@ -324,10 +324,10 @@ def test14_schema_diff_to_df_long(long_diff, diff_columns):
                         ['db1', '', '', None, 'db1'],
                         ['db', 'coll1', '', 'coll1', None],
                         ['db', 'coll2', '', None, 'coll2'],
-                        ['db', 'coll', '', 'field2', None],
-                        ['db', 'coll', '', None, 'field4'],
+                        ['db', 'coll', 'field2', 'field2', None],
+                        ['db', 'coll', 'field4', None, 'field4'],
                         ['db', 'coll', 'field3', '{"type": "boolean"}', '{"type": "string"}'],
-                        ['db', 'coll', 'field.array_subfield', None, 'subsubfield2'],
+                        ['db', 'coll', 'field.array_subfield.subsubfield2', None, 'subsubfield2'],
                         ['db', 'coll', 'field.array_subfield.subsubfield', '{"type": "integer"}',
                          '{"type": "boolean"}'],
                         ['db', 'coll', 'field5', '{"array_type": "string"}',

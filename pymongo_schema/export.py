@@ -250,17 +250,9 @@ class _DiffPreProcessing(OutputPreProcessing):
 
         table = []
         for d in data:
-            if not d['hierarchy']:
-                db = d['prev_schema'] or d['new_schema']
-                coll = ''
-                hierarchy = []
-            else:
-                hierarchy = d['hierarchy'].split('.')
-                db = hierarchy.pop(0)
-                if not hierarchy:
-                    coll = d['prev_schema'] or d['new_schema']
-                else:
-                    coll = hierarchy.pop(0)
+            hierarchy = d['hierarchy'].split('.')
+            db = hierarchy.pop(0)
+            coll = hierarchy.pop(0) if hierarchy else ''
 
             table.append([db, coll] +
                          [cls.make_column_value(col_name, d, hierarchy)
