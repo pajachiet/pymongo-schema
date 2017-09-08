@@ -73,6 +73,7 @@ def add_subparser_compare(subparsers, parent_parsers):
                            help='Input schema')
     subparser.add_argument('new_schema', nargs='?',
                            help='Expected schema')
+    subparser.add_argument('--detailed_diff', action='store_true')
 
 
 def main(argv=None):
@@ -206,7 +207,7 @@ def compare_schemas(args):
     logger.info('=== Compare schemas')
     prev_schema = load_input_schema(args, opt='prev_schema')
     new_schema = load_input_schema(args, opt='new_schema')
-    diff = compare_schemas_bases(prev_schema, new_schema)
+    diff = compare_schemas_bases(prev_schema, new_schema, detailed_diff=args.detailed_diff)
     return diff
 
 

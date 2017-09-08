@@ -41,8 +41,6 @@ def test00_from_mongo_to_mapping_long(pymongo_client):
                                                  database_names=['test_db', 'test_db1', 'test_db2'])
 
     mapping = mongo_schema_to_mapping(mongo_schema)
-    print(mapping)
-    print(exp_mapping)
     assert mapping == exp_mapping
 
 
@@ -156,6 +154,31 @@ def test06_compare():
     exp = os.path.join(TEST_DIR, 'resources', 'functional', 'expected', 'diff')
     exp_schema = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema2.json')
     argv = ['compare', SCHEMA_FILE, exp_schema, '--output', base_output, '--formats'] + extensions
+    main(argv)
+
+    assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))
+    assert filecmp.cmp(outputs['md'], "{}.md".format(exp))
+    with open(outputs['html']) as out_fd, \
+            open("{}.html".format(exp)) as exp_fd:
+        assert out_fd.read().replace(' ', '') == exp_fd.read().replace(' ', '')
+    res = [cell.value for row in load_workbook(outputs['xlsx']).active for cell in row]
+    exp = [cell.value for row in load_workbook("{}.xlsx".format(exp)).active for cell in row]
+    assert res == exp
+    for output in outputs.values():
+        os.remove(output)
+
+
+def test07_compare_detailed():
+    base_output = "output_fctl_detailed_diff"
+    outputs = {}
+    extensions = ['html', 'xlsx', 'tsv', 'md']
+    for ext in extensions:
+        outputs[ext] = "{}.{}".format(base_output, ext)
+
+    exp = os.path.join(TEST_DIR, 'resources', 'functional', 'expected', 'detailed_diff')
+    exp_schema = os.path.join(TEST_DIR, 'resources', 'input', 'test_schema2.json')
+    argv = ['compare', SCHEMA_FILE, exp_schema, '--output', base_output, '--detailed_diff',
+            '--formats'] + extensions
     main(argv)
 
     assert filecmp.cmp(outputs['tsv'], "{}.tsv".format(exp))

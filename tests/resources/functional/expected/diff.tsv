@@ -2,7 +2,7 @@ Database	Collection	Hierarchy	Previous Schema	New Schema
 test_db2			test_db2	
 test_db1	test_col2		test_col2	
 test_db1	test_col3			test_col3
-test_db1	test_col1		borough	
-test_db1	test_col1			_borough
+test_db1	test_col1	borough	borough	
+test_db1	test_col1	_borough		_borough
 test_db1	test_col1	cuisine	{"type": "string"}	{"type": "ARRAY"}
-test_db1	test_col1	grades	grade	
+test_db1	test_col1	grades.grade	grade	
