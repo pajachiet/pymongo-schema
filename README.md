@@ -49,10 +49,10 @@ Usage:
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--category CATEGORY] [-n FILTER]
                 [--columns COLUMNS [COLUMNS ...]] [--without-counts] [input]
                 
-    python -m pymongo_schema transform -h
-    usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
-                [--columns COLUMNS [COLUMNS ...]] [--without-counts]
-    
+    python -m pymongo_schema tosql -h
+    usage: [-h] [-f [FORMATS [FORMATS ...]]] [--columns COLUMNS [COLUMNS ...]]
+                [--without-counts] [-o OUTPUT] [input]
+
     python -m pymongo_schema compare -h
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [input]
                 [--columns COLUMNS [COLUMNS ...]] [--without-counts]
