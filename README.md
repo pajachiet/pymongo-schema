@@ -69,15 +69,15 @@ pymongo-schema <command> -h
 
 extract:
 ```shell
-    python -m pymongo_schema extract --database test_db --collection test_collection_1 test_collection_2 --output mongo_schema --format html --format json
+    python -m pymongo_schema extract --databases test_db --collections test_collection_1 test_collection_2 --output mongo_schema --format html json
 ```
 transform:
 ```shell
-    python -m pymongo_schema transform --input mongo_schema.json --filter namespace.json --output mongo_schema_filtered --format html --format csv --format json
+    python -m pymongo_schema transform mongo_schema.json --filter namespace.json --output mongo_schema_filtered --format html csv json
 ```
 tosql:
 ```shell
-    python -m pymongo_schema tosql --input mongo_schema_filtered.json --output mapping.json
+    python -m pymongo_schema tosql mongo_schema_filtered.json --output mapping.json
 ```
 
 # Schema
