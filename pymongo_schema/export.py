@@ -187,7 +187,7 @@ class OutputPreProcessing(object):
             return value
         try:
             return json.dumps(value)
-        except ValueError:
+        except (ValueError, TypeError):
             return str(value)
 
 
