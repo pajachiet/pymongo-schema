@@ -1,4 +1,6 @@
 # coding: utf8
+from datetime import datetime
+
 import pytest
 import filecmp
 from pandas.util.testing import assert_frame_equal
@@ -77,6 +79,10 @@ def diff_columns():
 @pytest.fixture(scope='module')
 def schema_ex_df(schema_ex_dict, columns):
     return _SchemaPreProcessing.convert_to_dataframe(schema_ex_dict, columns)
+
+
+def test00_printable_value_date():
+    assert OutputPreProcessing.printable_value(datetime(2015, 1, 1, 1, 1, 1)) == '2015-01-01 01:01:01'
 
 
 def test00_field_compact_name():
