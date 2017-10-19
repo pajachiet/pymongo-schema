@@ -1,7 +1,7 @@
 {
   "test_db1": {
     "col2__field_141__field_80": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_80": {
         "type": "TEXT",
         "dest": "field_80"
@@ -11,7 +11,7 @@
       }
     },
     "col2__field_165__field_80": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_80": {
         "type": "TEXT",
         "dest": "field_80"
@@ -21,7 +21,7 @@
       }
     },
     "col2__field_146__field_151": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2__field_146": {
         "type": "SERIAL"
       },
@@ -42,7 +42,7 @@
       "id_col0": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_57": {
         "type": "TEXT",
         "dest": "field_57"
@@ -67,7 +67,7 @@
       }
     },
     "col2__field_141__field_81": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -81,7 +81,7 @@
       }
     },
     "col2__field_165__field_79": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -114,7 +114,7 @@
         "type": "TEXT",
         "dest": "field_46"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_50": {
         "type": "BOOLEAN",
         "dest": "field_50"
@@ -133,7 +133,7 @@
       }
     },
     "col2__field_141__field_100": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -147,7 +147,7 @@
       }
     },
     "col2__field_141__field_79": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -320,7 +320,7 @@
         "type": "BOOLEAN",
         "dest": "field_13"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2": {
         "type": "TEXT"
       },
@@ -446,14 +446,14 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_80": {
         "type": "TEXT",
         "dest": "field_80"
       }
     },
     "col2__field_166__field_151": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_151": {
         "type": "TEXT",
         "dest": "field_151"
@@ -466,14 +466,14 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_109": {
         "type": "TEXT",
         "dest": "field_109"
       }
     },
     "col0__field_22__field_42": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col0__field_22": {
         "type": "SERIAL"
       },
@@ -499,7 +499,7 @@
         "type": "BOOLEAN",
         "dest": "field_74"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col0": {
         "type": "TEXT"
       },
@@ -517,7 +517,7 @@
         "type": "TEXT",
         "dest": "field_80"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2__field_149": {
         "type": "SERIAL"
       }
@@ -546,7 +546,7 @@
         "type": "TEXT",
         "dest": "field_46"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_50": {
         "type": "BOOLEAN",
         "dest": "field_50"
@@ -581,7 +581,7 @@
         "type": "TIMESTAMP",
         "dest": "field_49"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2": {
         "type": "TEXT"
       },
@@ -1076,7 +1076,7 @@
         "type": "TEXT",
         "dest": "field_91"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_92.field_119": {
         "type": "TEXT",
         "dest": "field_92__field_119"
@@ -1091,7 +1091,7 @@
       }
     },
     "col0__field_12": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_12": {
         "type": "INT",
         "dest": "field_12"
@@ -1101,7 +1101,7 @@
       }
     },
     "col2__field_165__field_92__field_94": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_94": {
         "type": "REAL",
         "dest": "field_94"
@@ -1130,7 +1130,7 @@
       "id_col2": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_151": {
         "type": "_ARRAY_OF_SCALARS",
         "fk": "id_col2__field_146",
@@ -1143,7 +1143,7 @@
       }
     },
     "col2__field_165__field_81": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -1815,7 +1815,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -1829,7 +1829,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -1863,7 +1863,7 @@
         "type": "TEXT",
         "dest": "field_46"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_51": {
         "type": "BOOLEAN",
         "dest": "field_51"
@@ -1878,7 +1878,7 @@
       }
     },
     "col1__field_90__field_92__field_94": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col1__field_90": {
         "type": "SERIAL"
       },
@@ -1888,7 +1888,7 @@
       }
     },
     "col2__field_149__field_100": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2__field_149": {
         "type": "SERIAL"
       },
@@ -1902,7 +1902,7 @@
       }
     },
     "col2__field_149__field_81": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2__field_149": {
         "type": "SERIAL"
       },
@@ -1916,7 +1916,7 @@
       }
     },
     "col2__field_149__field_79": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2__field_149": {
         "type": "SERIAL"
       },
@@ -1933,7 +1933,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -1955,7 +1955,7 @@
       "id_col0": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_39": {
         "type": "TIMESTAMP",
         "dest": "field_39"
@@ -1970,7 +1970,7 @@
       }
     },
     "col2__field_149__field_92__field_94": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_col2__field_149": {
         "type": "SERIAL"
       },
@@ -1980,7 +1980,7 @@
       }
     },
     "col2__field_165__field_100": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_44": {
         "type": "TEXT",
         "dest": "field_44"
@@ -1994,7 +1994,7 @@
       }
     },
     "col2__field_141__field_92__field_94": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_94": {
         "type": "REAL",
         "dest": "field_94"
@@ -2025,7 +2025,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_77": {
         "type": "TEXT",
         "dest": "field_77"
@@ -2036,7 +2036,7 @@
       }
     },
     "col0__field_list_string_copy": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_list_string_copy": {
         "type": "TEXT",
         "dest": "field_list_string_copy"
@@ -2046,7 +2046,7 @@
       }
     },
     "col1__field_22__field_42": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_42": {
         "type": "TEXT",
         "dest": "field_42"
@@ -2056,7 +2056,7 @@
       }
     },
     "col0__field_super_nested__subfield_list__subsubfield_list": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "subsubfield_list": {
         "type": "INT",
         "dest": "subsubfield_list"
@@ -2077,7 +2077,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_57": {
         "type": "TEXT",
         "dest": "field_57"
@@ -2105,14 +2105,14 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_12": {
         "type": "INT",
         "dest": "field_12"
       }
     },
     "col3__accent_in_obj_list": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "\u00ef": {
         "type": "TEXT",
         "dest": "\u00ef"
@@ -2145,7 +2145,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_50": {
         "type": "BOOLEAN",
         "dest": "field_50"
@@ -2171,7 +2171,7 @@
       "id_col1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_39": {
         "type": "TIMESTAMP",
         "dest": "field_39"
@@ -2186,7 +2186,7 @@
       }
     },
     "col0__field_list_number_copy": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_list_number_copy": {
         "type": "DOUBLE PRECISION",
         "dest": "field_list_number_copy"
@@ -2196,7 +2196,7 @@
       }
     },
     "col0__field_list_obj__subfield_list": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "subfield_list": {
         "type": "TEXT",
         "dest": "subfield_list"
@@ -2453,7 +2453,7 @@
       }
     },
     "col0__field_list_string": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_list_string": {
         "type": "TEXT",
         "dest": "field_list_string"
@@ -2463,7 +2463,7 @@
       }
     },
     "col0__field_super_nested": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "subfield_list": {
         "type": "_ARRAY",
         "fk": "id_col0__field_super_nested",
@@ -2576,7 +2576,7 @@
       }
     },
     "col0__field_super_nested__subfield_list": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "subsubfield_list": {
         "type": "_ARRAY_OF_SCALARS",
         "fk": "id_col0__field_super_nested__subfield_list",
@@ -2588,7 +2588,7 @@
       }
     },
     "col3__accent_in_list": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "accent_in_list": {
         "type": "TEXT",
         "dest": "accent_in_list"
@@ -2598,7 +2598,7 @@
       }
     },
     "col0__field_list_number": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "field_list_number": {
         "type": "DOUBLE PRECISION",
         "dest": "field_list_number"
@@ -2610,7 +2610,7 @@
   },
   "test_db": {
     "test_col__address__coord": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_test_col": {
         "type": "TEXT"
       },
@@ -2624,7 +2624,7 @@
         "dest": "date",
         "type": "TIMESTAMP"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_test_col": {
         "type": "TEXT"
       },

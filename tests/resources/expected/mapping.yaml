@@ -40,7 +40,7 @@ test_db:
       type: REAL
     id_test_col:
       type: TEXT
-    pk: id
+    pk: _id_postgres
   test_col__grades:
     date:
       dest: date
@@ -50,7 +50,7 @@ test_db:
       type: TEXT
     id_test_col:
       type: TEXT
-    pk: id
+    pk: _id_postgres
     score:
       dest: score
       type: INT

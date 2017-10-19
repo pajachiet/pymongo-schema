@@ -136,7 +136,7 @@
         "type": "BOOLEAN",
         "dest": "subsubfield2"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_coll1__field4": {
         "type": "SERIAL"
       },
@@ -162,7 +162,7 @@
       "id_coll1": {
         "type": "TEXT"
       },
-      "pk": "id"
+      "pk": "_id_postgres"
     },
     "coll3": {
       "_id": {
@@ -187,7 +187,7 @@
       "id_coll1": {
         "type": "TEXT"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "field1": {
         "type": "TEXT",
         "dest": "field1"
@@ -201,7 +201,7 @@
       "id_coll1": {
         "type": "TEXT"
       },
-      "pk": "id"
+      "pk": "_id_postgres"
     }
   }
 }

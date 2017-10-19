@@ -1,7 +1,7 @@
 {
   "test_db": {
     "test_col__address__coord": {
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_test_col": {
         "type": "TEXT"
       },
@@ -15,7 +15,7 @@
         "dest": "date",
         "type": "TIMESTAMP"
       },
-      "pk": "id",
+      "pk": "_id_postgres",
       "id_test_col": {
         "type": "TEXT"
       },

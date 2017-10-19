@@ -170,11 +170,17 @@ def initiate_array_mapping(mongo_field_name, mapping, parent_table_name):
         'fk': fk_name,
     }
 
-    pk_type = get_collection_pk_type(mapping, parent_table_name)
+    # Get type of parent table primary key
+    parent_table_pk = mapping[parent_table_name]['pk']
+    if parent_table_pk == '_id':
+        parent_table_pk_type = mapping[parent_table_name][parent_table_pk]['type']
+    else:
+        parent_table_pk_type = AUTO_GENERATED_PK_TYPE
+
     mapping[linked_table_name] = {
-        'pk': 'id',
+        'pk': '_id_postgres',
         fk_name: {
-            'type': pk_type
+            'type': parent_table_pk_type
         }
     }
     return linked_table_name
@@ -201,21 +207,6 @@ def add_field_to_table_mapping(mongo_field_name, table_mapping, mongo_type, comm
     }
     if comment:
         table_mapping[mongo_field_name]['comment'] = comment
-
-
-def get_collection_pk_type(mapping, table_name):
-    """ Get the type of a table primary key in the mapping
-
-    :param mapping: dict
-    :param table_name: str
-    :return collection_pk_type: str
-    """
-    collection_pk = mapping[table_name]['pk']
-    if collection_pk == '_id':
-        collection_pk_type = mapping[table_name][collection_pk]['type']
-    else:
-        collection_pk_type = AUTO_GENERATED_PK_TYPE
-    return collection_pk_type
 
 
 def to_sql_identifier(identifier):
