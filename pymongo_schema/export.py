@@ -414,7 +414,7 @@ class _SchemaPreProcessing(OutputPreProcessing):
         :return types_count_string : str
         """
         if types_count is None:
-            return None
+            return str(None)
 
         types_count = sorted(types_count.items(), key=lambda x: x[1], reverse=True)
 

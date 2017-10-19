@@ -21,3 +21,6 @@ tests/mongodb
 
 # reports
 .coverage
+
+.DS_Store
+.cache
