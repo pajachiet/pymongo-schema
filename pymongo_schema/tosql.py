@@ -178,7 +178,7 @@ def initiate_array_mapping(mongo_field_name, mapping, parent_table_name):
         parent_table_pk_type = AUTO_GENERATED_PK_TYPE
 
     mapping[linked_table_name] = {
-        'pk': 'id',
+        'pk': '_id_postgres',
         fk_name: {
             'type': parent_table_pk_type
         }

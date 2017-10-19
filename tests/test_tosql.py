@@ -76,7 +76,7 @@ def test04_initiate_array_mapping():
                 'array_field': {'dest': 'parent_table__array_field',
                                 'fk': 'id_parent_table'}},
            'parent_table__array_field': {'id_parent_table': {'type': 'TEXT'},
-                                         'pk': 'id'}}
+                                         'pk': '_id_postgres'}}
     assert res == 'parent_table__array_field'
     assert mapping == exp
 
@@ -92,7 +92,7 @@ def test05_add_scalar_array():
                                                    'type': '_ARRAY_OF_SCALARS',
                                                    'valueField': 'scalar_array_field'}},
            'parent_table__scalar_array_field': {'id_parent_table': {'type': 'TEXT'},
-                                                'pk': 'id',
+                                                'pk': '_id_postgres',
                                                 'scalar_array_field':
                                                     {'dest': 'scalar_array_field',
                                                      'type': 'BOOLEAN'}}}
@@ -144,7 +144,7 @@ def test10_mongo_schema_to_mapping_long(simple_schema, long_schema):
     exp = {'db1':
                {'coll1__field3__subfield2':
                     {'id_coll1__field3': {'type': 'SERIAL'},
-                     'pk': 'id',
+                     'pk': '_id_postgres',
                      'subfield2': {'dest': 'subfield2', 'type': 'TEXT'}},
                 'coll1': {'field2': {'dest': 'field2', 'type': 'TEXT'},
                           'pk': '_id',
@@ -153,7 +153,7 @@ def test10_mongo_schema_to_mapping_long(simple_schema, long_schema):
                                      'fk': 'id_coll1',
                                      'type': '_ARRAY'},
                           'field': {'dest': 'field', 'type': 'TEXT'}},
-                'coll1__field3': {'pk': 'id',
+                'coll1__field3': {'pk': '_id_postgres',
                                   'subfield2': {'dest': 'coll1__field3__subfield2',
                                                 'fk': 'id_coll1__field3',
                                                 'type': '_ARRAY_OF_SCALARS',
