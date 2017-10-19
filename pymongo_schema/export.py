@@ -526,7 +526,7 @@ class HtmlOutput(ListOutput):
     """
     output_format = 'html'
     _default_columns = {
-        'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+        'schema': ['Field_compact_name', 'Field_name', 'Count',
                    'Percentage', 'Types_count']}
 
     def opener(self):
@@ -563,7 +563,7 @@ class MdOutput(ListOutput):
     """
     output_format = 'md'
     _default_columns = {
-        'schema': ['Field_compact_name', 'Field_name', 'Full_name', 'Description', 'Count',
+        'schema': ['Field_compact_name', 'Field_name', 'Count',
                    'Percentage', 'Types_count']}
 
     def opener(self):
