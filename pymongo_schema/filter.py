@@ -16,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Schema of fields to include is based on keys of a dict.
-# PRESENT_VALUE is used as the value for thoses keys...
+# PRESENT_VALUE is used as the value for those keys to keep
 PRESENT_VALUE = 'present'
 
 

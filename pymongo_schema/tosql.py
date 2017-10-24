@@ -14,7 +14,7 @@ from pymongo_schema.mongo_sql_types import psql_type
 logger = logging.getLogger(__name__)
 
 # Type of automatically generated primary keys
-# int in default mongo-connector-postgresql, string in pajachiet branch
+# It may depend from mongo-connector-postgresql branch in use
 AUTO_GENERATED_PK_TYPE = 'SERIAL'
 
 
@@ -31,10 +31,10 @@ def mongo_schema_to_mapping(mongo_schema):
 
         for collection, collection_schema in database_schema.items():
             if not collection_schema['object']:
-                # Skip collection with empty schema
+                logger.warning("Collection '{}' is skipped has its schema is empty.")
                 continue
             if not init_collection_mapping(collection, db_mapping, collection_schema):
-                # in case of False initialization
+                logger.warning("Collection '{}' is skipped because initialisation of its mapping failed.")
                 continue
             add_object_to_mapping(collection_schema['object'], db_mapping, collection)
 
@@ -210,6 +210,6 @@ def add_field_to_table_mapping(mongo_field_name, table_mapping, mongo_type, comm
 
 
 def to_sql_identifier(identifier):
-    """ Replace '.' by '__' in identifier, to make it SQL compliant
+    """ Replace character in MongoDB identifier that are illegal in SQL
     """
-    return identifier.replace('.', '__')
+    return identifier.replace('.', '__').replace('-', '_').replace(' ', '_')
