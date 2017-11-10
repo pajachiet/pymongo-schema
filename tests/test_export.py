@@ -1,8 +1,9 @@
 # coding: utf8
+import filecmp
 from datetime import datetime
 
 import pytest
-import filecmp
+from bson import ObjectId
 from pandas.util.testing import assert_frame_equal
 
 from pymongo_schema.export import *
@@ -230,6 +231,26 @@ def test04_write_xlsx(schema_ex_df):
     res = [cell.value for row in load_workbook(output).active for cell in row]
     exp = [cell.value for row in load_workbook(expected_file).active for cell in row]
     assert res == exp
+    os.remove(output)
+
+
+def test04_write_json_with_mongo_objects():
+    schema = {
+        'db': {'coll': {'object': {'_id': {'type': 'oid', 'anonymized': ObjectId()},
+                                   'date': {'type': 'date', 'anonymized': datetime(2015, 1, 1)}}}}
+    }
+
+    output = os.path.join(TEST_DIR, 'output_data_dict.json')
+    output_maker = JsonOutput({})
+    output_maker.data = schema
+    with open(output, 'w') as out_fd:
+        output_maker.write_data(out_fd)
+    with open(output, 'r') as out_fd:
+        # custom json_options - DEFAULT_JSON_OPTIONS sets tzinfo when loading datetime (!= schema)
+        json_options = json_util.JSONOptions(tz_aware=False)
+        # object_hook allows to interpret $oid, $date, etc from json and convert them to objects
+        object_hook = partial(json_util.object_hook, json_options=json_options)
+        assert json.load(out_fd, object_hook=object_hook) == schema
     os.remove(output)
 
 

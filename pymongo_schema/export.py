@@ -38,6 +38,7 @@ from numbers import Number
 
 import yaml
 import jinja2
+from bson import json_util
 from future.moves.collections import OrderedDict
 from past.builtins import basestring
 import pandas as pd
@@ -492,7 +493,8 @@ class JsonOutput(HierarchicalOutput):
 
     def write_data(self, file_descr):
         """Use json module dump function to write into file_descr (opened with opener)."""
-        json.dump(self.data, file_descr, indent=4, ensure_ascii=False)
+        json.dump(self.data, file_descr, indent=4, ensure_ascii=False,
+                  default=json_util.default)
 
 
 class YamlOutput(HierarchicalOutput):
