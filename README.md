@@ -30,6 +30,8 @@ pip install --upgrade https://github.com/pajachiet/pymongo-schema/archive/master
 ```
 # Usage
 
+## Command line
+
 ```shell
 python -m pymongo_schema -h
 usage: [-h] [--quiet] {extract,transform,tosql,compare} ...
@@ -72,6 +74,20 @@ To display full usage, with options description, run:
 ```shell 
 pymongo-schema <command> -h
 ```
+
+## Python package
+
+pymongo_schema modules can also be imported to be used directly inside python code :
+
+```python
+from pymongo_schema.compare import compare_schemas_bases
+from pymongo_schema.export import transform_data_to_file
+from pymongo_schema.extract import extract_pymongo_client_schema
+from pymongo_schema.filter import filter_mongo_schema_namespaces
+from pymongo_schema.tosql import mongo_schema_to_mapping
+```
+
+Fore more details, refer to modules and functions docstrings.
 
 # Easy examples
 
