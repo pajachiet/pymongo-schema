@@ -213,9 +213,8 @@ def compare_schemas(args):
 
 def load_input_schema(args, opt='input'):
     """Load schema from file or stdin."""
-    try:
-        filename = getattr(args, opt)
-    except AttributeError:
+    filename = getattr(args, opt)
+    if not filename:
         input_schema = json.load(sys.stdin)
     else:
         with open(filename, 'r') as f:
