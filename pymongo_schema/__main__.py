@@ -224,4 +224,5 @@ def load_input_schema(args, opt='input'):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
     main()
