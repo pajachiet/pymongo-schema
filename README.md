@@ -177,17 +177,17 @@ Map this schema to a relational mapping
                       "pets": {"type": "TEXT", "dest": "pets"},
                       "pk": "_id_postgres"}}}
 
-### More complex examples
+### Other examples
 
-extract: Extract the schema for collections `test_collection_1` and `test_collection_2` from `test_db` and write it into `mongo_schema.html` and `mongo_schema.json` files
+**extract:** Extract the schema for collections `test_collection_1` and `test_collection_2` from `test_db` and write it into `mongo_schema.html` and `mongo_schema.json` files
 ```shell
     python -m pymongo_schema extract --databases test_db --collections test_collection_1 test_collection_2 --output mongo_schema --format html json
 ```
-transform: Filter extracted schema (`mongo_schema.json`) using `namespace.json` file and write output into `mongo_schema_filtered.html`, `mongo_schema_filtered.csv` and `mongo_schema_filtered.json` files
+**transform:** Filter extracted schema (`mongo_schema.json`) using `namespace.json` file and write output into `mongo_schema_filtered.html`, `mongo_schema_filtered.csv` and `mongo_schema_filtered.json` files
 ```shell
     python -m pymongo_schema transform mongo_schema.json --filter namespace.json --output mongo_schema_filtered --format html csv json
 ```
-tosql: Create mapping file based on `mongo_schema_filtered.json`
+**tosql:** Create mapping file based on `mongo_schema_filtered.json`
 ```shell
     python -m pymongo_schema tosql mongo_schema_filtered.json --output mapping.json
 ```
