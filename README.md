@@ -126,7 +126,7 @@ Extract the schema from this database, with a json format on standard output
                                     "types_count": {"OBJECT": 3}, "prop_in_object": 0.6, "type": "OBJECT", "count": 3}},
             "count": 5}}}
 
-Extract the same schema to a file in md format.
+Extract the same schema in md format.
 
     $ python -m pymongo_schema extract --database test --format md
     === Start MongoDB schema analysis
