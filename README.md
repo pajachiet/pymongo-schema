@@ -14,7 +14,7 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 - extract the **hierarchical structure** of the schema 
 - versatile output options : json, yaml, tsv, markdown or htlm
 - **finer grained types**. ex: INTEGER, DOUBLE rather than NUMBER 
-- **filtering** of the output schema
+- **filtering** of the output schema, using a `namespace` as defined by [mongo-connector](https://github.com/mongodb-labs/mongo-connector/wiki/Configuration-Options#configure-namespaces)
 - **mapping to a relational schema**
 - **comparison** of successive schema
 
@@ -89,25 +89,53 @@ from pymongo_schema.tosql import mongo_schema_to_mapping
 
 Fore more details, refer to modules and functions docstrings.
 
-# Easy examples
+# Examples
 
 First, lets populate a collection in test database from mongo shell
 
 
-    db.users.insert({name: "Tom", bio: "A nice guy.", pets: ["monkey", "fish"], someWeirdLegacyKey: "I like Ike!"});
-    db.users.insert({name: "Dick", bio: "I swordfight.", birthday: new Date("1974/03/14")});
-    db.users.insert({name: "Harry", pets: "egret", birthday: new Date("1984/03/14"), location:{country:"France", city: "Lyon"}});
-    db.users.insert({name: "Geneviève", bio: "Ça va?", location:{country:"France", city: "Nantes"}});
-    db.users.insert({name: "MadJacques", location:{country:"France", city: "Paris"}});
+    db.users.insert({name: "Tom", bio: "A nice guy.", pets: ["monkey", "fish"], someWeirdLegacyKey: "I like Ike!"})
+    db.users.insert({name: "Dick", bio: "I swordfight.", birthday: new Date("1974/03/14")})
+    db.users.insert({name: "Harry", pets: "egret", birthday: new Date("1984/03/14"), location:{country:"France", city: "Lyon"}})
+    db.users.insert({name: "Geneviève", bio: "Ça va?", location:{country:"France", city: "Nantes"}})
+    db.users.insert({name: "MadJacques", location:{country:"France", city: "Paris"}})
 
+## Bash api examples
+### Easy examples
 
-Extract the schema from this database, with a markdown format on standard output
+Extract the schema from this database, with a json format on standard output
 
-    $ python -m pymongo_schema extract --database test --format md
+    $ python -m pymongo_schema extract --database test
+    === Start MongoDB schema analysis
     Extract schema of database test
     ...collection users
        scanned 5 documents out of 5 (100.00 %)
-    
+    --- MongoDB schema analysis took 0.00 s
+    === Write output
+
+    {"test": {
+        "users": {
+            "object": {"_id": {"prop_in_object": 1.0, "count": 5, "type": "oid", "types_count": {"oid": 5}},
+                       "pets": {"array_types_count": {"string": 2}, "prop_in_object": 0.4, "count": 2, "array_type": "string", "type": "ARRAY", "types_count": {"string": 1, "ARRAY": 1}},
+                       "birthday": {"prop_in_object": 0.4, "count": 2, "type": "date", "types_count": {"date": 2}},
+                       "name": {"prop_in_object": 1.0, "count": 5, "type": "string", "types_count": {"string": 5}},
+                       "bio": {"prop_in_object": 0.6, "count": 3, "type": "string", "types_count": {"string": 3}},
+                       "someWeirdLegacyKey": {"prop_in_object": 0.2, "count": 1, "type": "string", "types_count": {"string": 1}},
+                       "location": {"object": {"country": {"prop_in_object": 1.0, "count": 3, "type": "string", "types_count": {"string": 3}},
+                                               "city": {"prop_in_object": 1.0, "count": 3, "type": "string", "types_count": {"string": 3}}},
+                                    "types_count": {"OBJECT": 3}, "prop_in_object": 0.6, "type": "OBJECT", "count": 3}},
+            "count": 5}}}
+
+Extract the same schema in md format.
+
+    $ python -m pymongo_schema extract --database test --format md
+    === Start MongoDB schema analysis
+    Extract schema of database test
+    ...collection users
+       scanned 5 documents out of 5 (100.00 %)
+    --- MongoDB schema analysis took 0.00 s
+    === Write output
+
     ### Database: test
     #### Collection: users 
     |Field_compact_name     |Field_name             |Count     |Percentage     |Types_count                           |
@@ -122,26 +150,106 @@ Extract the schema from this database, with a markdown format on standard output
     |pets                   |pets                   |2         |40.0           |ARRAY(string : 2) : 1, string : 1     |
     |someWeirdLegacyKey     |someWeirdLegacyKey     |1         |20.0           |string : 1                            |
 
-Extract the same schema to a file in json format.
-
-
-Filter this schema
-
 Map this schema to a relational mapping
 
-# Examples
+    $ python -m pymongo_schema extract --database test | python -m pymongo_schema tosql
+    === Start MongoDB schema analysis
+    Extract schema of database test
+    ...collection users
+       scanned 5 documents out of 5 (100.00 %)
+    --- MongoDB schema analysis took 0.00 s
+    === Write output
+    === Generate mapping from mongo to sql
+    === Write output
 
-extract:
+    {"test":
+     {"users":
+          {"_id": {"type": "TEXT", "dest": "_id"},
+           "pets": {"valueField": "pets", "fk": "id_users", "type": "_ARRAY_OF_SCALARS", "dest": "users__pets"},
+           "location.city": {"type": "TEXT", "dest": "location__city"},
+           "name": {"type": "TEXT", "dest": "name"},
+           "someWeirdLegacyKey": {"type": "TEXT", "dest": "someWeirdLegacyKey"},
+           "pk": "_id",
+           "bio": {"type": "TEXT", "dest": "bio"},
+           "birthday": {"type": "TIMESTAMP", "dest": "birthday"},
+           "location.country": {"type": "TEXT", "dest": "location__country"}},
+      "users__pets": {"id_users": {"type": "TEXT"},
+                      "pets": {"type": "TEXT", "dest": "pets"},
+                      "pk": "_id_postgres"}}}
+
+### Other examples
+
+**extract:** Extract the schema for collections `test_collection_1` and `test_collection_2` from `test_db` and write it into `mongo_schema.html` and `mongo_schema.json` files
 ```shell
     python -m pymongo_schema extract --databases test_db --collections test_collection_1 test_collection_2 --output mongo_schema --format html json
 ```
-transform:
+**transform:** Filter extracted schema (`mongo_schema.json`) using `namespace.json` file and write output into `mongo_schema_filtered.html`, `mongo_schema_filtered.csv` and `mongo_schema_filtered.json` files
 ```shell
     python -m pymongo_schema transform mongo_schema.json --filter namespace.json --output mongo_schema_filtered --format html csv json
 ```
-tosql:
+**tosql:** Create mapping file based on `mongo_schema_filtered.json`
 ```shell
     python -m pymongo_schema tosql mongo_schema_filtered.json --output mapping.json
+```
+
+## Python api examples
+
+Extract the schemas of all collections and all databases in a MongoDB instance:
+
+```python
+import pymongo
+from pymongo_schema.extract import extract_pymongo_client_schema
+
+with pymongo.MongoClient() as client:
+    schema = extract_pymongo_client_schema(client)
+```
+Arguments can be specified to extract only some databases and some collections. See code documentation for more details.
+
+Filter extract schema with a `namespace`:
+```python
+import json
+from pymongo_schema.filter import filter_mongo_schema_namespaces
+
+# assuming a namespace is defined in a file named namespace.json
+with open("namespace.json") as f:
+    namespace = json.load(f)
+
+schema_filtered = filter_mongo_schema_namespaces(schema, namespace)
+```
+
+Save filtered_schema (could be used for schema) to file in json and md formats in a `docs` directory:
+```python
+from pymongo_schema.export import transform_data_to_file
+
+transform_data_to_file(schema_filtered, ['json', 'md'], output='docs/schema_filtered')
+```
+
+Compare filtered_schema (could be used for schema) to another (previous for example) schema:
+```python
+from pymongo_schema.compare import compare_schemas_bases
+
+# assuming a namespace is defined in a file named namespace.json
+with open("old_schema_filtered.json") as f:
+    old_schema_filtered = json.load(f)
+
+differences = compare_schemas_bases(old_schema_filtered, schema_filtered)
+```
+
+Save differences to file in json and md formats in a `docs` directory:
+```python
+transform_data_to_file(differences, ['json', 'md'], output='docs/diff', category='diff')
+```
+
+Transform filtered_schema to a relational mapping:
+```python
+from pymongo_schema.tosql import mongo_schema_to_mapping
+
+mapping = mongo_schema_to_mapping(schema_filtered)
+```
+
+Save mapping to file in json and md formats in a `docs` directory:
+```python
+transform_data_to_file(mapping, ['json', 'md'], output='docs/mapping', category='mapping')
 ```
 
 # Schema
