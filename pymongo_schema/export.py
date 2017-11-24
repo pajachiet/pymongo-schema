@@ -187,7 +187,7 @@ class OutputPreProcessing(object):
         if isinstance(value, (Number, basestring, type(None))):
             return value
         try:
-            return json.dumps(value)
+            return json.dumps(value, sort_keys=True)
         except (ValueError, TypeError):
             return str(value)
 
@@ -494,7 +494,7 @@ class JsonOutput(HierarchicalOutput):
     def write_data(self, file_descr):
         """Use json module dump function to write into file_descr (opened with opener)."""
         json.dump(self.data, file_descr, indent=4, ensure_ascii=False,
-                  default=json_util.default)
+                  default=json_util.default, sort_keys=True)
 
 
 class YamlOutput(HierarchicalOutput):
