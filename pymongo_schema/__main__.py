@@ -38,10 +38,10 @@ def add_subparser_extract(subparsers, parent_parsers):
                            help='Port to connect to MongoDB [default: 27017]')
     subparser.add_argument('--host', default='localhost',
                            help='Server to connect to MongoDB [default: localhost]')
-    subparser.add_argument('--user', default='admin',
-                           help='User to connect to MongoDB [default: admin]')
-    subparser.add_argument('--password', default='',
-                          help='Password to connect to MongoDB [default: '']')
+    subparser.add_argument('--user', default=None,
+                           help='User to connect to MongoDB [default: None]')
+    subparser.add_argument('--password', default=None,
+                           help='Password to connect to MongoDB [default: None]')
 
 
 def add_subparser_transform(subparsers, parent_parsers):
