@@ -175,8 +175,11 @@ def extract_schema(args):
     """ Main entry point function to extract schema."""
     start_time = time()
     logger.info('=== Start MongoDB schema analysis')
-    client = pymongo.MongoClient(host=args.host, port=args.port, username=args.user, password=args.password)
-
+    if args.password:
+        client = pymongo.MongoClient(host=args.host, port=args.port, username=args.user, password=args.password)
+    else
+        client = pymongo.MongoClient(host=args.host, port=args.port)
+    
     mongo_schema = extract_pymongo_client_schema(client,
                                                  database_names=args.databases,
                                                  collection_names=args.collections)
