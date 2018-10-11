@@ -177,7 +177,7 @@ def extract_schema(args):
     logger.info('=== Start MongoDB schema analysis')
     if args.password:
         client = pymongo.MongoClient(host=args.host, port=args.port, username=args.user, password=args.password)
-    else
+    else:
         client = pymongo.MongoClient(host=args.host, port=args.port)
     
     mongo_schema = extract_pymongo_client_schema(client,
