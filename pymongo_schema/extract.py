@@ -50,13 +50,15 @@ from pymongo_schema.mongo_sql_types import get_type_string, common_parent_type
 logger = logging.getLogger(__name__)
 
 
-def extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None):
+def extract_pymongo_client_schema(pymongo_client, database_names=None, collection_names=None, sample_size=0):
     """ Extract the schema for every database in database_names
 
     :param pymongo_client: pymongo.mongo_client.MongoClient
     :param database_names: str, list of str, default None
     :param collection_names: str, list of str, default None
         Will be used for every database in database_names list
+    :param sample_size: int, default 0
+        Will be used for all collection
     :return mongo_schema: dict
     """
 
@@ -72,18 +74,19 @@ def extract_pymongo_client_schema(pymongo_client, database_names=None, collectio
     for database in database_names:
         logger.info('Extract schema of database %s', database)
         pymongo_database = pymongo_client[database]
-        database_schema = extract_database_schema(pymongo_database, collection_names)
+        database_schema = extract_database_schema(pymongo_database, collection_names, sample_size)
         if database_schema:  # Do not add a schema if it is empty
             mongo_schema[database] = database_schema
 
     return mongo_schema
 
 
-def extract_database_schema(pymongo_database, collection_names=None):
+def extract_database_schema(pymongo_database, collection_names=None, sample_size=0):
     """ Extract the database schema, for every collection in collection_names
 
     :param pymongo_database: pymongo.database.Database
     :param collection_names: str, list of str, default None
+    :param sample_size: int, default 0
     :return database_schema: dict
     """
     if isinstance(collection_names, basestring):
@@ -99,12 +102,12 @@ def extract_database_schema(pymongo_database, collection_names=None):
     for collection in collection_names:
         logger.info('...collection %s', collection)
         pymongo_collection = pymongo_database[collection]
-        database_schema[collection] = extract_collection_schema(pymongo_collection)
+        database_schema[collection] = extract_collection_schema(pymongo_collection, sample_size)
 
     return database_schema
 
 
-def extract_collection_schema(pymongo_collection):
+def extract_collection_schema(pymongo_collection, sample_size=0):
     """ Iterate through all document of a collection to create its schema
 
     - Init collection schema
@@ -112,6 +115,7 @@ def extract_collection_schema(pymongo_collection):
     - Post-process schema
 
     :param pymongo_collection: pymongo.collection.Collection
+    :param sample_size: int, default 0
     :return collection_schema: dict
     """
     collection_schema = {
@@ -121,8 +125,16 @@ def extract_collection_schema(pymongo_collection):
 
     n = pymongo_collection.count()
     collection_schema['count'] = n
-    for document in pymongo_collection.aggregate([{'$sample': {'size': 1000}}], allowDiskUse=True):
+    if sample_size:
+        documents = pymongo_collection.aggregate([{'$sample': {'size': sample_size}}], allowDiskUse=True)
+    else:
+        documents = pymongo_collection.find({})
+    i = 0
+    for document in documents:
         add_document_to_object_schema(document, collection_schema['object'])
+        i += 1
+        if i % 10 ** 5 == 0 or i == n:
+            logger.info('   scanned %s documents out of %s (%.2f %%)', i, n, (100. * i) / n)
 
     post_process_schema(collection_schema)
     collection_schema = recursive_default_to_regular_dict(collection_schema)

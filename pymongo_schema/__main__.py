@@ -34,6 +34,9 @@ def add_subparser_extract(subparsers, parent_parsers):
     subparser.add_argument('-c', '--collections', nargs='*',
                            help='Only analyze those collections. By default analyze all '
                                 'collections in each database')
+    subparser.add_argument('--size', default=0, type=int,
+                           help='Only analyze limited rows with random. By default analyze all '
+                                'rows in each collections')
     subparser.add_argument('--port', default=27017, type=int,
                            help='Port to connect to MongoDB [default: 27017]')
     subparser.add_argument('--host', default='localhost',
@@ -182,7 +185,8 @@ def extract_schema(args):
     
     mongo_schema = extract_pymongo_client_schema(client,
                                                  database_names=args.databases,
-                                                 collection_names=args.collections)
+                                                 collection_names=args.collections,
+                                                 sample_size=args.size)
 
     logger.info('--- MongoDB schema analysis took %.2f s', time() - start_time)
     return mongo_schema
