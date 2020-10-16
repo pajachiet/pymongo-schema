@@ -129,12 +129,13 @@ def extract_collection_schema(pymongo_collection, sample_size=0):
         documents = pymongo_collection.aggregate([{'$sample': {'size': sample_size}}], allowDiskUse=True)
     else:
         documents = pymongo_collection.find({})
+    scan_count = sample_size or n
     i = 0
     for document in documents:
         add_document_to_object_schema(document, collection_schema['object'])
         i += 1
-        if i % 10 ** 5 == 0 or i == n:
-            logger.info('   scanned %s documents out of %s (%.2f %%)', i, n, (100. * i) / n)
+        if i % 10 ** 5 == 0 or i == scan_count:
+            logger.info('   scanned %s documents out of %s (%.2f %%)', i, scan_count, (100. * i) / scan_count)
 
     post_process_schema(collection_schema)
     collection_schema = recursive_default_to_regular_dict(collection_schema)

@@ -53,7 +53,7 @@ Usage:
     python -m pymongo_schema extract -h
     usage:  [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--port PORT] [--host HOST]
                  [-d [DATABASES [DATABASES ...]]] [-c [COLLECTIONS [COLLECTIONS ...]]]
-                 [--columns COLUMNS [COLUMNS ...]] [--without-counts]
+                 [--columns COLUMNS [COLUMNS ...]] [--size SIZE] [--without-counts]
                  
     python -m pymongo_schema transform -h
     usage: [-h] [-f [FORMATS [FORMATS ...]]] [-o OUTPUT] [--category CATEGORY] [-n FILTER]
@@ -182,6 +182,10 @@ Map this schema to a relational mapping
 **extract:** Extract the schema for collections `test_collection_1` and `test_collection_2` from `test_db` and write it into `mongo_schema.html` and `mongo_schema.json` files
 ```shell
     python -m pymongo_schema extract --databases test_db --collections test_collection_1 test_collection_2 --output mongo_schema --format html json
+```
+**extract:** Extract the schema for collection `test_collection_1` with only 1000 random rows scanned and write it into `mongo_schema.html` files
+```shell
+    python -m pymongo_schema extract --collections test_collection_1 --size 1000 --output mongo_schema --format html
 ```
 **transform:** Filter extracted schema (`mongo_schema.json`) using `namespace.json` file and write output into `mongo_schema_filtered.html`, `mongo_schema_filtered.csv` and `mongo_schema_filtered.json` files
 ```shell
