@@ -1,4 +1,4 @@
-pymongo
+pymongo>=4.0.0
 pyyaml
 docopt
 git+https://github.com/etetoolkit/ete.git
@@ -8,6 +8,6 @@ xlsxwriter
 openpyxl
 python-coveralls
 jinja2
-future==0.16.0
-pytest==3.2.1
-pytest-cov==2.5.1
+future>=0.18.0
+pytest>=7.0.0
+pytest-cov>=3.00
