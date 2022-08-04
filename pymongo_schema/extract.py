@@ -66,7 +66,7 @@ def extract_pymongo_client_schema(pymongo_client, database_names=None, collectio
         database_names = [database_names]
 
     if database_names is None:
-        database_names = pymongo_client.database_names()
+        database_names = pymongo_client.list_database_names()
         database_names.remove('admin')
         database_names.remove('local')
 
@@ -92,7 +92,7 @@ def extract_database_schema(pymongo_database, collection_names=None, sample_size
     if isinstance(collection_names, basestring):
         collection_names = [collection_names]
 
-    database_collections = pymongo_database.collection_names(include_system_collections=False)
+    database_collections = pymongo_database.list_collection_names()
     if collection_names is None:
         collection_names = database_collections
     else:
@@ -123,7 +123,7 @@ def extract_collection_schema(pymongo_collection, sample_size=0):
         "object": init_empty_object_schema()
     }
 
-    n = pymongo_collection.count()
+    n = pymongo_collection.estimated_document_count()
     collection_schema['count'] = n
     if sample_size:
         documents = pymongo_collection.aggregate([{'$sample': {'size': sample_size}}], allowDiskUse=True)

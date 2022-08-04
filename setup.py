@@ -4,11 +4,11 @@
 from setuptools import setup
 
 setup(name='pymongo-schema',
-      version='0.3',
+      version='0.4',
       description='A schema analyser for MongoDB written in Python',
       packages=['pymongo_schema'],
       install_requires=[
-          'pymongo',
+          'pymongo>=4.0.0',
           'pyyaml',
           'docopt',
           'ete3',
@@ -17,7 +17,7 @@ setup(name='pymongo-schema',
           'xlsxwriter',
           'openpyxl',
           'jinja2',
-          'future==0.16.0',
+          'future>=0.18.0',
           'scipy'
       ],
       dependency_links=[
