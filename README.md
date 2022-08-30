@@ -24,9 +24,14 @@ This tools is inspired by [variety](https://github.com/variety/variety), with th
 
 # Install
 
-Before distribution of a stable distribution on PyPi, you can install pymongo-schema from github : 
+You can install latest stable version PyPi :
 ```shell
-pip install --upgrade https://github.com/pajachiet/pymongo-schema/archive/master.zip
+pip install --upgrade pymongo-schema
+```
+
+Or directly from github : 
+```shell
+pip install --upgrade git+https://github.com/pajachiet/pymongo-schema
 ```
 # Usage
 
@@ -306,7 +311,7 @@ The code base should be easy to read and improve upon. Contributions are welcome
 ## Mixed types handling
 pymongo-schema handles mixed types by looking for the lowest common parent type in the following tree.
 
-<img src="type_tree.png" alt="type_tree" width=700/>
+<img src="https://raw.githubusercontent.com/pajachiet/pymongo-schema/master/type_tree.png" alt="type_tree" width=700/>
 
 If a field contains both arrays and scalars, it is considered as an array. The 'array_type' is defined as the common parent type of scalars and array_types encountered in this field. 
 
@@ -356,11 +361,3 @@ To tackle bigger databases, it certainly would be usefull to implement the follo
 
 ## Tests
 The codebase is still under development. It should not be trusted blindly.
-
-## Distribution
-
-Will be distributed in PyPi
-
-
-
-
