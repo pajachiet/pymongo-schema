@@ -362,44 +362,8 @@ To tackle bigger databases, it certainly would be usefull to implement the follo
 ## Tests
 The codebase is still under development. It should not be trusted blindly.
 
-## Manual Testing
+## Devcontainer
 
-- Prerequisites: Docker and VS Code Dev Containers, or Docker Compose.
-- Dev Container:
-    - Open this folder in a Dev Container; the MongoDB sidecar starts automatically.
-    - Fixtures import runs via postCreateCommand: `scripts/init_mongo_from_json.py`.
-    - Run tests:
-        ```bash
-        /workspaces/pymongo-schema/.venv/bin/python -m pytest -q
-        ```
-- Outside Dev Container:
-    - Start MongoDB:
-        ```bash
-        docker run -d --name mongo -p 27017:27017 mongo:7
-        ```
-    - Import fixtures:
-        ```bash
-        python3 scripts/init_mongo_from_json.py
-        ```
-    - Run tests:
-        ```bash
-        pytest -q
-        ```
+This project contains a devcontainer definition.
 
-Notes:
-- Compatible with Python 3.13; uses `ete4` (replaces `ete3`).
-- Dates and ObjectIds are parsed from Extended JSON using `bson.json_util`.
-
-## Contributing
-
-- Keep changes minimal and focused; avoid unrelated fixes.
-- Conventional Commits:
-    - `feat:` new feature; `fix:` bug fix; `docs:` docs; `chore:` tooling/infra; `refactor:` code cleanup; `test:` tests.
-    - Breaking changes: add `!` (e.g., `fix!: ...`) and document rationale.
-- Testing:
-    - Use the devcontainer; ensure all tests pass (`pytest -q`).
-    - Functional tests require MongoDB running on `localhost:27017`.
-- Development tips:
-    - Run `scripts/init_mongo_from_json.py` to load fixtures.
-    - Pandas testing uses `pandas.testing.assert_frame_equal`.
-    - ETE Tree API uses `common_ancestor()` and a programmatic type tree setup.
+Just open the project in VS Code and hit `[CTRL]` + `[SHIFT]` + `[P]` > `Reopen in container` and it will launch the dev container with all dependencies installed.
