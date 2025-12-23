@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  mongodb:
+    image: mongo:7
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 })"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    image: mcr.microsoft.com/devcontainers/python:3.13
+    # Share network namespace with mongodb so tests using localhost:27017 work unchanged
+    network_mode: service:mongodb
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ..:/workspaces/pymongo-schema:cached
+    command: sleep infinity

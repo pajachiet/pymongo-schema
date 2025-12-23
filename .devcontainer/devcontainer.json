@@ -1,0 +1,21 @@
+{
+    "name": "pymongo-schema",
+    "dockerComposeFile": [
+        "docker-compose.yml"
+    ],
+    "service": "app",
+    "workspaceFolder": "/workspaces/pymongo-schema",
+    "features": {},
+    "forwardPorts": [
+        27017
+    ],
+    "postCreateCommand": "python3 scripts/init_mongo_from_json.py",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    }
+}
