@@ -18,7 +18,7 @@ Module grouping all TYPE's related issues
 import logging
 
 import bson
-from ete3 import Tree
+from ete4 import Tree
 
 logger = logging.getLogger(__name__)
 
@@ -71,26 +71,31 @@ def get_type_string(value):
 # Define and use type_string_tree,
 # to get the least common parent type_string from a list of type_string
 
-NEWICK_TYPES_STRING_TREE = """
-(
-    (
-        (
-            float, 
-            ((boolean) integer) biginteger
-        ) number,
-        (
-            oid, 
-            dbref
-        ) string,
-        date,
-        timestamp,
-        unknown
-    ) general_scalar,
-    OBJECT
-) mixed_scalar_object
-;"""
+def _build_types_string_tree():
+    t = Tree()
+    t.name = 'mixed_scalar_object'
 
-TYPES_STRING_TREE = Tree(NEWICK_TYPES_STRING_TREE, format=8)
+    general = t.add_child(name='general_scalar')
+
+    number = general.add_child(name='number')
+    number.add_child(name='float')
+    biginteger = number.add_child(name='biginteger')
+    integer = biginteger.add_child(name='integer')
+    integer.add_child(name='boolean')
+
+    string = general.add_child(name='string')
+    string.add_child(name='oid')
+    string.add_child(name='dbref')
+
+    general.add_child(name='date')
+    general.add_child(name='timestamp')
+    general.add_child(name='unknown')
+
+    t.add_child(name='OBJECT')
+
+    return t
+
+TYPES_STRING_TREE = _build_types_string_tree()
 
 
 def common_parent_type(list_of_type_string):
@@ -105,7 +110,7 @@ def common_parent_type(list_of_type_string):
     list_of_type_string = list(set(list_of_type_string))
     if len(list_of_type_string) == 1:
         return list_of_type_string[0]
-    return TYPES_STRING_TREE.get_common_ancestor(*list_of_type_string).name
+    return TYPES_STRING_TREE.common_ancestor(*list_of_type_string).name
 
 
 def generate_type_tree_figure(output_file):
@@ -117,7 +122,7 @@ def generate_type_tree_figure(output_file):
     :param output_file: str
     """
     try:
-        from ete3 import faces, TextFace, TreeStyle
+        from ete4 import faces, TextFace, TreeStyle
     except ImportError as e:
         logger.warning('ImportError : %s Generation of type_tree figure need ETE dependencies to '
                        'be installed Use from anaconda, or look at installation procedure on '
