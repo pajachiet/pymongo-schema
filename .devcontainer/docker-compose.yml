@@ -12,7 +12,9 @@ services:
       retries: 20
 
   app:
-    image: mcr.microsoft.com/devcontainers/python:3.13
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile
     # Share network namespace with mongodb so tests using localhost:27017 work unchanged
     network_mode: service:mongodb
     depends_on:

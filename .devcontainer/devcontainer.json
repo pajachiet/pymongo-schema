@@ -9,7 +9,7 @@
     "forwardPorts": [
         27017
     ],
-    "postCreateCommand": "python3 scripts/init_mongo_from_json.py",
+    "postCreateCommand": "./tests/db_init.sh",
     "customizations": {
         "vscode": {
             "extensions": [
